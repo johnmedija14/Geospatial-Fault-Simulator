@@ -290,6 +290,25 @@ body {
     border-radius: 8px;
     max-width: 360px;
 }
+    .card {
+    transition: all .35s ease;
+}
+
+.infoRow {
+    animation: fadeIn .35s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 </style>
 </head>
 
@@ -467,14 +486,101 @@ dashboard.style = `display:none;`;
 document.body.appendChild(dashboard);
 
 const riskNodes = [
-{region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050},
-{region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200},
-{region:"qc", name:"Batasan Hills", lon:121.0850, lat:14.6900},
-{region:"qc", name:"Loyola Heights", lon:121.0750, lat:14.6500},
-{region:"pasig", name:"Marikina", lon:121.1000, lat:14.6600},
-{region:"pasig", name:"Pasig", lon:121.0800, lat:14.5900},
-{region:"south", name:"Taguig", lon:121.0500, lat:14.5200},
-{region:"south", name:"Muntinlupa", lon:121.0400, lat:14.4500}
+{
+    region:"north",
+    name:"San Jose del Monte",
+    lon:121.0450,
+    lat:14.8050,
+    population:"651,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Residential expansion zones"
+},
+
+{
+    region:"north",
+    name:"Rodriguez–San Mateo",
+    lon:121.1500,
+    lat:14.7200,
+    population:"580,000",
+    intensity:"VIII",
+    rupture:"High",
+    liquefaction:"Moderate",
+    structures:"Hillside communities"
+},
+
+{
+    region:"qc",
+    name:"Batasan Hills",
+    lon:121.0850,
+    lat:14.6900,
+    population:"166,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"Low",
+    structures:"Dense residential communities"
+},
+
+{
+    region:"qc",
+    name:"Loyola Heights",
+    lon:121.0750,
+    lat:14.6500,
+    population:"34,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Universities and institutions"
+},
+
+{
+    region:"pasig",
+    name:"Marikina",
+    lon:121.1000,
+    lat:14.6600,
+    population:"456,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"High",
+    structures:"Commercial and residential districts"
+},
+
+{
+    region:"pasig",
+    name:"Pasig",
+    lon:121.0800,
+    lat:14.5900,
+    population:"803,000",
+    intensity:"VIII",
+    rupture:"High",
+    liquefaction:"Moderate",
+    structures:"CBD and mixed developments"
+},
+
+{
+    region:"south",
+    name:"Taguig",
+    lon:121.0500,
+    lat:14.5200,
+    population:"887,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"High",
+    structures:"BGC and residential towers"
+},
+
+{
+    region:"south",
+    name:"Muntinlupa",
+    lon:121.0400,
+    lat:14.4500,
+    population:"544,000",
+    intensity:"VII",
+    rupture:"Low",
+    liquefaction:"Low",
+    structures:"Residential subdivisions"
+}
 ];
 
 let markers = [];
@@ -499,40 +605,64 @@ function riskFromDistance(km) {
 }
 
 function updateSelectedInfo(data) {
+
     const info = document.getElementById("selectedInfo");
     const analysis = document.getElementById("analysisBox");
-    const statusTitle = document.getElementById("statusTitle");
-    const statusSub = document.getElementById("statusSub");
 
-    if (!data) {
+    if(!data){
         info.innerHTML = "";
-        analysis.textContent = "AI analysis will appear here after selection.";
-        statusTitle.textContent = "READY";
-        statusSub.textContent = "Tap a marker or the map to analyze risk";
+        analysis.innerHTML =
+        "Select a location to begin hazard analysis.";
         return;
     }
 
-    const km = getDistanceKm(currentCenter.lon, currentCenter.lat, data.lon, data.lat);
-    const risk = riskFromDistance(km);
-    const intensity = Math.max(1, Math.min(10, Math.round(10 - km / 2)));
-    const estimatedImpact = Math.max(5, Math.round(100 - km * 4));
-    const confidence = Math.max(78, Math.min(99, 98 - Math.round(km)));
-
     info.innerHTML = `
-        <div class="infoRow"><span class="infoLabel">Name</span><span class="infoValue">${data.name}</span></div>
-        <div class="infoRow"><span class="infoLabel">Region</span><span class="infoValue">${data.region}</span></div>
-        <div class="infoRow"><span class="infoLabel">Latitude</span><span class="infoValue">${data.lat.toFixed(4)}</span></div>
-        <div class="infoRow"><span class="infoLabel">Longitude</span><span class="infoValue">${data.lon.toFixed(4)}</span></div>
-        <div class="infoRow"><span class="infoLabel">Distance to fault</span><span class="infoValue">${km.toFixed(2)} km</span></div>
+        <div class="infoRow">
+            <span class="infoLabel">Location</span>
+            <span class="infoValue">${data.name}</span>
+        </div>
+
+        <div class="infoRow">
+            <span class="infoLabel">Population</span>
+            <span class="infoValue">${data.population}</span>
+        </div>
+
+        <div class="infoRow">
+            <span class="infoLabel">Expected Intensity</span>
+            <span class="infoValue">${data.intensity}</span>
+        </div>
+
+        <div class="infoRow">
+            <span class="infoLabel">Ground Rupture</span>
+            <span class="infoValue">${data.rupture}</span>
+        </div>
+
+        <div class="infoRow">
+            <span class="infoLabel">Liquefaction Risk</span>
+            <span class="infoValue">${data.liquefaction}</span>
+        </div>
+
+        <div class="infoRow">
+            <span class="infoLabel">Critical Structures</span>
+            <span class="infoValue">${data.structures}</span>
+        </div>
     `;
 
     analysis.innerHTML = `
-        <b>AI Analysis:</b> ${data.name} is assessed as <span style="color:${risk.color}">${risk.label} Risk</span>.<br>
-        Estimated intensity: <b>${intensity}/10</b> · Impact score: <b>${estimatedImpact}%</b> · Confidence: <b>${confidence}%</b>.
-    `;
+        <b>Automated Hazard Assessment</b><br><br>
 
-    statusTitle.textContent = "LOCATION SELECTED";
-    statusSub.textContent = `${data.name} · ${risk.label} risk · ${km.toFixed(2)} km from center`;
+        ${data.name} lies within the influence area of the
+        West Valley Fault system.
+
+        Expected shaking intensity is approximately
+        PHIVOLCS Intensity ${data.intensity} during a
+        magnitude 7.2 rupture scenario.
+
+        Ground rupture risk is classified as
+        <b>${data.rupture}</b> while liquefaction
+        susceptibility is estimated to be
+        <b>${data.liquefaction}</b>.
+    `;
 }
 
 function setCenterMarker(lon, lat, name) {
@@ -591,12 +721,8 @@ function render(region) {
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
                 pixelOffset: new Cesium.Cartesian2(0, -18)
             },
-            properties: {
-                name: n.name,
-                region: n.region,
-                lon: n.lon,
-                lat: n.lat
-            }
+            properties:n
+        
         });
 
         markers.push(entity);
@@ -623,20 +749,33 @@ render("all");
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
 
-viewer.scene.primitives.add(Cesium.createOsmBuildings());
-
 viewer.selectedEntityChanged.addEventListener(function(entity) {
+
     if (!entity || !entity.properties) return;
 
+    const props = entity.properties;
+
     const data = {
-        name: entity.properties.name.getValue(),
-        region: entity.properties.region.getValue(),
-        lon: entity.properties.lon.getValue(),
-        lat: entity.properties.lat.getValue()
+        name: props.name.getValue(),
+        region: props.region.getValue(),
+        lon: props.lon.getValue(),
+        lat: props.lat.getValue(),
+        population: props.population.getValue(),
+        intensity: props.intensity.getValue(),
+        rupture: props.rupture.getValue(),
+        liquefaction: props.liquefaction.getValue(),
+        structures: props.structures.getValue()
     };
 
     selectedEntityData = data;
     updateSelectedInfo(data);
+    viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(
+        data.lon,
+        data.lat,
+        9000
+    ),
+    duration: 1.5
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -646,16 +785,19 @@ handler.setInputAction(function(click) {
 
     if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
         viewer.selectedEntity = picked.id;
-        const data = {
-            name: picked.id.properties.name.getValue(),
-            region: picked.id.properties.region.getValue(),
-            lon: picked.id.properties.lon.getValue(),
-            lat: picked.id.properties.lat.getValue()
-        };
-        selectedEntityData = data;
-        updateSelectedInfo(data);
-        return;
-    }
+        const props = picked.id.properties;
+
+const data = {
+    name: props.name.getValue(),
+    region: props.region.getValue(),
+    lon: props.lon.getValue(),
+    lat: props.lat.getValue(),
+    population: props.population.getValue(),
+    intensity: props.intensity.getValue(),
+    rupture: props.rupture.getValue(),
+    liquefaction: props.liquefaction.getValue(),
+    structures: props.structures.getValue()
+};
 
     const cartesian = viewer.scene.pickPosition(click.position);
     if (!Cesium.defined(cartesian)) {
