@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake Simulation</title>
+
+    <!-- Cesium CSS -->
+    <link
+        href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css"
+        rel="stylesheet"
+    />
+
+    <!-- Cesium JS -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #cesiumContainer {
+            width: 80%;
+            height: 600px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Earthquake Simulation</h1>
+    <p>Explore how faults behave during earthquakes.</p>
+
+    <div id="cesiumContainer"></div>
+
+    <script>
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4Y2ZjZTA2ZC02NGYwLTRlNjYtOTk3NS1jMmI5MTk4MzkzODgiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiVW50aXRsZWQiLCJpYXQiOjE3ODI3NTM1NTl9.5kgEFRZLxvxAXEARAXWwFvxvx9r0BFf5N-0OA5hVwEk';
+
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            animation: false,
+            timeline: false,
+            homeButton: true,
+            geocoder: true,
+            sceneModePicker: true,
+            baseLayerPicker: true,
+            navigationHelpButton: true
+        });
+
+        // Force camera to Batasan Hills
+        viewer.camera.setView({
+            destination: Cesium.Cartesian3.fromDegrees(
+                121.0953,
+                14.6892,
+                100000
+            )
+        });
+
+        // Add a marker so we know we reached the correct location
+        viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(
+                121.0953,
+                14.6892
+            ),
+            point: {
+                pixelSize: 15
+            },
+            label: {
+                text: 'Batasan Hills National High School',
+                pixelOffset: new Cesium.Cartesian2(0, -25)
+            }
+        });
+    </script>
+</body>
+</html>
