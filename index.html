@@ -32,12 +32,12 @@
 
 <body>
     <h1>Earthquake Simulation</h1>
-    <p>Explore how faults behave during earthquakes.</p>
+    <p>Explore vulnerable areas near the West Valley Fault</p>
 
     <div id="cesiumContainer"></div>
 
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4Y2ZjZTA2ZC02NGYwLTRlNjYtOTk3NS1jMmI5MTk4MzkzODgiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiVW50aXRsZWQiLCJpYXQiOjE3ODI3NTM1NTl9.5kgEFRZLxvxAXEARAXWwFvxvx9r0BFf5N-0OA5hVwEk';
+        Cesium.Ion.defaultAccessToken = 'YOUR_TOKEN_HERE';
 
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
@@ -49,36 +49,102 @@
             navigationHelpButton: true
         });
 
-        // Force camera to Batasan Hills
+        const westValleyFault = [
+    121.0750, 14.7500,
+    121.0850, 14.7300,
+    121.0950, 14.7100,
+    121.1000, 14.6900,
+    121.1050, 14.6700,
+    121.1100, 14.6500,
+    121.1200, 14.6300
+];
+
+        viewer.entities.add({
+    name: "West Valley Fault",
+    polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
+        width: 6,
+        material: new Cesium.PolylineGlowMaterialProperty({
+            glowPower: 0.4,
+            color: Cesium.Color.ORANGERED.withAlpha(0.9)
+        }),
+        clampToGround: true
+    }
+});
+
+        // Camera view: Batasan Hills
         viewer.camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(
                 121.0990,  // longitude
                 14.6905,   // latitude
-                5000       // altitude in meters
+                5000       // altitude
             ),
-           orientation: {
-               heading: 0,
-               pitch: Cesium.Math.toRadians(-90),
-               roll: 0
-    }
-});
-            )
-        });
-
-        // Add a marker so we know we reached the correct location
-        viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(
-                121.0953,
-                14.6892
-            ),
-            point: {
-                pixelSize: 15
-            },
-            label: {
-                text: 'Batasan Hills National High School',
-                pixelOffset: new Cesium.Cartesian2(0, -25)
+            orientation: {
+                heading: 0,
+                pitch: Cesium.Math.toRadians(-45),
+                roll: 0
             }
         });
+
+        // Vulnerable sites list
+        const vulnerableSites = [
+            {
+                name: "Batasan Hills National High School",
+                lon: 121.0953,
+                lat: 14.6892
+            },
+            {
+                name: "Batasang Pambansa Complex",
+                lon: 121.1008,
+                lat: 14.6908
+            },
+            {
+                name: "Batasan-San Mateo Road",
+                lon: 121.1025,
+                lat: 14.6920
+            },
+            {
+                name: "Filinvest 1",
+                lon: 121.1030,
+                lat: 14.6875
+            },
+            {
+                name: "Manggahan",
+                lon: 121.1060,
+                lat: 14.6940
+            },
+            {
+                name: "Barangay Hall of Batasan Hills",
+                lon: 121.0972,
+                lat: 14.6887
+            }
+        ];
+
+        // Add markers dynamically
+        vulnerableSites.forEach(site => {
+            viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(
+                    site.lon,
+                    site.lat
+                ),
+                point: {
+                    pixelSize: 12,
+                    color: Cesium.Color.RED,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 2
+                },
+                label: {
+                    text: site.name,
+                    font: '14px sans-serif',
+                    pixelOffset: new Cesium.Cartesian2(0, -20),
+                    scale: 0.8,
+                    disableDepthTestDistance: Number.POSITIVE_INFINITY
+                }
+            });
+        });
+
+        viewer.zoomTo(viewer.entities);
+
     </script>
 </body>
 </html>
