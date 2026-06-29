@@ -1,382 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earthquake Simulation</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earthquake Simulation</title>
 
-    <!-- Cesium CSS -->
-    <link rel="stylesheet"
-      href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css">
+<link rel="stylesheet"
+  href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css">
 
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
 
-        #cesiumContainer {
-            width: 80%;
-            height: 600px;
-            margin: 20px auto;
-            border: 1px solid #ccc;
-        }
-    </style>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+}
+
+#cesiumContainer {
+    width: 100%;
+    height: 90vh;
+}
+
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 999;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+button {
+    margin: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+</style>
 </head>
 
 <body>
-    <h1>Earthquake Simulation</h1>
-    <p>Explore vulnerable areas near the West Valley Fault</p>
 
-    <div id="cesiumContainer"></div>
+<div id="ui">
+    <button onclick="goAll()">ALL</button>
+    <button onclick="goNorth()">NORTH</button>
+    <button onclick="goQC()">QC</button>
+    <button onclick="goMarikina()">MARIKINA</button>
+    <button onclick="goSouth()">SOUTH</button>
+</div>
+
+<div id="cesiumContainer"></div>
 
 <script>
-    Cesium.Ion.defaultAccessToken =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3YjFmYmJlZC1lOGY1LTQzNWQtOTIyMS1mOTEzZmU0YzlhNDUiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NTY4MzJ9.mstQlEVlZoLRqcB51qexbpIzXh6PVr_WOHTc47orRxs';
 
-    const viewer = new Cesium.Viewer('cesiumContainer', {
-        animation: false,
-        timeline: false,
-        homeButton: true,
-        geocoder: true,
-        sceneModePicker: true,
-        baseLayerPicker: true,
-        navigationHelpButton: true,
-        infoBox: true
-    });
+Cesium.Ion.defaultAccessToken = "YOUR_TOKEN";
 
-    viewer.scene.globe.enableLighting = false;
-    viewer.scene.globe.depthTestAgainstTerrain = false;
+const viewer = new Cesium.Viewer('cesiumContainer', {
+    animation: false,
+    timeline: false,
+    infoBox: true
+});
 
-    // =====================================================
-    // 1. WEST VALLEY FAULT (FULL UPDATED TRACE)
-    // =====================================================
-    const westValleyFault = [
-        121.0470, 14.8800,
-        121.0550, 14.8600,
-        121.0600, 14.8350,
-        121.0750, 14.8050,
-        121.0900, 14.7750,
-        121.1050, 14.7450,
-        121.0900, 14.7150,
-        121.0850, 14.7000,
-        121.0920, 14.6900,
-        121.1050, 14.6700,
-        121.1150, 14.6500,
-        121.1200, 14.6300,
-        121.1100, 14.6100,
-        121.1000, 14.5900,
-        121.0950, 14.5700,
-        121.0850, 14.5500,
-        121.0700, 14.5200
-    ];
+viewer.scene.globe.depthTestAgainstTerrain = false;
 
-    viewer.entities.add({
-        name: "West Valley Fault",
-        polyline: {
-            positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
-            width: 6,
-            material: new Cesium.PolylineGlowMaterialProperty({
-                glowPower: 0.4,
-                color: Cesium.Color.ORANGERED.withAlpha(0.9)
-            })
-        }
-    });
-
-    // =====================================================
-    // 2. FAULT BUFFER ZONE (REAL CORRIDOR)
-    // =====================================================
-    viewer.entities.add({
-        name: "Fault Hazard Corridor",
-        corridor: {
-            positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
-            width: 5000, // 5km total width
-            material: Cesium.Color.RED.withAlpha(0.15),
-            outline: true,
-            outlineColor: Cesium.Color.RED.withAlpha(0.4)
-        }
-    });
-
-    // =====================================================
-    // 3. DISTANCE + RISK FUNCTION
-    // =====================================================
-    function getDistanceKm(lon, lat, faultPoints) {
-        let minDist = Infinity;
-
-        for (let i = 0; i < faultPoints.length; i += 2) {
-            const fLon = faultPoints[i];
-            const fLat = faultPoints[i + 1];
-
-            const dist = Cesium.Cartesian3.distance(
-                Cesium.Cartesian3.fromDegrees(lon, lat),
-                Cesium.Cartesian3.fromDegrees(fLon, fLat)
-            ) / 1000;
-
-            if (dist < minDist) minDist = dist;
-        }
-
-        return minDist;
-    }
-
-    // =====================================================
-    // 4. VULNERABLE SITES (QC / BATASAN AREA)
-    // =====================================================
-    const vulnerableSites = [
-        { name: "Batasan Hills National High School", lon: 121.0953, lat: 14.6892 },
-        { name: "Batasang Pambansa Complex", lon: 121.1008, lat: 14.6908 },
-        { name: "Batasan-San Mateo Road", lon: 121.1025, lat: 14.6920 },
-        { name: "Filinvest 1", lon: 121.1030, lat: 14.6875 },
-        { name: "Manggahan", lon: 121.1060, lat: 14.6940 },
-        { name: "Barangay Hall of Batasan Hills", lon: 121.0972, lat: 14.6887 }
-    ];
-
-    vulnerableSites.forEach(site => {
-
-        const distKm = getDistanceKm(site.lon, site.lat, westValleyFault);
-
-        let color;
-
-        if (distKm <= 2) color = Cesium.Color.RED;
-        else if (distKm <= 4) color = Cesium.Color.ORANGE;
-        else if (distKm <= 7) color = Cesium.Color.YELLOW;
-        else color = Cesium.Color.LIME;
-
-        viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(site.lon, site.lat),
-
-            point: {
-                pixelSize: 12,
-                color: color,
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 2
-            },
-
-            label: {
-                text: `${site.name}\n${distKm.toFixed(2)} km`,
-                font: '14px sans-serif',
-                pixelOffset: new Cesium.Cartesian2(0, -20),
-                scale: 0.8,
-                disableDepthTestDistance: Number.POSITIVE_INFINITY
-            }
-        });
-    });
-
-    // =====================================================
-    // MAJOR RISK EXPOSURE NODES (FULL WVF CORRIDOR)
-    // =====================================================
-    const riskNodes = [
-
-    // =========================
-    // NORTH CLUSTER (Bulacan / SJDM)
-    // =========================
-    {
-        name: "San Jose del Monte (Kaypian / Tungko / Muzon)",
-        lon: 121.0450,
-        lat: 14.8050,
-        population: "≈ 650,000",
-        reason: "Direct proximity to northern WVF segment; dense informal + residential expansion zones"
-    },
-    {
-        name: "Rodriguez–San Mateo Border (Rizal)",
-        lon: 121.1500,
-        lat: 14.7200,
-        population: "≈ 400,000",
-        reason: "Fault-adjacent valley settlements; soft soil amplification zone"
-    },
-
-    // =========================
-    // QUEZON CITY CORE (HIGHEST RISK)
-    // =========================
-    {
-        name: "Batasan Hills – Commonwealth Corridor",
-        lon: 121.0850,
-        lat: 14.6900,
-        population: "≈ 600,000",
-        reason: "Highest exposure zone directly above West Valley Fault trace"
-    },
-    {
-        name: "Matandang Balara – Loyola Heights",
-        lon: 121.0750,
-        lat: 14.6500,
-        population: "≈ 300,000",
-        reason: "Residential + university zones near fault influence corridor"
-    },
-    {
-        name: "Ugong Norte / White Plains / Greenmeadows",
-        lon: 121.0600,
-        lat: 14.6100,
-        population: "≈ 250,000",
-        reason: "High-value dense subdivisions within strong shaking zone"
-    },
-
-    // =========================
-    // MARIKINA VALLEY (SOFT SOIL BASIN)
-    // =========================
-    {
-        name: "Marikina (Tumana / Malanday / IVS)",
-        lon: 121.1000,
-        lat: 14.6600,
-        population: "≈ 500,000",
-        reason: "Alluvial basin; high liquefaction + shaking amplification risk"
-    },
-
-    // =========================
-    // PASIG CORE
-    // =========================
-    {
-        name: "Pasig (Ugong / Bagong Ilog / Valle Verde)",
-        lon: 121.0800,
-        lat: 14.5900,
-        population: "≈ 400,000",
-        reason: "Dense residential-commercial zone within seismic influence corridor"
-    },
-
-    // =========================
-    // TAGUIG ZONE
-    // =========================
-    {
-        name: "Taguig (Upper Bicutan / Maharlika / Signal Village)",
-        lon: 121.0500,
-        lat: 14.5200,
-        population: "≈ 450,000",
-        reason: "High-density residential communities near southern WVF extension"
-    },
-
-    // =========================
-    // SOUTHERN METRO MANILA
-    // =========================
-    {
-        name: "Muntinlupa (Sucat / Cupang / Alabang Fringe)",
-        lon: 121.0400,
-        lat: 14.4500,
-        population: "≈ 350,000",
-        reason: "Southern fault influence termination zone; mixed residential-industrial exposure"
-    },
-
-    // =========================
-    // LAGUNA / CAVITE EXTENSION
-    // =========================
-    {
-        name: "San Pedro – San Vicente / San Antonio",
-        lon: 121.0450,
-        lat: 14.3500,
-        population: "≈ 350,000",
-        reason: "Southern WVF extension influence; dense suburban expansion"
-    },
-    {
-        name: "Carmona / GMA (Cavite)",
-        lon: 121.0400,
-        lat: 14.3000,
-        population: "≈ 300,000",
-        reason: "Near fault extension zone; mixed industrial-residential exposure"
-    }
+// =====================
+// FAULT LINE
+// =====================
+const westValleyFault = [
+121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
+121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
+121.0900,14.7150,121.0850,14.7000,121.0920,14.6900,
+121.1050,14.6700,121.1150,14.6500,121.1200,14.6300,
+121.1100,14.6100,121.1000,14.5900,121.0950,14.5700,
+121.0850,14.5500,121.0700,14.5200
 ];
 
-   
-const intensityEntities = [];
+viewer.entities.add({
+    polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
+        width: 5,
+        material: Cesium.Color.ORANGERED
+    }
+});
 
-riskNodes.forEach(node => {
+// =====================
+// DISTANCE FUNCTION
+// =====================
+function getDistanceKm(lon, lat) {
+    let min = 999999;
 
-    const dist = getDistanceKm(node.lon, node.lat, westValleyFault);
-    const intensity = getIntensity(dist);
+    for (let i = 0; i < westValleyFault.length; i += 2) {
+        const d = Cesium.Cartesian3.distance(
+            Cesium.Cartesian3.fromDegrees(lon, lat),
+            Cesium.Cartesian3.fromDegrees(westValleyFault[i], westValleyFault[i+1])
+        ) / 1000;
+
+        if (d < min) min = d;
+    }
+    return min;
+}
+
+function getIntensity(d) {
+    return d < 2 ? 1 : d < 5 ? 0.7 : d < 10 ? 0.4 : 0.2;
+}
+
+// =====================
+// RISK NODES (ALL REGIONS)
+// =====================
+const riskNodes = [
+{ name:"San Jose del Monte", lon:121.0450, lat:14.8050, population:"650k", region:"north" },
+{ name:"Rodriguez", lon:121.1500, lat:14.7200, population:"400k", region:"north" },
+
+{ name:"Batasan QC", lon:121.0850, lat:14.6900, population:"600k", region:"qc" },
+{ name:"Loyola Heights", lon:121.0750, lat:14.6500, population:"300k", region:"qc" },
+{ name:"White Plains", lon:121.0600, lat:14.6100, population:"250k", region:"qc" },
+
+{ name:"Marikina", lon:121.1000, lat:14.6600, population:"500k", region:"marikina" },
+
+{ name:"Pasig", lon:121.0800, lat:14.5900, population:"400k", region:"south" },
+{ name:"Taguig", lon:121.0500, lat:14.5200, population:"450k", region:"south" },
+{ name:"Muntinlupa", lon:121.0400, lat:14.4500, population:"350k", region:"south" }
+];
+
+// =====================
+// RENDER FUNCTION
+// =====================
+function render(region="all") {
+
+viewer.entities.removeAll();
+
+viewer.entities.add({
+    polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
+        width: 5,
+        material: Cesium.Color.ORANGERED
+    }
+});
+
+riskNodes.forEach(n => {
+
+    if (region !== "all" && n.region !== region) return;
+
+    const d = getDistanceKm(n.lon, n.lat);
+    const intensity = getIntensity(d);
 
     viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
+        position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
 
         ellipse: {
-            semiMajorAxis: 20000 * intensity,
-            semiMinorAxis: 20000 * intensity,
-            material: Cesium.Color.RED.withAlpha(0.3)
+            semiMajorAxis: 8000 * intensity,
+            semiMinorAxis: 8000 * intensity,
+            material: Cesium.Color.RED.withAlpha(0.2)
         }
     });
 
-    let damage =
-        dist < 2 ? "SEVERE DAMAGE" :
-        dist < 5 ? "MODERATE DAMAGE" :
-        dist < 10 ? "LIGHT DAMAGE" :
-        "MINIMAL IMPACT";
-
     viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
+        position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
 
         point: {
-            pixelSize: 14,
-            color: Cesium.Color.RED,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 2
+            pixelSize: 12,
+            color: Cesium.Color.YELLOW,
+            outlineColor: Cesium.Color.BLACK
         },
 
         label: {
-            text: node.name,
-            font: "13px sans-serif",
-            fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 2,
-            pixelOffset: new Cesium.Cartesian2(0, -25)
+            text: n.name,
+            font: "12px sans-serif",
+            pixelOffset: new Cesium.Cartesian2(0,-20)
         },
 
         description: `
-            <h2>${node.name}</h2>
-            <p><b>Population:</b> ${node.population}</p>
-            <p><b>Risk:</b> ${node.reason}</p>
-            <p><b>Damage:</b> ${damage}</p>
+            <h2>${n.name}</h2>
+            <p><b>Population:</b> ${n.population}</p>
+            <p><b>Region:</b> ${n.region}</p>
+            <p><b>Distance to Fault:</b> ${d.toFixed(2)} km</p>
         `
     });
+
 });
+}
 
 // =====================
-// WAVE SYSTEM (FIXED)
+// REGION CONTROLS
 // =====================
-let waveRadius = 1000;
+function goAll(){
+render("all");
+viewer.camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(121.05,14.65,300000)});
+}
 
-viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(121.09, 14.69),
+function goNorth(){
+render("north");
+viewer.camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(121.10,14.78,150000)});
+}
 
-    ellipse: {
-        semiMajorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
-        semiMinorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
-        material: Cesium.Color.RED.withAlpha(0.15)
-    }
-});
+function goQC(){
+render("qc");
+viewer.camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(121.08,14.69,80000)});
+}
 
-// =====================
-// CLICK TRIGGER
-// =====================
-const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+function goMarikina(){
+render("marikina");
+viewer.camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(121.10,14.66,80000)});
+}
 
-handler.setInputAction(() => {
+function goSouth(){
+render("south");
+viewer.camera.flyTo({destination: Cesium.Cartesian3.fromDegrees(121.05,14.50,150000)});
+}
 
-    waveRadius = 1000;
-
-    const interval = setInterval(() => {
-        waveRadius += 800;
-
-        if (waveRadius > 200000) {
-            clearInterval(interval);
-        }
-    }, 100);
-
-    console.log("Earthquake triggered");
-
-}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-// =====================
-// CAMERA
-// =====================
-viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(121.0990, 14.6905, 5000),
-    orientation: {
-        heading: 0,
-        pitch: Cesium.Math.toRadians(-45),
-        roll: 0
-    }
-});
-
-console.log("Cesium loaded");
+// INIT
+render("all");
+goAll();
 
 </script>
+
 </body>
 </html>
