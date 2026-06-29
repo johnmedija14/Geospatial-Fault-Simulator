@@ -157,8 +157,20 @@ body {
     flex-direction: column;
     gap: 12px;
     min-height: 0;
+
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
+#sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+}
+    
 .card {
     background: rgba(17,24,39,0.86);
     border: 1px solid rgba(255,255,255,0.10);
@@ -450,16 +462,21 @@ viewer.entities.add({
         positions: new Cesium.CallbackProperty(() => {
             ruptureT += 0.002;
 
-            return Cesium.Cartesian3.fromDegreesArray(
-                westValleyFault.map((v, i) => {
-                    const wave = Math.sin(ruptureT + i * 0.2) * 0.00015;
-                    const base = Math.sin(Date.now()*0.002) * 0.0002;
-                    return i % 2 === 0 ? v + base + wave : v;
+            return Cesium.Cartesian3.fromDegreesArrayHeights(
+                westValleyFault.flatMap((v, i) => {
+                    if (i % 2 === 0) {
+                        const wave = Math.sin(ruptureT + i * 0.2) * 0.00015;
+                        const base = Math.sin(Date.now() * 0.002) * 0.0002;
+                        return [v + base + wave, westValleyFault[i + 1], 100];
+                    }
+                    return [];
                 })
             );
         }, false),
-        width: 4,
-        material: Cesium.Color.ORANGERED
+
+        width: 6,
+        material: Cesium.Color.ORANGERED,
+        clampToGround: true
     }
 });
 
@@ -476,10 +493,14 @@ for (let i = 0; i < westValleyFault.length; i += 2) {
 
 viewer.entities.add({
     polygon: {
-        hierarchy: Cesium.Cartesian3.fromDegreesArray(left.concat(right.reverse())),
-        material: Cesium.Color.RED.withAlpha(0.10),
+        hierarchy: Cesium.Cartesian3.fromDegreesArray(
+            left.concat(right.reverse())
+        ),
+        material: Cesium.Color.RED.withAlpha(0.15),
         outline: true,
-        outlineColor: Cesium.Color.DARKRED
+        outlineColor: Cesium.Color.RED,
+        perPositionHeight: false,
+        height: 20
     }
 });
 
@@ -689,12 +710,14 @@ function setCenterMarker(lon, lat, name) {
 
     centerMarker = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(lon, lat),
-        point: {
-            pixelSize: 16,
-            color: Cesium.Color.CYAN,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 2
-        },
+       point: {
+    pixelSize: 14,
+    color: Cesium.Color.YELLOW,
+    outlineColor: Cesium.Color.WHITE,
+    outlineWidth: 3,
+    disableDepthTestDistance: Number.POSITIVE_INFINITY,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+},
         label: {
             text: name,
             font: "12px sans-serif",
