@@ -401,7 +401,8 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 const viewer = new Cesium.Viewer("cesiumContainer", {
     animation: false,
     timeline: false,
-    infoBox: true,
+    infoBox: false,
+    selectionIndicator: false,
     geocoder: true,
     baseLayerPicker: true,
     terrainProvider: new Cesium.EllipsoidTerrainProvider()
@@ -769,60 +770,139 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
 
     selectedEntityData = data;
     updateSelectedInfo(data);
+
     viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(
-        data.lon,
-        data.lat,
-        9000
-    ),
-    duration: 1.5
+        destination: Cesium.Cartesian3.fromDegrees(
+            data.lon,
+            data.lat,
+            9000
+        ),
+        duration: 1.5
+    });
+
 });
 
-const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+const handler = new Cesium.ScreenSpaceEventHandler(
+    viewer.scene.canvas
+);
 
 handler.setInputAction(function(click) {
+
     const picked = viewer.scene.pick(click.position);
 
-    if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
+    // User clicked a marker
+    if (
+        Cesium.defined(picked) &&
+        Cesium.defined(picked.id) &&
+        picked.id.properties
+    ) {
+
         viewer.selectedEntity = picked.id;
+
         const props = picked.id.properties;
 
-const data = {
-    name: props.name.getValue(),
-    region: props.region.getValue(),
-    lon: props.lon.getValue(),
-    lat: props.lat.getValue(),
-    population: props.population.getValue(),
-    intensity: props.intensity.getValue(),
-    rupture: props.rupture.getValue(),
-    liquefaction: props.liquefaction.getValue(),
-    structures: props.structures.getValue()
-};
+        const data = {
+            name: props.name.getValue(),
+            region: props.region.getValue(),
+            lon: props.lon.getValue(),
+            lat: props.lat.getValue(),
+            population: props.population.getValue(),
+            intensity: props.intensity.getValue(),
+            rupture: props.rupture.getValue(),
+            liquefaction: props.liquefaction.getValue(),
+            structures: props.structures.getValue()
+        };
 
-    const cartesian = viewer.scene.pickPosition(click.position);
-    if (!Cesium.defined(cartesian)) {
-        setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+        selectedEntityData = data;
+        updateSelectedInfo(data);
+
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(
+                data.lon,
+                data.lat,
+                9000
+            ),
+            duration: 1.5
+        });
+
         return;
     }
 
-    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-    const lon = Cesium.Math.toDegrees(cartographic.longitude);
-    const lat = Cesium.Math.toDegrees(cartographic.latitude);
+    // User clicked elsewhere on the map
+    let cartesian = viewer.scene.pickPosition(click.position);
 
-    setCenterMarker(lon, lat, "Tapped Zone");
-    const closest = riskNodes.reduce((best, n) => {
-        const d = getDistanceKm(lon, lat, n.lon, n.lat);
-        return (!best || d < best.d) ? { node: n, d } : best;
-    }, null);
+if (!Cesium.defined(cartesian)) {
+    const ray = viewer.camera.getPickRay(click.position);
+
+    if (ray) {
+        cartesian = viewer.scene.globe.pick(
+            ray,
+            viewer.scene
+        );
+    }
+}
+
+    if (!Cesium.defined(cartesian)) {
+        setCenterMarker(
+            currentCenter.lon,
+            currentCenter.lat,
+            "Proximity Zone"
+        );
+        return;
+    }
+
+    const cartographic =
+        Cesium.Cartographic.fromCartesian(cartesian);
+
+    const lon =
+        Cesium.Math.toDegrees(
+            cartographic.longitude
+        );
+
+    const lat =
+        Cesium.Math.toDegrees(
+            cartographic.latitude
+        );
+
+    setCenterMarker(
+        lon,
+        lat,
+        "Tapped Zone"
+    );
+
+    const closest = riskNodes.reduce(
+        (best, n) => {
+            const d = getDistanceKm(
+                lon,
+                lat,
+                n.lon,
+                n.lat
+            );
+
+            return (!best || d < best.d)
+                ? { node: n, d }
+                : best;
+        },
+        null
+    );
 
     if (closest) {
+
         updateSelectedInfo({
             name: closest.node.name,
             region: closest.node.region,
             lon: closest.node.lon,
-            lat: closest.node.lat
+            lat: closest.node.lat,
+            population: closest.node.population,
+            intensity: closest.node.intensity,
+            rupture: closest.node.rupture,
+            liquefaction: closest.node.liquefaction,
+            structures: closest.node.structures
         });
+
     }
+
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 /* =========================
