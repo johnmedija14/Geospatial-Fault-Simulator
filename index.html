@@ -21,73 +21,363 @@ html, body {
     color: #fff;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#topbar {
+    height: 64px;
+    background: linear-gradient(180deg, #0d1119 0%, #06080d 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 20;
+    box-sizing: border-box;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pulseIcon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%);
+    box-shadow: 0 0 18px rgba(255,60,60,0.7);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(120,0,0,0.88), rgba(80,0,0,0.88));
+    border: 1px solid rgba(255,80,80,0.35);
+    border-radius: 18px;
+    padding: 10px 14px;
+    box-shadow: 0 0 20px rgba(255,0,0,0.12);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.statusDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    box-shadow: 0 0 10px #ff4d4d;
+}
+
+.statusTitle {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.statusSub {
+    font-size: 11px;
+    color: #ffd6d6;
+}
+
+#content {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+#mapWrap {
+    flex: 1;
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: #0b1220;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
 #cesiumContainer {
     position: absolute;
-    top: 0;
-    left: 260px;
-    right: 0;
-    bottom: 0;
+    inset: 0;
 }
 
 #controls {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 14px;
+    left: 14px;
     z-index: 999;
-    background: rgba(18, 24, 35, 0.92);
+    background: rgba(18, 24, 35, 0.80);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
     padding: 12px;
-    border-radius: 12px;
+    border-radius: 18px;
     width: 220px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+#controls h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
 }
 
 #controls select {
     width: 100%;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: #0f1722;
+    color: white;
+    outline: none;
+}
+
+#sidebar {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+}
+
+.card {
+    background: rgba(17,24,39,0.86);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 22px;
+    padding: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.card h3 {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(110,0,0,0.9), rgba(70,0,0,0.9));
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px;
+}
+
+.metric:last-child {
+    border-bottom: none;
+}
+
+.metric span {
+    color: #d1d5db;
+}
+
+.metric b {
+    color: #fff;
+}
+
+.intensityBar {
+    height: 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #3bd24f 0%, #d7d92e 35%, #ff9f1c 70%, #ff2d2d 100%);
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.45);
+}
+
+.scaleLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-top: 8px;
+    color: #cbd5e1;
+}
+
+.steps {
+    margin: 0;
+    padding-left: 20px;
+    color: #e5e7eb;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 #breakdownList {
-    color: white;
-    font-size: 13px;
+    display: grid;
+    gap: 8px;
 }
 
 .breakdownItem {
     display: flex;
     justify-content: space-between;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 13px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.infoGrid {
+    display: grid;
+    gap: 10px;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px;
+}
+
+.infoRow:last-child {
+    border-bottom: none;
+}
+
+.infoLabel {
+    color: #cbd5e1;
+}
+
+.infoValue {
+    font-weight: 700;
+    color: #fff;
+}
+
+.analysisBadge {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: #fff;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#selectedHint {
+    color: #cbd5e1;
+    font-size: 13px;
+    padding: 6px 0 2px;
+}
+
+#errorBox {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 9999;
+    background: rgba(0,0,0,0.85);
+    color: #ff4d4d;
+    padding: 10px;
+    font-size: 12px;
+    display: none;
+    border-radius: 8px;
+    max-width: 360px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="controls">
-    <h3>Region Switcher</h3>
-    <select id="regionSelect">
-        <option value="all">All Regions</option>
-        <option value="north">North</option>
-        <option value="qc">Quezon City</option>
-        <option value="pasig">Pasig / Marikina</option>
-        <option value="south">South</option>
-    </select>
+<div id="topbar">
+    <div class="brand">
+        <div class="pulseIcon"></div>
+        <div>
+            <div class="title">EARTHQUAKE SIMULATION</div>
+            <div class="subtitle">West Valley Fault System – Metro Manila & Nearby Areas</div>
+        </div>
+    </div>
+
+    <div class="statusBadge">
+        <div class="statusDot"></div>
+        <div>
+            <div class="statusTitle" id="statusTitle">READY</div>
+            <div class="statusSub" id="statusSub">Tap a marker or the map to analyze risk</div>
+        </div>
+    </div>
 </div>
 
-<div id="cesiumContainer"></div>
+<div id="content">
+    <div id="mapWrap">
+        <div id="controls">
+            <h3>Region Switcher</h3>
+            <select id="regionSelect">
+                <option value="all">All Regions</option>
+                <option value="north">North</option>
+                <option value="qc">Quezon City</option>
+                <option value="pasig">Pasig / Marikina</option>
+                <option value="south">South</option>
+            </select>
+        </div>
+
+        <div id="cesiumContainer"></div>
+    </div>
+
+    <aside id="sidebar">
+        <section class="card">
+            <h3>SELECTED LOCATION</h3>
+            <div id="selectedHint">Tap a marked zone or location to view details.</div>
+            <div class="infoGrid" id="selectedInfo"></div>
+            <div class="analysisBadge" id="analysisBox">AI analysis will appear here after selection.</div>
+        </section>
+
+        <section class="card">
+            <h3>LIVE RISK SUMMARY</h3>
+            <div class="metric"><span>Total Pop. In View</span><b id="popCount">≈ 4,050,000</b></div>
+            <div class="metric"><span>High Risk Zones</span><b id="highCount">3</b></div>
+            <div class="metric"><span>Moderate Risk Zones</span><b id="modCount">6</b></div>
+            <div class="metric"><span>Low Risk Zones</span><b id="lowCount">1</b></div>
+            <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
+        </section>
+
+        <section class="card">
+            <h3>INTENSITY OVERVIEW</h3>
+            <div class="intensityBar"></div>
+            <div class="scaleLabels"><span>LOW</span><span>MODERATE</span><span>VERY HIGH</span></div>
+        </section>
+
+        <section class="card">
+            <h3>REGION BREAKDOWN (POPULATION)</h3>
+            <div id="breakdownList"></div>
+        </section>
+
+        <section class="card">
+            <h3>HOW TO USE</h3>
+            <ol class="steps">
+                <li>Select a region to filter risk zones</li>
+                <li>Tap a marker or nearby zone on the map</li>
+                <li>Observe seismic wave propagation and intensity impact</li>
+            </ol>
+        </section>
+    </aside>
+</div>
+
+<div id="errorBox"></div>
 
 <script>
-/* =========================
-ERROR SAFE MODE
-========================= */
 window.onerror = function(msg, src, line) {
-    console.error("ERROR:", msg, "line", line);
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-/* =========================
-CESIUM INIT (SAFE)
-========================= */
-Cesium.Ion.defaultAccessToken =
-"YOUR_CESIUM_TOKEN_HERE";
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYTUzZmI1OS0wNjUxLTQxYjktOGMzMC1lODQyNzQ3YzIxZGMiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NjgwNzd9.jmAmq8mS_RcWJ0ZHunsG1neH_Mry1-3s4Ldu-NH7HoY";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
     animation: false,
@@ -98,16 +388,13 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
 
-/* =========================
-CAMERA
-========================= */
+Cesium.createWorldTerrainAsync()
+.then(t => viewer.terrainProvider = t);
+
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
 });
 
-/* =========================
-FAULT LINE
-========================= */
 const westValleyFault = [
 121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
 121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
@@ -117,18 +404,21 @@ const westValleyFault = [
 121.0850,14.5500,121.0700,14.5200
 ];
 
-/* =========================
-FAULT ANIMATION
-========================= */
+let ruptureT = 0;
+let centerMarker = null;
+let currentCenter = { lon: 121.09, lat: 14.69 };
+
 viewer.entities.add({
     polyline: {
         positions: new Cesium.CallbackProperty(() => {
-            const offset = Math.sin(Date.now() * 0.002) * 0.0002;
+            ruptureT += 0.002;
 
             return Cesium.Cartesian3.fromDegreesArray(
-                westValleyFault.map((v, i) =>
-                    i % 2 === 0 ? v + offset : v
-                )
+                westValleyFault.map((v, i) => {
+                    const wave = Math.sin(ruptureT + i * 0.2) * 0.00015;
+                    const base = Math.sin(Date.now()*0.002) * 0.0002;
+                    return i % 2 === 0 ? v + base + wave : v;
+                })
             );
         }, false),
         width: 4,
@@ -136,9 +426,6 @@ viewer.entities.add({
     }
 });
 
-/* =========================
-BUFFER ZONE (PROXIMITY)
-========================= */
 const left = [];
 const right = [];
 
@@ -153,13 +440,12 @@ for (let i = 0; i < westValleyFault.length; i += 2) {
 viewer.entities.add({
     polygon: {
         hierarchy: Cesium.Cartesian3.fromDegreesArray(left.concat(right.reverse())),
-        material: Cesium.Color.RED.withAlpha(0.12)
+        material: Cesium.Color.RED.withAlpha(0.10),
+        outline: true,
+        outlineColor: Cesium.Color.DARKRED
     }
 });
 
-/* =========================
-SEISMIC WAVE
-========================= */
 let waveRadius = 1000;
 
 viewer.entities.add({
@@ -176,9 +462,10 @@ setInterval(() => {
     if (waveRadius > 280000) waveRadius = 1000;
 }, 70);
 
-/* =========================
-RISK NODES
-========================= */
+const dashboard = document.createElement("div");
+dashboard.style = `display:none;`;
+document.body.appendChild(dashboard);
+
 const riskNodes = [
 {region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050},
 {region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200},
@@ -191,36 +478,229 @@ const riskNodes = [
 ];
 
 let markers = [];
+let activeMarkers = [];
+let selectedEntityData = null;
 
-function render(region) {
-markers.forEach(m => viewer.entities.remove(m));
-markers = [];
+function getDistanceKm(lon1, lat1, lon2, lat2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 
-riskNodes
-.filter(n => region === "all" || n.region === region)
-.forEach(n => {
+function riskFromDistance(km) {
+    if (km <= 3) return { label: "Very High", color: "#ff2d2d" };
+    if (km <= 8) return { label: "High", color: "#ff9f1c" };
+    if (km <= 15) return { label: "Moderate", color: "#d7d92e" };
+    return { label: "Low", color: "#3bd24f" };
+}
 
-    const entity = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+function updateSelectedInfo(data) {
+    const info = document.getElementById("selectedInfo");
+    const analysis = document.getElementById("analysisBox");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusSub = document.getElementById("statusSub");
+
+    if (!data) {
+        info.innerHTML = "";
+        analysis.textContent = "AI analysis will appear here after selection.";
+        statusTitle.textContent = "READY";
+        statusSub.textContent = "Tap a marker or the map to analyze risk";
+        return;
+    }
+
+    const km = getDistanceKm(currentCenter.lon, currentCenter.lat, data.lon, data.lat);
+    const risk = riskFromDistance(km);
+    const intensity = Math.max(1, Math.min(10, Math.round(10 - km / 2)));
+    const estimatedImpact = Math.max(5, Math.round(100 - km * 4));
+    const confidence = Math.max(78, Math.min(99, 98 - Math.round(km)));
+
+    info.innerHTML = `
+        <div class="infoRow"><span class="infoLabel">Name</span><span class="infoValue">${data.name}</span></div>
+        <div class="infoRow"><span class="infoLabel">Region</span><span class="infoValue">${data.region}</span></div>
+        <div class="infoRow"><span class="infoLabel">Latitude</span><span class="infoValue">${data.lat.toFixed(4)}</span></div>
+        <div class="infoRow"><span class="infoLabel">Longitude</span><span class="infoValue">${data.lon.toFixed(4)}</span></div>
+        <div class="infoRow"><span class="infoLabel">Distance to fault</span><span class="infoValue">${km.toFixed(2)} km</span></div>
+    `;
+
+    analysis.innerHTML = `
+        <b>AI Analysis:</b> ${data.name} is assessed as <span style="color:${risk.color}">${risk.label} Risk</span>.<br>
+        Estimated intensity: <b>${intensity}/10</b> · Impact score: <b>${estimatedImpact}%</b> · Confidence: <b>${confidence}%</b>.
+    `;
+
+    statusTitle.textContent = "LOCATION SELECTED";
+    statusSub.textContent = `${data.name} · ${risk.label} risk · ${km.toFixed(2)} km from center`;
+}
+
+function setCenterMarker(lon, lat, name) {
+    currentCenter = { lon, lat };
+    if (centerMarker) viewer.entities.remove(centerMarker);
+
+    centerMarker = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(lon, lat),
         point: {
-            pixelSize: 10,
-            color: Cesium.Color.YELLOW
+            pixelSize: 16,
+            color: Cesium.Color.CYAN,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 2
         },
         label: {
-            text: n.name,
+            text: name,
             font: "12px sans-serif",
-            pixelOffset: new Cesium.Cartesian2(0, -18)
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 4,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -22)
         }
     });
 
-    markers.push(entity);
-});
+    updateSelectedInfo({
+        name,
+        region: "Tap Point",
+        lon,
+        lat
+    });
+}
+
+function render(region) {
+    markers.forEach(m => viewer.entities.remove(m));
+    markers = [];
+    activeMarkers = [];
+
+    riskNodes
+    .filter(n => region === "all" || n.region === region)
+    .forEach(n => {
+        const entity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+            point: {
+                pixelSize: 10,
+                color: Cesium.Color.YELLOW,
+                outlineColor: Cesium.Color.WHITE,
+                outlineWidth: 2
+            },
+            label: {
+                text: n.name,
+                font: "12px sans-serif",
+                fillColor: Cesium.Color.WHITE,
+                outlineColor: Cesium.Color.BLACK,
+                outlineWidth: 4,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                pixelOffset: new Cesium.Cartesian2(0, -18)
+            },
+            properties: {
+                name: n.name,
+                region: n.region,
+                lon: n.lon,
+                lat: n.lat
+            }
+        });
+
+        markers.push(entity);
+        activeMarkers.push(n);
+    });
+
+    document.getElementById("breakdownList").innerHTML = `
+        <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
+        <div class="breakdownItem"><span>Quezon City</span><b>1,150,000</b></div>
+        <div class="breakdownItem"><span>Pasig / Marikina</span><b>900,000</b></div>
+        <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
+    `;
+
+    const count = activeMarkers.length;
+    document.getElementById("popCount").textContent = region === "all" ? "≈ 4,050,000" : `≈ ${count * 450000}`;
+    document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
+    document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
+    document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
+
+    updateSelectedInfo(null);
 }
 
 render("all");
 
-document.getElementById("regionSelect")
-.addEventListener("change", e => render(e.target.value));
+document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
+
+viewer.scene.primitives.add(Cesium.createOsmBuildings());
+
+viewer.selectedEntityChanged.addEventListener(function(entity) {
+    if (!entity || !entity.properties) return;
+
+    const data = {
+        name: entity.properties.name.getValue(),
+        region: entity.properties.region.getValue(),
+        lon: entity.properties.lon.getValue(),
+        lat: entity.properties.lat.getValue()
+    };
+
+    selectedEntityData = data;
+    updateSelectedInfo(data);
+});
+
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+handler.setInputAction(function(click) {
+    const picked = viewer.scene.pick(click.position);
+
+    if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
+        viewer.selectedEntity = picked.id;
+        const data = {
+            name: picked.id.properties.name.getValue(),
+            region: picked.id.properties.region.getValue(),
+            lon: picked.id.properties.lon.getValue(),
+            lat: picked.id.properties.lat.getValue()
+        };
+        selectedEntityData = data;
+        updateSelectedInfo(data);
+        return;
+    }
+
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (!Cesium.defined(cartesian)) {
+        setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+        return;
+    }
+
+    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude);
+    const lat = Cesium.Math.toDegrees(cartographic.latitude);
+
+    setCenterMarker(lon, lat, "Tapped Zone");
+    const closest = riskNodes.reduce((best, n) => {
+        const d = getDistanceKm(lon, lat, n.lon, n.lat);
+        return (!best || d < best.d) ? { node: n, d } : best;
+    }, null);
+
+    if (closest) {
+        updateSelectedInfo({
+            name: closest.node.name,
+            region: closest.node.region,
+            lon: closest.node.lon,
+            lat: closest.node.lat
+        });
+    }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+/* =========================
+   SAFE BUILDINGS LOADER
+========================= */
+function loadBuildings() {
+    try {
+        if (typeof Cesium.createOsmBuildingsAsync === "function") {
+            Cesium.createOsmBuildingsAsync()
+                .then(b => viewer.scene.primitives.add(b))
+                .catch(err => console.warn("Buildings failed:", err));
+        } else {
+            console.warn("OSM Buildings not supported in this Cesium build.");
+        }
+    } catch (e) {
+        console.warn("OSM Buildings disabled safely:", e);
+    }
+}
+
+loadBuildings();
 </script>
 
 </body>
