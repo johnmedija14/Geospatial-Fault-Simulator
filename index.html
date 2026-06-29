@@ -275,7 +275,29 @@
     }
 ];
 
-    riskNodes.forEach(node => {
+   
+const intensityEntities = [];
+
+riskNodes.forEach(node => {
+
+    const dist = getDistanceKm(node.lon, node.lat, westValleyFault);
+    const intensity = getIntensity(dist);
+
+    viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
+
+        ellipse: {
+            semiMajorAxis: 20000 * intensity,
+            semiMinorAxis: 20000 * intensity,
+            material: Cesium.Color.RED.withAlpha(0.3)
+        }
+    });
+
+    let damage =
+        dist < 2 ? "SEVERE DAMAGE" :
+        dist < 5 ? "MODERATE DAMAGE" :
+        dist < 10 ? "LIGHT DAMAGE" :
+        "MINIMAL IMPACT";
 
     viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
@@ -293,37 +315,68 @@
             fillColor: Cesium.Color.WHITE,
             outlineColor: Cesium.Color.BLACK,
             outlineWidth: 2,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            pixelOffset: new Cesium.Cartesian2(0, -25),
-            disableDepthTestDistance: Number.POSITIVE_INFINITY
+            pixelOffset: new Cesium.Cartesian2(0, -25)
         },
 
         description: `
             <h2>${node.name}</h2>
             <p><b>Population:</b> ${node.population}</p>
-            <p><b>Risk Reason:</b> ${node.reason}</p>
-            <hr>
-            <p>Located within West Valley Fault influence corridor.</p>
+            <p><b>Risk:</b> ${node.reason}</p>
+            <p><b>Damage:</b> ${damage}</p>
         `
     });
 });
 
-    // =====================================================
-    // 5. CAMERA POSITION (BATASAN FOCUS)
-    // =====================================================
-    viewer.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(
-            121.0990,
-            14.6905,
-            5000
-        ),
-        orientation: {
-            heading: 0,
-            pitch: Cesium.Math.toRadians(-45),
-            roll: 0
-        }
-    });
+// =====================
+// WAVE SYSTEM (FIXED)
+// =====================
+let waveRadius = 1000;
 
-    console.log("Cesium loaded:", Cesium);
+viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(121.09, 14.69),
+
+    ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
+        material: Cesium.Color.RED.withAlpha(0.15)
+    }
+});
+
+// =====================
+// CLICK TRIGGER
+// =====================
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+handler.setInputAction(() => {
+
+    waveRadius = 1000;
+
+    const interval = setInterval(() => {
+        waveRadius += 800;
+
+        if (waveRadius > 200000) {
+            clearInterval(interval);
+        }
+    }, 100);
+
+    console.log("Earthquake triggered");
+
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+// =====================
+// CAMERA
+// =====================
+viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(121.0990, 14.6905, 5000),
+    orientation: {
+        heading: 0,
+        pitch: Cesium.Math.toRadians(-45),
+        roll: 0
+    }
+});
+
+console.log("Cesium loaded");
+
 </script>
+</body>
 </html>
