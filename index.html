@@ -168,54 +168,145 @@
     // MAJOR RISK EXPOSURE NODES (FULL WVF CORRIDOR)
     // =====================================================
     const riskNodes = [
-        { name: "Rodriguez (Montalban)", lon: 121.1800, lat: 14.7300, population: "≈ 280,000" },
-        { name: "Commonwealth–Batasan QC", lon: 121.0850, lat: 14.6900, population: "≈ 600,000" },
-        { name: "Marikina Valley Basin", lon: 121.1050, lat: 14.6500, population: "≈ 450,000" },
-        { name: "Pasig–Cainta Border", lon: 121.1200, lat: 14.6000, population: "≈ 350,000" },
-        { name: "Taguig Upper Bicutan", lon: 121.0500, lat: 14.5200, population: "≈ 300,000" },
-        { name: "Muntinlupa Sucat–Alabang", lon: 121.0200, lat: 14.4300, population: "≈ 250,000" }
-    ];
+
+    // =========================
+    // NORTH CLUSTER (Bulacan / SJDM)
+    // =========================
+    {
+        name: "San Jose del Monte (Kaypian / Tungko / Muzon)",
+        lon: 121.0450,
+        lat: 14.8050,
+        population: "≈ 650,000",
+        reason: "Direct proximity to northern WVF segment; dense informal + residential expansion zones"
+    },
+    {
+        name: "Rodriguez–San Mateo Border (Rizal)",
+        lon: 121.1500,
+        lat: 14.7200,
+        population: "≈ 400,000",
+        reason: "Fault-adjacent valley settlements; soft soil amplification zone"
+    },
+
+    // =========================
+    // QUEZON CITY CORE (HIGHEST RISK)
+    // =========================
+    {
+        name: "Batasan Hills – Commonwealth Corridor",
+        lon: 121.0850,
+        lat: 14.6900,
+        population: "≈ 600,000",
+        reason: "Highest exposure zone directly above West Valley Fault trace"
+    },
+    {
+        name: "Matandang Balara – Loyola Heights",
+        lon: 121.0750,
+        lat: 14.6500,
+        population: "≈ 300,000",
+        reason: "Residential + university zones near fault influence corridor"
+    },
+    {
+        name: "Ugong Norte / White Plains / Greenmeadows",
+        lon: 121.0600,
+        lat: 14.6100,
+        population: "≈ 250,000",
+        reason: "High-value dense subdivisions within strong shaking zone"
+    },
+
+    // =========================
+    // MARIKINA VALLEY (SOFT SOIL BASIN)
+    // =========================
+    {
+        name: "Marikina (Tumana / Malanday / IVS)",
+        lon: 121.1000,
+        lat: 14.6600,
+        population: "≈ 500,000",
+        reason: "Alluvial basin; high liquefaction + shaking amplification risk"
+    },
+
+    // =========================
+    // PASIG CORE
+    // =========================
+    {
+        name: "Pasig (Ugong / Bagong Ilog / Valle Verde)",
+        lon: 121.0800,
+        lat: 14.5900,
+        population: "≈ 400,000",
+        reason: "Dense residential-commercial zone within seismic influence corridor"
+    },
+
+    // =========================
+    // TAGUIG ZONE
+    // =========================
+    {
+        name: "Taguig (Upper Bicutan / Maharlika / Signal Village)",
+        lon: 121.0500,
+        lat: 14.5200,
+        population: "≈ 450,000",
+        reason: "High-density residential communities near southern WVF extension"
+    },
+
+    // =========================
+    // SOUTHERN METRO MANILA
+    // =========================
+    {
+        name: "Muntinlupa (Sucat / Cupang / Alabang Fringe)",
+        lon: 121.0400,
+        lat: 14.4500,
+        population: "≈ 350,000",
+        reason: "Southern fault influence termination zone; mixed residential-industrial exposure"
+    },
+
+    // =========================
+    // LAGUNA / CAVITE EXTENSION
+    // =========================
+    {
+        name: "San Pedro – San Vicente / San Antonio",
+        lon: 121.0450,
+        lat: 14.3500,
+        population: "≈ 350,000",
+        reason: "Southern WVF extension influence; dense suburban expansion"
+    },
+    {
+        name: "Carmona / GMA (Cavite)",
+        lon: 121.0400,
+        lat: 14.3000,
+        population: "≈ 300,000",
+        reason: "Near fault extension zone; mixed industrial-residential exposure"
+    }
+];
 
     riskNodes.forEach(node => {
 
-        viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
+    viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(node.lon, node.lat),
 
-    point: {
-        pixelSize: 14,
-        color: Cesium.Color.RED,
-        outlineColor: Cesium.Color.WHITE,
-        outlineWidth: 2
-    },
+        point: {
+            pixelSize: 14,
+            color: Cesium.Color.RED,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 2
+        },
 
-    label: {
-        text: node.name,
-        font: "13px sans-serif",
-        fillColor: Cesium.Color.WHITE,
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 2,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        pixelOffset: new Cesium.Cartesian2(0, -25),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY
-    },
+        label: {
+            text: node.name,
+            font: "13px sans-serif",
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 2,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -25),
+            disableDepthTestDistance: Number.POSITIVE_INFINITY
+        },
 
-    // THIS IS THE POPUP CONTENT
-    description: `
-        <h2 style="margin-bottom:5px;">${node.name}</h2>
-
-        <p><b>Estimated Population Exposure:</b><br>${node.population}</p>
-
-        <p><b>Hazard Explanation:</b><br>${node.reason}</p>
-
-        <hr>
-
-        <p style="font-size:12px;">
-        Located within West Valley Fault influence corridor.
-        High seismic risk due to proximity + soil + population density.
-        </p>
-    `
-});
+        description: `
+            <h2>${node.name}</h2>
+            <p><b>Population:</b> ${node.population}</p>
+            <p><b>Risk Reason:</b> ${node.reason}</p>
+            <hr>
+            <p>Located within West Valley Fault influence corridor.</p>
+        `
     });
+});
 
     // =====================================================
     // 5. CAMERA POSITION (BATASAN FOCUS)
