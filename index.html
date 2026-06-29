@@ -37,7 +37,7 @@
     <div id="cesiumContainer"></div>
 
     <script>
-        Cesium.Ion.defaultAccessToken = 'YOUR_TOKEN_HERE';
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1ZTE3NzVmZi04Y2QwLTRiMTAtOWFkNS01OTdmZjJlM2IxZDMiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NTYyNjV9.Y6kGlEJh66o-k45Hm8iaO7gTmcye0wm9AZN5wXp6ZhM';
 
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
@@ -47,7 +47,11 @@
             sceneModePicker: true,
             baseLayerPicker: true,
             navigationHelpButton: true
+            imageryProvider: Cesium.createWorldImagery()
         });
+
+        viewer.scene.globe.enableLighting = true;
+        viewer.scene.globe.depthTestAgainstTerrain = false;
 
         const westValleyFault = [
     121.0750, 14.7500,
