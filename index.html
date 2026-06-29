@@ -720,11 +720,16 @@ if(data.intensity){
     document.getElementById("intensityPointer").style.left =
         intensityMap[data.intensity] + "%";
 
-    document.getElementById("intensityText").innerHTML =
-        `PHIVOLCS Intensity ${data.intensity}`;
-}
-    }
+    const intensityLabels = {
+    "VII": "HIGH",
+    "VIII": "VERY HIGH",
+    "IX": "EXTREME",
+    "X": "CATASTROPHIC"
+};
 
+document.getElementById("intensityText").innerHTML =
+    `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
+    
     info.innerHTML = `
         <div class="infoRow">
             <span class="infoLabel">Location</span>
