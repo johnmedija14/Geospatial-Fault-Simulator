@@ -478,17 +478,25 @@ document.getElementById("regionSelect")
 /* =========================
    3D BUILDINGS (SAFE FIX)
 ========================= */
-try {
-    const buildings = Cesium.createOsmBuildingsAsync
-        ? Cesium.createOsmBuildingsAsync()
-        : null;
+function loadBuildings() {
+    try {
 
-    if (buildings) {
-        buildings.then(b => viewer.scene.primitives.add(b));
+        // Try modern async version
+        if (typeof Cesium.createOsmBuildingsAsync === "function") {
+            Cesium.createOsmBuildingsAsync()
+                .then(b => viewer.scene.primitives.add(b))
+                .catch(err => console.warn("Buildings failed:", err));
+        } else {
+            console.warn("OSM Buildings not supported in this Cesium build.");
+        }
+
+    } catch (e) {
+        console.warn("OSM Buildings disabled safely:", e);
     }
-} catch (e) {
-    console.warn("OSM Buildings not available:", e);
 }
+
+loadBuildings();
+    
 </script>
 
 </body>
