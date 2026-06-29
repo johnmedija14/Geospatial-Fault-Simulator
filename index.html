@@ -37,7 +37,8 @@
     <div id="cesiumContainer"></div>
 
     <script>
-        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxZmQyMDgzMS02ZTE0LTRhZWYtODRkNi00ZjZhNGY0ZDlkNzEiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiVW50aXRsZWQiLCJpYXQiOjE3ODI3NTY1NTd9.52Pt5H0k2QVsY12xYWKSJxvUJrhbqKsqZbL93w7DvBo';
+        Cesium.Ion.defaultAccessToken =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3YjFmYmJlZC1lOGY1LTQzNWQtOTIyMS1mOTEzZmU0YzlhNDUiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NTY4MzJ9.mstQlEVlZoLRqcB51qexbpIzXh6PVr_WOHTc47orRxs';
 
         const viewer = new Cesium.Viewer('cesiumContainer', {
             animation: false,
@@ -47,50 +48,34 @@
             sceneModePicker: true,
             baseLayerPicker: true,
             navigationHelpButton: true
-            imageryProvider: Cesium.createWorldImagery()
+            terrain: Cesium.Terrain.fromWorldTerrain()
         });
 
-        viewer.scene.globe.enableLighting = true;
+        // Optional visual settings
+        viewer.scene.globe.enableLighting = false;
         viewer.scene.globe.depthTestAgainstTerrain = false;
 
         const westValleyFault = [
-    121.0750, 14.7500,
-    121.0850, 14.7300,
-    121.0950, 14.7100,
-    121.1000, 14.6900,
-    121.1050, 14.6700,
-    121.1100, 14.6500,
-    121.1200, 14.6300
+    121.094, 14.694,
+    121.098, 14.691,
+    121.102, 14.688
 ];
 
         viewer.entities.add({
-    name: "West Valley Fault",
-    polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
-        width: 6,
-        material: new Cesium.PolylineGlowMaterialProperty({
-            glowPower: 0.4,
-            color: Cesium.Color.ORANGERED.withAlpha(0.9)
-        }),
-        clampToGround: true
-    }
-});
-
-        // Camera view: Batasan Hills
-        viewer.camera.setView({
-            destination: Cesium.Cartesian3.fromDegrees(
-                121.0990,  // longitude
-                14.6905,   // latitude
-                5000       // altitude
-            ),
-            orientation: {
-                heading: 0,
-                pitch: Cesium.Math.toRadians(-45),
-                roll: 0
+            name: "West Valley Fault",
+            polyline: {
+                positions: Cesium.Cartesian3.fromDegreesArray(
+                    westValleyFault
+                ),
+                width: 6,
+                material: new Cesium.PolylineGlowMaterialProperty({
+                    glowPower: 0.4,
+                    color: Cesium.Color.ORANGERED.withAlpha(0.9)
+                }),
+                clampToGround: false
             }
         });
 
-        // Vulnerable sites list
         const vulnerableSites = [
             {
                 name: "Batasan Hills National High School",
@@ -124,7 +109,6 @@
             }
         ];
 
-        // Add markers dynamically
         vulnerableSites.forEach(site => {
             viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(
@@ -142,13 +126,27 @@
                     font: '14px sans-serif',
                     pixelOffset: new Cesium.Cartesian2(0, -20),
                     scale: 0.8,
-                    disableDepthTestDistance: Number.POSITIVE_INFINITY
+                    disableDepthTestDistance:
+                        Number.POSITIVE_INFINITY
                 }
             });
         });
 
-        viewer.zoomTo(viewer.entities);
+        viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(
+        121.0990,
+        14.6905,
+        5000
+    ),
+    orientation: {
+        heading: 0,
+        pitch: Cesium.Math.toRadians(-45),
+        roll: 0
+    }
+});
 
+</script>
+            
     </script>
 </body>
 </html>
