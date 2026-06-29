@@ -11,17 +11,31 @@ href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
 
 <style>
-body { margin:0; font-family:Arial; }
-#cesiumContainer { width:100%; height:100vh; }
+body {
+    margin: 0;
+    font-family: Arial;
+    overflow: hidden;
+}
 
+/* ✅ UI PANEL (RESTORED SPACE) */
 #controls {
-    position:absolute;
-    top:10px;
-    left:10px;
-    z-index:999;
-    background:white;
-    padding:10px;
-    border-radius:8px;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 999;
+    background: rgba(255,255,255,0.92);
+    padding: 12px;
+    border-radius: 10px;
+    width: 220px;
+}
+
+/* ✅ MAP IS NOT FULLSCREEN ANYMORE */
+#cesiumContainer {
+    position: absolute;
+    top: 0;
+    left: 260px;   /* space for UI */
+    right: 0;
+    bottom: 0;
 }
 </style>
 </head>
@@ -44,30 +58,28 @@ body { margin:0; font-family:Arial; }
 <script>
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4YTI4ZjcwZi02YTgxLTRhMjYtYjg4OC03YjQ2ZDcwM2FjNjYiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NjU0MDV9.p7cfQhS6SZ900y95Ll-5bmgITgleEBJGGQpNL9iWI_w";
 
+<script>
+Cesium.Ion.defaultAccessToken = "YOUR_TOKEN_HERE";
+
 const viewer = new Cesium.Viewer("cesiumContainer", {
     animation: false,
     timeline: false,
     infoBox: true,
     geocoder: true,
-    baseLayerPicker: true
+    baseLayerPicker: true,
+    terrainProvider: Cesium.createWorldTerrain()
 });
-    
-viewer.terrainProvider = Cesium.Terrain.fromWorldTerrain();
-viewer.scene.globe.enableLighting = false;
-viewer.scene.globe.depthTestAgainstTerrain = false;
-viewer.scene.skyAtmosphere.show = true;
 
-// =====================
-// CAMERA FIX (IMPORTANT)
-// =====================
+// =========================
+// CAMERA (QC FOCUS)
+// =========================
 viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 20000),
-    duration: 2
+    destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
 });
 
-// =====================
-// FAULT LINE
-// =====================
+// =========================
+// WEST VALLEY FAULT
+// =========================
 const westValleyFault = [
 121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
 121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
@@ -77,140 +89,162 @@ const westValleyFault = [
 121.0850,14.5500,121.0700,14.5200
 ];
 
+// Fault line
 viewer.entities.add({
-name:"West Valley Fault",
-polyline:{
-positions:Cesium.Cartesian3.fromDegreesArray(westValleyFault),
-width:5,
-material:Cesium.Color.ORANGERED
-}
+    name: "West Valley Fault",
+    polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(westValleyFault),
+        width: 4,
+        material: Cesium.Color.ORANGERED
+    }
 });
 
-// =====================
-// DISTANCE + INTENSITY
-// =====================
-function getDistanceKm(lon,lat,fault){
-let min=Infinity;
-for(let i=0;i<fault.length;i+=2){
-const d=Cesium.Cartesian3.distance(
-Cesium.Cartesian3.fromDegrees(lon,lat),
-Cesium.Cartesian3.fromDegrees(fault[i],fault[i+1])
-)/1000;
-if(d<min)min=d;
-}
-return min;
-}
+// =========================
+// 🌋 FAULT SLIP ANIMATION (NEW)
+// =========================
+let slipOffset = 0;
 
-function getIntensity(d){
-if(d<2)return 1;
-if(d<5)return 0.7;
-if(d<10)return 0.4;
-return 0.2;
-}
+setInterval(() => {
+    slipOffset = Math.sin(Date.now() * 0.002) * 0.0003;
 
-// =====================
-// FULL RISK NODES (FIXED + COMPLETE)
-// =====================
+    const shifted = westValleyFault.map((v, i) =>
+        i % 2 === 0 ? v + slipOffset : v
+    );
+
+    viewer.entities.removeAll();
+
+    viewer.entities.add({
+        name: "West Valley Fault (Active Slip)",
+        polyline: {
+            positions: Cesium.Cartesian3.fromDegreesArray(shifted),
+            width: 4,
+            material: Cesium.Color.ORANGERED
+        }
+    });
+
+}, 80);
+
+// =========================
+// 🌊 SEISMIC WAVE
+// =========================
+let waveRadius = 1000;
+
+viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(121.09, 14.69),
+    ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
+        material: Cesium.Color.RED.withAlpha(0.12)
+    }
+});
+
+setInterval(() => {
+    waveRadius += 1500;
+    if (waveRadius > 300000) waveRadius = 1000;
+}, 60);
+
+// =========================
+// 📊 LIVE RISK DASHBOARD
+// =========================
+const dashboard = document.createElement("div");
+dashboard.style = `
+position:absolute; top:10px; right:10px;
+background:white; padding:10px;
+border-radius:10px; z-index:999;
+width:220px; font-family:Arial;
+`;
+dashboard.innerHTML = "<b>Seismic Risk Panel</b><br>Loading...";
+document.body.appendChild(dashboard);
+
+// =========================
+// RISK NODES (FULL RESTORED)
+// =========================
 const riskNodes = [
+/* ================= NORTH ================= */
+{region:"north", name:"San Jose del Monte (Kaypian / Tungko / Muzon)", lon:121.0450, lat:14.8050, population:"≈ 650,000", reason:"Direct proximity to northern WVF segment; dense informal + residential expansion zones"},
 
-{region:"north",name:"San Jose del Monte (Kaypian / Tungko / Muzon)",lon:121.0450,lat:14.8050,population:"650k",reason:"Northern WVF proximity"},
-{region:"north",name:"Rodriguez–San Mateo Border",lon:121.1500,lat:14.7200,population:"400k",reason:"Soft soil amplification"},
+{region:"north", name:"Rodriguez–San Mateo Border (Rizal)", lon:121.1500, lat:14.7200, population:"≈ 400,000", reason:"Fault-adjacent valley settlements; soft soil amplification zone"},
 
-{region:"qc",name:"Batasan Hills – Commonwealth",lon:121.0850,lat:14.6900,population:"600k",reason:"Direct fault zone"},
-{region:"qc",name:"Matandang Balara / Loyola",lon:121.0750,lat:14.6500,population:"300k",reason:"Near fault corridor"},
-{region:"qc",name:"White Plains / Greenmeadows",lon:121.0600,lat:14.6100,population:"250k",reason:"Dense subdivision zone"},
+/* ================= QUEZON CITY CORE ================= */
+{region:"qc", name:"Batasan Hills – Commonwealth Corridor", lon:121.0850, lat:14.6900, population:"≈ 600,000", reason:"Highest exposure zone directly above West Valley Fault trace"},
 
-{region:"pasig",name:"Marikina Valley Basin",lon:121.1000,lat:14.6600,population:"500k",reason:"Liquefaction risk"},
-{region:"pasig",name:"Pasig Ugong / Valle Verde",lon:121.0800,lat:14.5900,population:"400k",reason:"Urban seismic zone"},
+{region:"qc", name:"Matandang Balara – Loyola Heights", lon:121.0750, lat:14.6500, population:"≈ 300,000", reason:"Residential + university zones near fault influence corridor"},
 
-{region:"south",name:"Taguig Bicutan",lon:121.0500,lat:14.5200,population:"450k",reason:"Southern extension"},
-{region:"south",name:"Muntinlupa Alabang",lon:121.0200,lat:14.4300,population:"350k",reason:"Southern hazard zone"}
+{region:"qc", name:"Ugong Norte / White Plains / Greenmeadows", lon:121.0600, lat:14.6100, population:"≈ 250,000", reason:"High-value dense subdivisions within strong shaking zone"},
+
+/* ================= MARIKINA / PASIG ================= */
+{region:"pasig", name:"Marikina (Tumana / Malanday / Industrial Valley)", lon:121.1000, lat:14.6600, population:"≈ 500,000", reason:"Alluvial basin; high liquefaction + shaking amplification risk"},
+
+{region:"pasig", name:"Pasig (Ugong / Bagong Ilog / Valle Verde)", lon:121.0800, lat:14.5900, population:"≈ 400,000", reason:"Dense residential-commercial seismic exposure zone"},
+
+/* ================= SOUTH METRO ================= */
+{region:"south", name:"Taguig (Upper Bicutan / Maharlika / Signal Village)", lon:121.0500, lat:14.5200, population:"≈ 450,000", reason:"High-density communities near southern WVF extension"},
+
+{region:"south", name:"Muntinlupa (Sucat / Cupang / Alabang Fringe)", lon:121.0400, lat:14.4500, population:"≈ 350,000", reason:"Southern termination influence zone; mixed industrial-residential exposure"},
+
+/* ================= LAGUNA / CAVITE EXTENSION ================= */
+{region:"south", name:"San Pedro (San Vicente / San Antonio)", lon:121.0450, lat:14.3500, population:"≈ 350,000", reason:"Southern WVF extension influence; suburban expansion corridor"},
+
+{region:"south", name:"Carmona / General Mariano Alvarez (Cavite)", lon:121.0400, lat:14.3000, population:"≈ 300,000", reason:"Near fault extension zone; industrial-residential mix"}
 ];
 
-let nodeEntities=[];
+let markers = [];
 
-// =====================
-// RENDER SYSTEM
-// =====================
-function render(region){
+function render(region) {
 
-nodeEntities.forEach(e=>viewer.entities.remove(e));
-nodeEntities=[];
+markers.forEach(m => viewer.entities.remove(m));
+markers = [];
+
+let count = 0;
 
 riskNodes
-.filter(n=>region==="all"||n.region===region)
-.forEach(node=>{
+.filter(n => region === "all" || n.region === region)
+.forEach(n => {
 
-const dist=getDistanceKm(node.lon,node.lat,westValleyFault);
-const intensity=getIntensity(dist);
+    const dist = Cesium.Cartesian3.distance(
+        Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+        Cesium.Cartesian3.fromDegrees(121.09, 14.69)
+    ) / 1000;
 
-const color=
-intensity>0.8?Cesium.Color.RED:
-intensity>0.5?Cesium.Color.ORANGE:
-intensity>0.3?Cesium.Color.YELLOW:
-Cesium.Color.GREEN;
+    const intensity = Math.max(0.2, 1 - dist / 15);
 
-const entity=viewer.entities.add({
-position:Cesium.Cartesian3.fromDegrees(node.lon,node.lat),
+    const entity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+        point: {
+            pixelSize: 12,
+            color: intensity > 0.7 ? Cesium.Color.RED :
+                   intensity > 0.4 ? Cesium.Color.ORANGE :
+                   Cesium.Color.YELLOW
+        },
+        label: {
+            text: n.name,
+            font: "12px sans-serif",
+            pixelOffset: new Cesium.Cartesian2(0, -20)
+        }
+    });
 
-point:{pixelSize:12,color},
-
-label:{
-text:node.name,
-font:"12px sans-serif",
-pixelOffset:new Cesium.Cartesian2(0,-20)
-},
-
-description:`
-<h2>${node.name}</h2>
-<p><b>Population:</b> ${node.population}</p>
-<p><b>Risk:</b> ${node.reason}</p>
-<p><b>Distance:</b> ${dist.toFixed(2)} km</p>
-`
+    markers.push(entity);
+    count++;
 });
 
-nodeEntities.push(entity);
-});
+dashboard.innerHTML = `
+<b>Seismic Risk Panel</b><br>
+Visible zones: ${count}<br>
+Intensity model: active<br>
+Fault system: West Valley Fault
+`;
 }
 
 render("all");
 
-// =====================
-// SWITCHER
-// =====================
+// =========================
+// REGION SWITCHER
+// =========================
 document.getElementById("regionSelect")
-.addEventListener("change",e=>render(e.target.value));
+.addEventListener("change", e => render(e.target.value));
 
-// =====================
-// EARTHQUAKE WAVE
-// =====================
-let waveRadius=1000;
-
-viewer.entities.add({
-position:Cesium.Cartesian3.fromDegrees(121.09,14.69),
-ellipse:{
-semiMajorAxis:new Cesium.CallbackProperty(()=>waveRadius,false),
-semiMinorAxis:new Cesium.CallbackProperty(()=>waveRadius,false),
-material:Cesium.Color.RED.withAlpha(0.15)
-}
-});
-
-const handler=new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-
-handler.setInputAction(()=>{
-
-waveRadius=1000;
-let interval=setInterval(()=>{
-waveRadius+=1200;
-if(waveRadius>250000)clearInterval(interval);
-},80);
-
-console.log("Earthquake triggered");
-
-},Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-console.log("Loaded successfully");
+// =========================
+// 🌆 3D BUILDINGS (QC / MARIKINA)
+// =========================
+viewer.scene.primitives.add(Cesium.createOsmBuildings());
 </script>
-
-</body>
-</html>
