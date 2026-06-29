@@ -247,6 +247,10 @@ body {
 .scaleLabels {
     display: flex;
     justify-content: space-between;
+    font-size: 11px;
+    margin-top: 8px;
+    color: #cbd5e1;
+}
 
 .scaleLabels {
     display: flex;
@@ -692,13 +696,19 @@ function updateSelectedInfo(data) {
     const info = document.getElementById("selectedInfo");
     const analysis = document.getElementById("analysisBox");
 
-    if(!data){
-        info.innerHTML = "";
-        analysis.innerHTML =
+   if(!data){
+    info.innerHTML = "";
+    analysis.innerHTML =
         "Select a location to begin hazard analysis.";
-        return;
-        
-    if(data.intensity){
+
+    document.getElementById("intensityPointer").style.left = "0%";
+    document.getElementById("intensityText").innerHTML =
+        "Awaiting selection";
+
+    return;
+}
+
+if(data.intensity){
 
     const intensityMap = {
         "VII": 60,
@@ -781,7 +791,7 @@ function setCenterMarker(lon, lat, name) {
         Number.POSITIVE_INFINITY
 },
        label: {
-    text: n.name,
+    text: name,
     font: "12px sans-serif",
     fillColor: Cesium.Color.WHITE,
     outlineColor: Cesium.Color.BLACK,
@@ -814,20 +824,24 @@ function render(region) {
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             point: {
-                pixelSize: 10,
-                color: Cesium.Color.YELLOW,
-                outlineColor: Cesium.Color.WHITE,
-                outlineWidth: 2
-            },
-            label: {
-                text: n.name,
-                font: "12px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 4,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                pixelOffset: new Cesium.Cartesian2(0, -18)
-            },
+    pixelSize: 14,
+    color: Cesium.Color.RED,
+    outlineColor: Cesium.Color.WHITE,
+    outlineWidth: 3,
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+    disableDepthTestDistance: Number.POSITIVE_INFINITY
+},
+           label: {
+    text: n.name,
+    font: "12px sans-serif",
+    fillColor: Cesium.Color.WHITE,
+    outlineColor: Cesium.Color.BLACK,
+    outlineWidth: 4,
+    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+    pixelOffset: new Cesium.Cartesian2(0,-22),
+    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+    disableDepthTestDistance: Number.POSITIVE_INFINITY
+},
             properties:n
         
         });
