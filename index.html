@@ -461,7 +461,6 @@ window.onerror = function(msg, src, line) {
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYTUzZmI1OS0wNjUxLTQxYjktOGMzMC1lODQyNzQ3YzIxZGMiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NjgwNzd9.jmAmq8mS_RcWJ0ZHunsG1neH_Mry1-3s4Ldu-NH7HoY";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
-const viewer = new Cesium.Viewer("cesiumContainer", {
     animation: false,
     timeline: false,
     infoBox: false,
@@ -472,17 +471,13 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 
 Cesium.createWorldTerrainAsync()
-.then(t => {
-    viewer.terrainProvider = t;
-    viewer.resize();
-});
+    .then(t => {
+        viewer.terrainProvider = t;
+    })
+    .catch(err => console.warn(err));
 
 viewer.scene.globe.enableLighting = false;
 viewer.scene.debugShowFramesPerSecond = true;
-viewer.resize();
-
-Cesium.createWorldTerrainAsync()
-.then(t => viewer.terrainProvider = t);
 
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
