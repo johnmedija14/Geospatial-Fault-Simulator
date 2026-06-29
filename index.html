@@ -696,40 +696,41 @@ function updateSelectedInfo(data) {
     const info = document.getElementById("selectedInfo");
     const analysis = document.getElementById("analysisBox");
 
-   if(!data){
-    info.innerHTML = "";
-    analysis.innerHTML =
-        "Select a location to begin hazard analysis.";
+    if (!data) {
+        info.innerHTML = "";
+        analysis.innerHTML =
+            "Select a location to begin hazard analysis.";
 
-    document.getElementById("intensityPointer").style.left = "0%";
-    document.getElementById("intensityText").innerHTML =
-        "Awaiting selection";
+        document.getElementById("intensityPointer").style.left = "0%";
+        document.getElementById("intensityText").innerHTML =
+            "Awaiting selection";
 
-    return;
-}
+        return;
+    }
 
-if(data.intensity){
+    if (data.intensity) {
 
-    const intensityMap = {
-        "VII": 60,
-        "VIII": 75,
-        "IX": 92,
-        "X": 100
-    };
+        const intensityMap = {
+            "VII": 60,
+            "VIII": 75,
+            "IX": 92,
+            "X": 100
+        };
 
-    document.getElementById("intensityPointer").style.left =
-        intensityMap[data.intensity] + "%";
+        const intensityLabels = {
+            "VII": "HIGH",
+            "VIII": "VERY HIGH",
+            "IX": "EXTREME",
+            "X": "CATASTROPHIC"
+        };
 
-    const intensityLabels = {
-    "VII": "HIGH",
-    "VIII": "VERY HIGH",
-    "IX": "EXTREME",
-    "X": "CATASTROPHIC"
-};
+        document.getElementById("intensityPointer").style.left =
+            intensityMap[data.intensity] + "%";
 
-document.getElementById("intensityText").innerHTML =
-    `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
-    
+        document.getElementById("intensityText").innerHTML =
+            `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
+    }
+
     info.innerHTML = `
         <div class="infoRow">
             <span class="infoLabel">Location</span>
@@ -738,27 +739,27 @@ document.getElementById("intensityText").innerHTML =
 
         <div class="infoRow">
             <span class="infoLabel">Population</span>
-            <span class="infoValue">${data.population}</span>
+            <span class="infoValue">${data.population || "-"}</span>
         </div>
 
         <div class="infoRow">
             <span class="infoLabel">Expected Intensity</span>
-            <span class="infoValue">${data.intensity}</span>
+            <span class="infoValue">${data.intensity || "-"}</span>
         </div>
 
         <div class="infoRow">
             <span class="infoLabel">Ground Rupture</span>
-            <span class="infoValue">${data.rupture}</span>
+            <span class="infoValue">${data.rupture || "-"}</span>
         </div>
 
         <div class="infoRow">
             <span class="infoLabel">Liquefaction Risk</span>
-            <span class="infoValue">${data.liquefaction}</span>
+            <span class="infoValue">${data.liquefaction || "-"}</span>
         </div>
 
         <div class="infoRow">
             <span class="infoLabel">Critical Structures</span>
-            <span class="infoValue">${data.structures}</span>
+            <span class="infoValue">${data.structures || "-"}</span>
         </div>
     `;
 
@@ -769,16 +770,15 @@ document.getElementById("intensityText").innerHTML =
         West Valley Fault system.
 
         Expected shaking intensity is approximately
-        PHIVOLCS Intensity ${data.intensity} during a
+        PHIVOLCS Intensity ${data.intensity || "-"} during a
         magnitude 7.2 rupture scenario.
 
         Ground rupture risk is classified as
-        <b>${data.rupture}</b> while liquefaction
+        <b>${data.rupture || "-"}</b> while liquefaction
         susceptibility is estimated to be
-        <b>${data.liquefaction}</b>.
+        <b>${data.liquefaction || "-"}</b>.
     `;
 }
-
 function setCenterMarker(lon, lat, name) {
     currentCenter = { lon, lat };
     if (centerMarker) viewer.entities.remove(centerMarker);
