@@ -11,59 +11,305 @@ href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
 
 <style>
-body {
+html, body {
+    width: 100%;
+    height: 100%;
     margin: 0;
     overflow: hidden;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    background: #05070c;
+    color: #fff;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+#topbar {
+    height: 64px;
+    background: linear-gradient(180deg, #0d1119 0%, #06080d 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 20;
+    box-sizing: border-box;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pulseIcon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%);
+    box-shadow: 0 0 18px rgba(255,60,60,0.7);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(120,0,0,0.95), rgba(80,0,0,0.95));
+    border: 1px solid rgba(255,80,80,0.35);
+    border-radius: 10px;
+    padding: 10px 14px;
+    box-shadow: 0 0 20px rgba(255,0,0,0.12);
+}
+
+.statusDot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff4d4d;
+    box-shadow: 0 0 10px #ff4d4d;
+}
+
+.statusTitle {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.statusSub {
+    font-size: 11px;
+    color: #ffd6d6;
+}
+
+#content {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+#mapWrap {
+    flex: 1;
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: #0b1220;
 }
 
 #cesiumContainer {
     position: absolute;
-    top: 0;
-    left: 260px;
-    right: 0;
-    bottom: 0;
+    inset: 0;
 }
 
 #controls {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 14px;
+    left: 14px;
     z-index: 999;
-    background: rgba(255,255,255,0.92);
+    background: rgba(18, 24, 35, 0.92);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     width: 220px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+}
+
+#controls h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+#controls select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: #0f1722;
+    color: white;
+    outline: none;
+}
+
+#sidebar {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(17,24,39,0.98), rgba(8,12,20,0.98));
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+}
+
+.card h3 {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(110,0,0,0.9), rgba(70,0,0,0.9));
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.metric {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px;
+}
+
+.metric:last-child {
+    border-bottom: none;
+}
+
+.metric span {
+    color: #d1d5db;
+}
+
+.metric b {
+    color: #fff;
+}
+
+.intensityBar {
+    height: 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #3bd24f 0%, #d7d92e 35%, #ff9f1c 70%, #ff2d2d 100%);
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.45);
+}
+
+.scaleLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    margin-top: 8px;
+    color: #cbd5e1;
+}
+
+.steps {
+    margin: 0;
+    padding-left: 20px;
+    color: #e5e7eb;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+#breakdownList {
+    display: grid;
+    gap: 8px;
+}
+
+.breakdownItem {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 #errorBox {
-    position: absolute;
+    position: fixed;
     bottom: 10px;
     left: 10px;
     z-index: 9999;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.85);
     color: #ff4d4d;
     padding: 10px;
     font-size: 12px;
     display: none;
+    border-radius: 8px;
+    max-width: 360px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="controls">
-    <h3>Region Switcher</h3>
-    <select id="regionSelect">
-        <option value="all">All Regions</option>
-        <option value="north">North</option>
-        <option value="qc">Quezon City</option>
-        <option value="pasig">Pasig / Marikina</option>
-        <option value="south">South</option>
-    </select>
+<div id="topbar">
+    <div class="brand">
+        <div class="pulseIcon"></div>
+        <div>
+            <div class="title">EARTHQUAKE SIMULATION</div>
+            <div class="subtitle">West Valley Fault System – Metro Manila & Nearby Areas</div>
+        </div>
+    </div>
+
+    <div class="statusBadge">
+        <div class="statusDot"></div>
+        <div>
+            <div class="statusTitle">EARTHQUAKE TRIGGERED</div>
+            <div class="statusSub">Click anywhere on the map to trigger seismic wave</div>
+        </div>
+    </div>
 </div>
 
-<div id="cesiumContainer"></div>
+<div id="content">
+    <div id="mapWrap">
+        <div id="controls">
+            <h3>Region Switcher</h3>
+            <select id="regionSelect">
+                <option value="all">All Regions</option>
+                <option value="north">North</option>
+                <option value="qc">Quezon City</option>
+                <option value="pasig">Pasig / Marikina</option>
+                <option value="south">South</option>
+            </select>
+        </div>
+
+        <div id="cesiumContainer"></div>
+    </div>
+
+    <aside id="sidebar">
+        <section class="card">
+            <h3>LIVE RISK SUMMARY</h3>
+            <div class="metric"><span>Total Pop. In View</span><b>≈ 4,050,000</b></div>
+            <div class="metric"><span>High Risk Zones</span><b>3</b></div>
+            <div class="metric"><span>Moderate Risk Zones</span><b>6</b></div>
+            <div class="metric"><span>Low Risk Zones</span><b>1</b></div>
+            <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
+        </section>
+
+        <section class="card">
+            <h3>INTENSITY OVERVIEW</h3>
+            <div class="intensityBar"></div>
+            <div class="scaleLabels"><span>LOW</span><span>MODERATE</span><span>VERY HIGH</span></div>
+        </section>
+
+        <section class="card">
+            <h3>REGION BREAKDOWN (POPULATION)</h3>
+            <div id="breakdownList"></div>
+        </section>
+
+        <section class="card">
+            <h3>HOW TO USE</h3>
+            <ol class="steps">
+                <li>Select a region to filter risk zones</li>
+                <li>Click anywhere on the map</li>
+                <li>Observe seismic wave propagation and intensity impact</li>
+            </ol>
+        </section>
+    </aside>
+</div>
+
 <div id="errorBox"></div>
 
 <script>
@@ -73,7 +319,7 @@ window.onerror = function(msg, src, line) {
     box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-Cesium.Ion.defaultAccessToken = "YOUR_CESIUM_TOKEN_HERE";
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYTUzZmI1OS0wNjUxLTQxYjktOGMzMC1lODQyNzQ3YzIxZGMiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NjgwNzd9.jmAmq8mS_RcWJ0ZHunsG1neH_Mry1-3s4Ldu-NH7HoY";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
     animation: false,
@@ -172,15 +418,7 @@ setInterval(() => {
 ========================= */
 const dashboard = document.createElement("div");
 dashboard.style = `
-position:absolute;
-top:10px;
-right:10px;
-background:white;
-padding:10px;
-border-radius:10px;
-z-index:999;
-width:220px;
-font-family:Arial;
+display:none;
 `;
 document.body.appendChild(dashboard);
 
@@ -224,11 +462,11 @@ riskNodes
     count++;
 });
 
-dashboard.innerHTML = `
-<b>Seismic Risk Panel</b><br>
-Zones: ${count}<br>
-Fault system: West Valley Fault<br>
-Buffer zone: ACTIVE
+document.getElementById("breakdownList").innerHTML = `
+    <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
+    <div class="breakdownItem"><span>Quezon City</span><b>1,150,000</b></div>
+    <div class="breakdownItem"><span>Pasig / Marikina</span><b>900,000</b></div>
+    <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
 `;
 }
 
@@ -237,7 +475,20 @@ render("all");
 document.getElementById("regionSelect")
 .addEventListener("change", e => render(e.target.value));
 
-viewer.scene.primitives.add(Cesium.createOsmBuildings());
+/* =========================
+   3D BUILDINGS (SAFE FIX)
+========================= */
+try {
+    const buildings = Cesium.createOsmBuildingsAsync
+        ? Cesium.createOsmBuildingsAsync()
+        : null;
+
+    if (buildings) {
+        buildings.then(b => viewer.scene.primitives.add(b));
+    }
+} catch (e) {
+    console.warn("OSM Buildings not available:", e);
+}
 </script>
 
 </body>
