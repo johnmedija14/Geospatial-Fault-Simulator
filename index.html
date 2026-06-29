@@ -211,12 +211,42 @@ body {
     color: #fff;
 }
 
-.intensityBar {
-    height: 16px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #3bd24f 0%, #d7d92e 35%, #ff9f1c 70%, #ff2d2d 100%);
+.intensityContainer{
+    position:relative;
+    height:24px;
+}
+
+.intensityBar{
+    position:absolute;
+    width:100%;
+    height:16px;
+    top:4px;
+    border-radius:999px;
+    background:linear-gradient(
+        90deg,
+        #3bd24f 0%,
+        #d7d92e 35%,
+        #ff9f1c 70%,
+        #ff2d2d 100%
+    );
     box-shadow: inset 0 0 8px rgba(0,0,0,0.45);
 }
+
+#intensityPointer{
+    position:absolute;
+    top:0px;
+    width:4px;
+    height:24px;
+    background:white;
+    border-radius:10px;
+    left:0%;
+    transition:all .5s ease;
+    box-shadow:0 0 10px white;
+}
+
+.scaleLabels {
+    display: flex;
+    justify-content: space-between;
 
 .scaleLabels {
     display: flex;
@@ -379,11 +409,25 @@ body {
             <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
         </section>
 
-        <section class="card">
-            <h3>INTENSITY OVERVIEW</h3>
-            <div class="intensityBar"></div>
-            <div class="scaleLabels"><span>LOW</span><span>MODERATE</span><span>VERY HIGH</span></div>
-        </section>
+       <section class="card">
+    <h3>INTENSITY OVERVIEW</h3>
+
+    <div class="intensityContainer">
+        <div class="intensityBar"></div>
+        <div id="intensityPointer"></div>
+    </div>
+
+    <div id="intensityText"
+         style="text-align:center;margin-top:10px;">
+         Awaiting selection
+    </div>
+
+    <div class="scaleLabels">
+        <span>LOW</span>
+        <span>MODERATE</span>
+        <span>VERY HIGH</span>
+    </div>
+</section>
 
         <section class="card">
             <h3>REGION BREAKDOWN (POPULATION)</h3>
@@ -487,8 +531,8 @@ for (let i = 0; i < westValleyFault.length; i += 2) {
     const lon = westValleyFault[i];
     const lat = westValleyFault[i + 1];
 
-    left.push(lon - 0.012, lat + 0.006);
-    right.push(lon + 0.012, lat - 0.006);
+   left.push(lon - 0.01, lat);
+right.push(lon + 0.01, lat);
 }
 
 viewer.entities.add({
@@ -653,6 +697,22 @@ function updateSelectedInfo(data) {
         analysis.innerHTML =
         "Select a location to begin hazard analysis.";
         return;
+        
+    if(data.intensity){
+
+    const intensityMap = {
+        "VII": 60,
+        "VIII": 75,
+        "IX": 92,
+        "X": 100
+    };
+
+    document.getElementById("intensityPointer").style.left =
+        intensityMap[data.intensity] + "%";
+
+    document.getElementById("intensityText").innerHTML =
+        `PHIVOLCS Intensity ${data.intensity}`;
+}
     }
 
     info.innerHTML = `
@@ -711,22 +771,28 @@ function setCenterMarker(lon, lat, name) {
     centerMarker = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(lon, lat),
        point: {
-    pixelSize: 14,
+    pixelSize: 12,
     color: Cesium.Color.YELLOW,
     outlineColor: Cesium.Color.WHITE,
-    outlineWidth: 3,
-    disableDepthTestDistance: Number.POSITIVE_INFINITY,
-    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+    outlineWidth: 2,
+    heightReference:
+        Cesium.HeightReference.CLAMP_TO_GROUND,
+    disableDepthTestDistance:
+        Number.POSITIVE_INFINITY
 },
-        label: {
-            text: name,
-            font: "12px sans-serif",
-            fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 4,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            pixelOffset: new Cesium.Cartesian2(0, -22)
-        }
+       label: {
+    text: n.name,
+    font: "12px sans-serif",
+    fillColor: Cesium.Color.WHITE,
+    outlineColor: Cesium.Color.BLACK,
+    outlineWidth: 4,
+    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+    pixelOffset: new Cesium.Cartesian2(0,-18),
+    heightReference:
+        Cesium.HeightReference.CLAMP_TO_GROUND,
+    disableDepthTestDistance:
+        Number.POSITIVE_INFINITY
+},
     });
 
     updateSelectedInfo({
