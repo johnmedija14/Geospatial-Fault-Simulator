@@ -6,13 +6,10 @@
     <title>Earthquake Simulation</title>
 
     <!-- Cesium CSS -->
-    <link
-        href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css"
-        rel="stylesheet"
-    />
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/cesium@1.142/Build/Cesium/Widgets/widgets.css">
 
-    <!-- Cesium JS -->
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cesium@1.142/Build/Cesium/Cesium.js"></script>
 
     <style>
         body {
@@ -47,8 +44,7 @@
             geocoder: true,
             sceneModePicker: true,
             baseLayerPicker: true,
-            navigationHelpButton: true
-            terrain: Cesium.Terrain.fromWorldTerrain()
+            navigationHelpButton: true,
         });
 
         // Optional visual settings
@@ -144,8 +140,6 @@
         roll: 0
     }
 });
-
-</script>
             
     </script>
 </body>
