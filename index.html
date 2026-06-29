@@ -7,10 +7,10 @@
 
     <!-- Cesium CSS -->
     <link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/cesium@1.142/Build/Cesium/Widgets/widgets.css">
+      href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/cesium@1.142/Build/Cesium/Cesium.js"></script>
-
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -139,6 +139,11 @@
         pitch: Cesium.Math.toRadians(-45),
         roll: 0
     }
+});
+
+        console.log("Cesium loaded:", Cesium);
+        viewer.scene.globe.tileLoadProgressEvent.addEventListener(function (remaining) {
+    console.log("Tiles remaining:", remaining);
 });
             
     </script>
