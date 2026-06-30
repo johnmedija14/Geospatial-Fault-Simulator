@@ -302,7 +302,9 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
   infoBox: false,
   selectionIndicator: false,
   geocoder: true,
-  baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" }))
+  baseLayer: new Cesium.ImageryLayer(
+    new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" })
+  )
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -330,102 +332,10 @@ const westValleyFault = [121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,121.
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
 let scenarioMag = 7.2;
-let safeZonesVisible = false;
 let measureMode = true;
-let measureEntities = [];
+let safeZonesVisible = true;
+let pulseEnabled = true;
 
-function clearMeasureLines() {
-  measureEntities.forEach(e => viewer.entities.remove(e));
-  measureEntities = [];
-}
-
-function getDistanceKm(lon1, lat1, lon2, lat2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function estimateTravelMinutes(distanceKm) {
-  const speedKmh = 4.5;
-  return Math.max(1, Math.round((distanceKm / speedKmh) * 60));
-}
-
-function getNearestSafeZone(node, safeZones) {
-  let best = null;
-  let bestDist = Infinity;
-  for (const s of safeZones) {
-    const d = getDistanceKm(node.lon, node.lat, s.lon, s.lat);
-    if (d < bestDist) {
-      bestDist = d;
-      best = s;
-    }
-  }
-  return best ? { zone: best, distance: bestDist } : null;
-}
-
-function drawMeasureLines() {
-  clearMeasureLines();
-
-  const safeZones = [
-    { name: "Veterans Memorial Medical Center", lon: 121.0408, lat: 14.6515 },
-    { name: "UP Diliman Grounds", lon: 121.0720, lat: 14.6535 },
-    { name: "N. S. Amoranto Stadium", lon: 121.0006, lat: 14.6337 },
-    { name: "Quezon Memorial Circle", lon: 121.0415, lat: 14.6510 },
-    { name: "Marikina Sports Center", lon: 121.0970, lat: 14.6575 },
-    { name: "Pasig City RAVE Park", lon: 121.0805, lat: 14.5655 },
-    { name: "Bonifacio Civil Center Grounds", lon: 121.0645, lat: 14.5380 },
-    { name: "Filinvest Corporate City Open Grounds", lon: 121.0480, lat: 14.4165 }
-  ];
-
-  const highRiskNodes = riskNodes.filter(n => n.intensity === "IX" || n.intensity === "VIII");
-
-  highRiskNodes.forEach((node, idx) => {
-    const match = getNearestSafeZone(node, safeZones);
-    if (!match) return;
-
-    const km = match.distance;
-    const mins = estimateTravelMinutes(km);
-
-    const line = viewer.entities.add({
-      polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArray([
-          node.lon, node.lat,
-          match.zone.lon, match.zone.lat
-        ]),
-        width: 3,
-        material: Cesium.Color.CYAN.withAlpha(0.28),
-        clampToGround: true
-      }
-    });
-
-    const midLon = (node.lon + match.zone.lon) / 2;
-    const midLat = (node.lat + match.zone.lat) / 2;
-
-    const label = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(midLon, midLat),
-      label: {
-        text: `${km.toFixed(1)} km • ~${mins} min`,
-        font: "13px sans-serif",
-        fillColor: Cesium.Color.WHITE,
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 3,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        backgroundColor: Cesium.Color.BLACK.withAlpha(0.45),
-        showBackground: true,
-        pixelOffset: new Cesium.Cartesian2(0, -10),
-        disableDepthTestDistance: Number.POSITIVE_INFINITY
-      }
-    });
-
-    measureEntities.push(line, label);
-  });
-}
-    
 viewer.entities.add({
   polyline: {
     positions: new Cesium.CallbackProperty(() => {
@@ -510,7 +420,7 @@ const riskNodes = [
   { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential" }
 ];
 
-let markers = [], activeMarkers = [], pulseEntities = [], pulseEnabled = true, heatEntities = [];
+let markers = [], activeMarkers = [], pulseEntities = [], heatEntities = [], safeZoneEntities = [], guideLineEntities = [], measureLineEntities = [];
 
 function intensityToMagnitude(intensity) {
   if (intensity === "IX") return scenarioMag;
@@ -647,6 +557,18 @@ function setCenterMarker(lon, lat, name) {
   updateSelectedInfo({ name, region: "Tap Point", lon, lat });
 }
 
+function clearSafeLayers() {
+  safeZoneEntities.forEach(e => viewer.entities.remove(e));
+  guideLineEntities.forEach(e => viewer.entities.remove(e));
+  safeZoneEntities = [];
+  guideLineEntities = [];
+}
+
+function clearMeasureLines() {
+  measureLineEntities.forEach(e => viewer.entities.remove(e));
+  measureLineEntities = [];
+}
+
 function render(region) {
   markers.forEach(m => viewer.entities.remove(m));
   markers = [];
@@ -694,55 +616,70 @@ function render(region) {
   updateSelectedInfo(null);
 }
 
+const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
+
+const safeLocations = [
+  { name: "Open Space", lon: 121.072, lat: 14.635, type: "evacuation" },
+  { name: "Hospital", lon: 121.060, lat: 14.675, type: "hospital" },
+  { name: "Evacuation Center", lon: 121.105, lat: 14.605, type: "evacuation" }
+];
+
 function addSafeZones() {
-  heatEntities.forEach(e => viewer.entities.remove(e));
-  heatEntities = [];
+  clearSafeLayers();
 
-  if (!safeZonesVisible) return;
+  riskNodes.forEach((node) => {
+    const nearest = safeLocations.reduce((best, loc) => {
+      const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
+      return (!best || d < best.d) ? { loc, d } : best;
+    }, null);
 
-  const safePoints = [
-    { name: "Veterans Memorial Medical Center", lon: 121.0408, lat: 14.6515, type: "green" },
-    { name: "UP Diliman Grounds", lon: 121.0720, lat: 14.6535, type: "green" },
-    { name: "N. S. Amoranto Stadium", lon: 121.0006, lat: 14.6337, type: "green" },
-    { name: "Quezon Memorial Circle", lon: 121.0415, lat: 14.6510, type: "green" },
-    { name: "Neopolitan Business District", lon: 121.0550, lat: 14.7280, type: "green" },
-    { name: "Manila Seedling Bank", lon: 121.0370, lat: 14.6425, type: "green" },
-    { name: "Marikina Sports Center", lon: 121.0970, lat: 14.6575, type: "green" },
-    { name: "Marikina River Park Grounds", lon: 121.0985, lat: 14.6450, type: "green" },
-    { name: "Pasig City RAVE Park", lon: 121.0805, lat: 14.5655, type: "green" },
-    { name: "Rizal High School Grounds", lon: 121.0830, lat: 14.5890, type: "green" },
-    { name: "Bonifacio Civil Center Grounds", lon: 121.0645, lat: 14.5380, type: "green" },
-    { name: "TLC Park", lon: 121.0555, lat: 14.5360, type: "green" },
-    { name: "Camp Bagong Diwa Open Fields", lon: 121.0520, lat: 14.5005, type: "green" },
-    { name: "Filinvest Corporate City Open Grounds", lon: 121.0480, lat: 14.4165, type: "green" },
-    { name: "Muntinlupa Sports Complex", lon: 121.0500, lat: 14.3835, type: "green" }
-  ];
+    if (!nearest) return;
 
-  const greenPin = new Cesium.PinBuilder().fromColor(Cesium.Color.LIMEGREEN, 48).toDataURL();
-
-  safePoints.forEach(p => {
-    const e = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat),
-      billboard: {
-        image: greenPin,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        scale: 0.95
-      },
-      label: {
-        text: p.name,
-        font: "13px sans-serif",
-        fillColor: Cesium.Color.LIME,
-        outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 3,
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        pixelOffset: new Cesium.Cartesian2(0, -28),
-        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
+    const line = viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([
+          node.lon, node.lat,
+          nearest.loc.lon, nearest.loc.lat
+        ]),
+        width: 3,
+        material: new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.WHITE.withAlpha(0.35),
+          gapColor: Cesium.Color.TRANSPARENT,
+          dashLength: 16
+        })
       }
     });
-    heatEntities.push(e);
+    guideLineEntities.push(line);
+
+    const safeMarker = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(nearest.loc.lon, nearest.loc.lat),
+      billboard: {
+        image: safeIcon,
+        scale: 0.65,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+      },
+      label: {
+        text: nearest.loc.name,
+        font: "13px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -30),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
+      },
+      properties: {
+        name: nearest.loc.name,
+        region: "Safe Zone",
+        lon: nearest.loc.lon,
+        lat: nearest.loc.lat
+      }
+    });
+
+    safeZoneEntities.push(safeMarker);
   });
 }
-    
+
 function generatePreparednessGuide(distanceKm) {
   const before = ["Secure heavy furniture.", "Prepare go-bag.", "Identify exits."];
   const during = ["Drop, Cover, and Hold On.", "Stay away from glass.", "Protect head and neck."];
@@ -750,22 +687,85 @@ function generatePreparednessGuide(distanceKm) {
   return `<b>Preparedness Guidance</b><br>Distance to nearest fault: <b>${distanceKm.toFixed(2)} km</b><br><br><b>Before:</b> ${before.join(" ")}<br><b>During:</b> ${during.join(" ")}<br><b>After:</b> ${after.join(" ")}`;
 }
 
+function drawMeasureLines() {
+  clearMeasureLines();
+  if (!measureMode) return;
+
+  const highRiskNodes = riskNodes.filter(n => n.intensity === "IX" || n.rupture === "Very High" || n.rupture === "High");
+
+  highRiskNodes.forEach((node) => {
+    const nearest = safeLocations.reduce((best, loc) => {
+      const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
+      return (!best || d < best.d) ? { loc, d } : best;
+    }, null);
+
+    if (!nearest) return;
+
+    const distanceKm = getDistanceKm(node.lon, node.lat, nearest.loc.lon, nearest.loc.lat);
+    const avgSpeedKmh = 4.8;
+    const timeMin = Math.max(1, Math.round((distanceKm / avgSpeedKmh) * 60));
+    const midLon = (node.lon + nearest.loc.lon) / 2;
+    const midLat = (node.lat + nearest.loc.lat) / 2;
+
+    const line = viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([node.lon, node.lat, nearest.loc.lon, nearest.loc.lat]),
+        width: 2,
+        material: new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.CYAN.withAlpha(0.22),
+          gapColor: Cesium.Color.TRANSPARENT,
+          dashLength: 12
+        })
+      }
+    });
+
+    const label = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(midLon, midLat),
+      label: {
+        text: `${distanceKm.toFixed(1)} km • ~${timeMin} min`,
+        font: "12px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -6),
+        backgroundColor: Cesium.Color.BLACK.withAlpha(0.35),
+        showBackground: true,
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000)
+      }
+    });
+
+    measureLineEntities.push(line, label);
+  });
+}
+
 function applyPreparednessMode() {
   document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
   document.getElementById("liveStatus").textContent = "Live AI Repository: Connected";
   document.getElementById("prepNote").textContent = measureMode
-    ? "Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers."
+    ? "Each high-risk node is connected to the nearest safe zone with an approximate distance and travel time."
     : "Safe zones are highlighted to support evacuation planning and preparedness recommendations.";
+}
+
+function setMode(measure) {
+  measureMode = measure;
+  measureBtn.classList.toggle("active", measure);
+  safeBtn.classList.toggle("active", !measure);
+  drawMeasureLines();
+  applyPreparednessMode();
 }
 
 function init() {
   render("all");
   addSeismicPulse();
+  addSafeZones();
+  drawMeasureLines();
   applyPreparednessMode();
 }
 init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
+
 document.getElementById("pulseToggle").addEventListener("click", () => {
   pulseEnabled = !pulseEnabled;
   pulseEntities.forEach(entity => entity.show = pulseEnabled);
@@ -776,7 +776,6 @@ document.getElementById("pulseToggle").addEventListener("click", () => {
 document.getElementById("toggleHeat").addEventListener("click", () => {
   if (heatEntities.length === 0) {
     addHeatLayer();
-    safeZonesVisible = false;
   } else {
     heatEntities.forEach(entity => viewer.entities.remove(entity));
     heatEntities = [];
@@ -792,31 +791,11 @@ document.getElementById("scenarioSlider").addEventListener("input", e => {
   document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
   viewer.scene.requestRender();
   applyPreparednessMode();
+  drawMeasureLines();
 });
 
 const measureBtn = document.getElementById("measureBtn");
 const safeBtn = document.getElementById("safeBtn");
-
-function setMode(measure) {
-  measureMode = measure;
-  safeZonesVisible = !measure;
-  measureBtn.classList.toggle("active", measure);
-  safeBtn.classList.toggle("active", !measure);
-
-  addSafeZones();
-
-  if (measure) {
-    drawMeasureLines();
-    document.getElementById("prepNote").textContent =
-      "Each high-risk node is connected to the nearest safe zone with an approximate distance and travel time.";
-  } else {
-    clearMeasureLines();
-    document.getElementById("prepNote").textContent =
-      "Safe zones are highlighted to support evacuation planning and preparedness recommendations.";
-  }
-
-  applyPreparednessMode();
-}
 measureBtn.addEventListener("click", () => setMode(true));
 safeBtn.addEventListener("click", () => setMode(false));
 
@@ -837,10 +816,10 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
     lon: props.lon.getValue(),
     lat: props.lat.getValue(),
     population: props.population.getValue(),
-    intensity: props.intensity.getValue(),
-    rupture: props.rupture.getValue(),
-    liquefaction: props.liquefaction.getValue(),
-    structures: props.structures.getValue()
+    intensity: props.intensity ? props.intensity.getValue() : null,
+    rupture: props.rupture ? props.rupture.getValue() : null,
+    liquefaction: props.liquefaction ? props.liquefaction.getValue() : null,
+    structures: props.structures ? props.structures.getValue() : null
   };
   updateSelectedInfo(data);
   viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
@@ -859,10 +838,10 @@ handler.setInputAction(function(click) {
       lon: props.lon.getValue(),
       lat: props.lat.getValue(),
       population: props.population.getValue(),
-      intensity: props.intensity.getValue(),
-      rupture: props.rupture.getValue(),
-      liquefaction: props.liquefaction.getValue(),
-      structures: props.structures.getValue()
+      intensity: props.intensity ? props.intensity.getValue() : null,
+      rupture: props.rupture ? props.rupture.getValue() : null,
+      liquefaction: props.liquefaction ? props.liquefaction.getValue() : null,
+      structures: props.structures ? props.structures.getValue() : null
     };
     updateSelectedInfo(data);
     viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
@@ -894,6 +873,7 @@ handler.setInputAction(function(click) {
   if (closest) {
     const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
     document.getElementById("analysisBox").innerHTML = generatePreparednessGuide(distanceKm);
+
     if (measureMode) {
       updateSelectedInfo({
         name: closest.node.name,
