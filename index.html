@@ -359,7 +359,100 @@ let currentCenter = { lon: 121.09, lat: 14.69 };
 let scenarioMag = 7.2;
 let safeZonesVisible = false;
 let measureMode = true;
+let measureEntities = [];
 
+function clearMeasureLines() {
+  measureEntities.forEach(e => viewer.entities.remove(e));
+  measureEntities = [];
+}
+
+function getDistanceKm(lon1, lat1, lon2, lat2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function estimateTravelMinutes(distanceKm) {
+  const speedKmh = 4.5;
+  return Math.max(1, Math.round((distanceKm / speedKmh) * 60));
+}
+
+function getNearestSafeZone(node, safeZones) {
+  let best = null;
+  let bestDist = Infinity;
+  for (const s of safeZones) {
+    const d = getDistanceKm(node.lon, node.lat, s.lon, s.lat);
+    if (d < bestDist) {
+      bestDist = d;
+      best = s;
+    }
+  }
+  return best ? { zone: best, distance: bestDist } : null;
+}
+
+function drawMeasureLines() {
+  clearMeasureLines();
+
+  const safeZones = [
+    { name: "Veterans Memorial Medical Center", lon: 121.0408, lat: 14.6515 },
+    { name: "UP Diliman Grounds", lon: 121.0720, lat: 14.6535 },
+    { name: "N. S. Amoranto Stadium", lon: 121.0006, lat: 14.6337 },
+    { name: "Quezon Memorial Circle", lon: 121.0415, lat: 14.6510 },
+    { name: "Marikina Sports Center", lon: 121.0970, lat: 14.6575 },
+    { name: "Pasig City RAVE Park", lon: 121.0805, lat: 14.5655 },
+    { name: "Bonifacio Civil Center Grounds", lon: 121.0645, lat: 14.5380 },
+    { name: "Filinvest Corporate City Open Grounds", lon: 121.0480, lat: 14.4165 }
+  ];
+
+  const highRiskNodes = riskNodes.filter(n => n.intensity === "IX" || n.intensity === "VIII");
+
+  highRiskNodes.forEach((node, idx) => {
+    const match = getNearestSafeZone(node, safeZones);
+    if (!match) return;
+
+    const km = match.distance;
+    const mins = estimateTravelMinutes(km);
+
+    const line = viewer.entities.add({
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([
+          node.lon, node.lat,
+          match.zone.lon, match.zone.lat
+        ]),
+        width: 3,
+        material: Cesium.Color.CYAN.withAlpha(0.28),
+        clampToGround: true
+      }
+    });
+
+    const midLon = (node.lon + match.zone.lon) / 2;
+    const midLat = (node.lat + match.zone.lat) / 2;
+
+    const label = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(midLon, midLat),
+      label: {
+        text: `${km.toFixed(1)} km • ~${mins} min`,
+        font: "13px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 3,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        backgroundColor: Cesium.Color.BLACK.withAlpha(0.45),
+        showBackground: true,
+        pixelOffset: new Cesium.Cartesian2(0, -10),
+        disableDepthTestDistance: Number.POSITIVE_INFINITY
+      }
+    });
+
+    measureEntities.push(line, label);
+  });
+}
+    
 viewer.entities.add({
   polyline: {
     positions: new Cesium.CallbackProperty(() => {
@@ -631,31 +724,52 @@ function render(region) {
 function addSafeZones() {
   heatEntities.forEach(e => viewer.entities.remove(e));
   heatEntities = [];
+
   if (!safeZonesVisible) return;
+
   const safePoints = [
-    { name: "Open Space", lon: 121.072, lat: 14.635 },
-    { name: "Hospital", lon: 121.060, lat: 14.675 },
-    { name: "Evacuation Center", lon: 121.105, lat: 14.605 }
+    { name: "Veterans Memorial Medical Center", lon: 121.0408, lat: 14.6515, type: "green" },
+    { name: "UP Diliman Grounds", lon: 121.0720, lat: 14.6535, type: "green" },
+    { name: "N. S. Amoranto Stadium", lon: 121.0006, lat: 14.6337, type: "green" },
+    { name: "Quezon Memorial Circle", lon: 121.0415, lat: 14.6510, type: "green" },
+    { name: "Neopolitan Business District", lon: 121.0550, lat: 14.7280, type: "green" },
+    { name: "Manila Seedling Bank", lon: 121.0370, lat: 14.6425, type: "green" },
+    { name: "Marikina Sports Center", lon: 121.0970, lat: 14.6575, type: "green" },
+    { name: "Marikina River Park Grounds", lon: 121.0985, lat: 14.6450, type: "green" },
+    { name: "Pasig City RAVE Park", lon: 121.0805, lat: 14.5655, type: "green" },
+    { name: "Rizal High School Grounds", lon: 121.0830, lat: 14.5890, type: "green" },
+    { name: "Bonifacio Civil Center Grounds", lon: 121.0645, lat: 14.5380, type: "green" },
+    { name: "TLC Park", lon: 121.0555, lat: 14.5360, type: "green" },
+    { name: "Camp Bagong Diwa Open Fields", lon: 121.0520, lat: 14.5005, type: "green" },
+    { name: "Filinvest Corporate City Open Grounds", lon: 121.0480, lat: 14.4165, type: "green" },
+    { name: "Muntinlupa Sports Complex", lon: 121.0500, lat: 14.3835, type: "green" }
   ];
+
+  const greenPin = new Cesium.PinBuilder().fromColor(Cesium.Color.LIMEGREEN, 48).toDataURL();
+
   safePoints.forEach(p => {
     const e = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat),
-      point: { pixelSize: 12, color: Cesium.Color.LIME, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
+      billboard: {
+        image: greenPin,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        scale: 0.95
+      },
       label: {
         text: p.name,
         font: "13px sans-serif",
         fillColor: Cesium.Color.LIME,
         outlineColor: Cesium.Color.BLACK,
-        outlineWidth: 2,
+        outlineWidth: 3,
         style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        pixelOffset: new Cesium.Cartesian2(0, -18),
+        pixelOffset: new Cesium.Cartesian2(0, -28),
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
       }
     });
     heatEntities.push(e);
   });
 }
-
+    
 function generatePreparednessGuide(distanceKm) {
   const before = ["Secure heavy furniture.", "Prepare go-bag.", "Identify exits."];
   const during = ["Drop, Cover, and Hold On.", "Stay away from glass.", "Protect head and neck."];
@@ -715,7 +829,19 @@ function setMode(measure) {
   safeZonesVisible = !measure;
   measureBtn.classList.toggle("active", measure);
   safeBtn.classList.toggle("active", !measure);
+
   addSafeZones();
+
+  if (measure) {
+    drawMeasureLines();
+    document.getElementById("prepNote").textContent =
+      "Each high-risk node is connected to the nearest safe zone with an approximate distance and travel time.";
+  } else {
+    clearMeasureLines();
+    document.getElementById("prepNote").textContent =
+      "Safe zones are highlighted to support evacuation planning and preparedness recommendations.";
+  }
+
   applyPreparednessMode();
 }
 measureBtn.addEventListener("click", () => setMode(true));
