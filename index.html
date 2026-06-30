@@ -487,16 +487,16 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 console.log("Cesium loaded:", Cesium);
     
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-        url: "https://tile.openstreetmap.org/"
-    }),
     animation: false,
     timeline: false,
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayerPicker: true,
-    terrainProvider: new Cesium.EllipsoidTerrainProvider()
+    baseLayerPicker: false,
+    terrainProvider: new Cesium.EllipsoidTerrainProvider(),
+    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+        url: "https://tile.openstreetmap.org/"
+    })
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
