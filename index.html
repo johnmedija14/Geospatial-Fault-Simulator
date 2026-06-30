@@ -459,7 +459,7 @@ window.onerror = function(msg, src, line) {
     box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTcxMDY5OS01NGNiLTRhOTYtYjA5Yi03MGU2NjA4NGU3YTIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI4MTI4MDJ9.FI17Q76OE7diFhN3DyMFAxvfm8KhpxqAl6OPUIf5XkU";
+Cesium.Ion.defaultAccessToken = "YOUR_CESIUM_ION_TOKEN_HERE";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
     baseLayerPicker: true,
@@ -580,7 +580,7 @@ viewer.entities.add({
     ellipse: {
         semiMajorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
         semiMinorAxis: new Cesium.CallbackProperty(() => waveRadius, false),
-        material: Cesium.Color.RED.withAlpha(0.08)
+        material: Cesium.Color.RED.withAlpha(0.04)
     }
 });
 
@@ -908,19 +908,19 @@ function addSeismicPulse() {
             ellipse: {
                 semiMajorAxis: new Cesium.CallbackProperty(() => {
                     if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.35 + index * 800) % 25000;
-                    return 1000 + t;
+                    const t = (performance.now() * 0.12 + index * 180) % 1200;
+                    return 120 + t;
                 }, false),
                 semiMinorAxis: new Cesium.CallbackProperty(() => {
                     if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.35 + index * 800) % 25000;
-                    return 1000 + t;
+                    const t = (performance.now() * 0.12 + index * 180) % 1200;
+                    return 120 + t;
                 }, false),
                 material: new Cesium.ColorMaterialProperty(
                     new Cesium.CallbackProperty(() => {
                         if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
                         const pulse = ((performance.now() * 0.001 + index) % 25) / 25;
-                        return Cesium.Color.RED.withAlpha(0.18 * (1 - pulse));
+                        return Cesium.Color.RED.withAlpha(0.04 * (1 - pulse));
                     }, false)
                 )
             }
@@ -1009,7 +1009,7 @@ function setCenterMarker(lon, lat, name) {
             outlineWidth: 2,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             pixelOffset: new Cesium.Cartesian2(0, -15),
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000)
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000)
         }
     });
 
@@ -1036,7 +1036,16 @@ function render(region) {
                     color: Cesium.Color.RED
                 },
                 label: {
-                    text: n.name
+                    text: n.name,
+                    font: "12px sans-serif",
+                    fillColor: Cesium.Color.WHITE,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 2,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    pixelOffset: new Cesium.Cartesian2(0, -18),
+                    distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 8000),
+                    translucencyByDistance: new Cesium.NearFarScalar(3000, 1.0, 8000, 0.0),
+                    scaleByDistance: new Cesium.NearFarScalar(3000, 1.0, 8000, 0.7)
                 },
                 properties: n
             });
