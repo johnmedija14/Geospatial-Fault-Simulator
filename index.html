@@ -1237,10 +1237,9 @@ document.getElementById("pulseToggle").addEventListener("click", () => {
         pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
 
     if (!pulseEnabled) {
-    pulseEntities.forEach(e => viewer.entities.remove(e));
-    pulseEntities = [];
-    viewer.scene.requestRender(); // forces immediate visual update
-}
+        pulseEntities.forEach(e => viewer.entities.remove(e));
+        pulseEntities = [];
+        viewer.scene.requestRender();
     } else {
         addSeismicPulse();
     }
