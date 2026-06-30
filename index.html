@@ -537,21 +537,32 @@ let ruptureT = 0;
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
 
+let time = 0;
+
 viewer.entities.add({
     polyline: {
         positions: new Cesium.CallbackProperty(() => {
-            ruptureT += 0.002;
 
-            return Cesium.Cartesian3.fromDegreesArrayHeights(
-                westValleyFault.flatMap((v, i) => {
-                    if (i % 2 === 0) {
-                        const base = 250;
-const radius = Math.min(1800, base + t * 0.2);
-                        return [v + base + wave, westValleyFault[i + 1], 100];
-                    }
-                    return [];
-                })
-            );
+            time += 0.01;
+
+            const coords = [];
+
+            for (let i = 0; i < westValleyFault.length; i += 2) {
+
+                const lon = westValleyFault[i];
+                const lat = westValleyFault[i + 1];
+
+                const wave = Math.sin(time + i) * 0.0005;
+
+                coords.push(
+                    lon + wave,
+                    lat,
+                    100
+                );
+            }
+
+            return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
+
         }, false),
 
         width: 6,
@@ -936,25 +947,6 @@ const riskNodes = [
 
 ];
 
-function addHeatLayer() {  
-    riskNodes.forEach(n => {  
-        viewer.entities.add({  
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),  
-            ellipse: {  
-                semiMajorAxis: 15000,  
-                semiMinorAxis: 15000,  
-                material: new Cesium.ColorMaterialProperty(  
-                    Cesium.Color.RED.withAlpha(  
-                        n.intensity === "IX" ? 0.25 :  
-                        n.intensity === "VIII" ? 0.18 :  
-                        0.10  
-                    )  
-                )  
-            }  
-        });  
-    });  
-}
-
 let markers = [];
 let activeMarkers = [];
 let selectedEntityData = null;
@@ -1170,9 +1162,6 @@ function setCenterMarker(lon, lat, name) {
     });
 }
 
-let markers = [];
-let activeMarkers = [];
-
 function render(region) {
     markers.forEach(m => viewer.entities.remove(m));
     markers = [];
@@ -1199,38 +1188,6 @@ function render(region) {
 }
 
 render("all");
-
-    riskNodes
-    .filter(n => region === "all" || n.region === region)
-    .forEach(n => {
-        const entity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            point: {
-    pixelSize: 14,
-    color: Cesium.Color.RED,
-    outlineColor: Cesium.Color.WHITE,
-    outlineWidth: 3,
-    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-    disableDepthTestDistance: Number.POSITIVE_INFINITY
-},
-           label: {
-    text: n.name,
-    font: "12px sans-serif",
-    fillColor: Cesium.Color.WHITE,
-    outlineColor: Cesium.Color.BLACK,
-    outlineWidth: 4,
-    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-    pixelOffset: new Cesium.Cartesian2(0,-22),
-    heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-    disableDepthTestDistance: Number.POSITIVE_INFINITY
-},
-            properties:n
-        
-        });
-
-        markers.push(entity);
-        activeMarkers.push(n);
-    });
 
     document.getElementById("breakdownList").innerHTML = `
         <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
