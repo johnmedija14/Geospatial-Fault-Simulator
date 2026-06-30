@@ -970,32 +970,46 @@ function addSeismicPulse() {
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
 
-            ellipse: {
-               semiMajorAxis: new Cesium.CallbackProperty(() => {
-    if (!pulseEnabled) return 0;
-    const t = (Date.now() * 0.0015 + index * 120) % 8000;
-    const radius = Math.min(6000, 500 + t * 0.6);
-    return radius;
-}, false),
+          ellipse: {
 
-semiMinorAxis: new Cesium.CallbackProperty(() => {
-    if (!pulseEnabled) return 0;
-    const t = (Date.now() * 0.0015 + index * 120) % 8000;
-    const radius = Math.min(6000, 500 + t * 0.6);
-    return radius;
-}, false),
+    semiMajorAxis: new Cesium.CallbackProperty(() => {
 
-                material: new Cesium.ColorMaterialProperty(
-                    new Cesium.CallbackProperty(() => {
+        if (!pulseEnabled) return 0;
 
-                        if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
+        const t =
+            (performance.now() * 0.35 + index * 800) % 25000;
 
-                        const t = (Math.sin(Date.now() * 0.002 + index) + 1) / 2;
+        return 1000 + t;
 
-                        return Cesium.Color.fromCssColorString("#ff6b81").withAlpha(0.04 * (1 - t));
-                    }, false)
-                )
-            }
+    }, false),
+
+    semiMinorAxis: new Cesium.CallbackProperty(() => {
+
+        if (!pulseEnabled) return 0;
+
+        const t =
+            (performance.now() * 0.35 + index * 800) % 25000;
+
+        return 1000 + t;
+
+    }, false),
+
+    material: new Cesium.ColorMaterialProperty(
+        new Cesium.CallbackProperty(() => {
+
+            if (!pulseEnabled)
+                return Cesium.Color.TRANSPARENT;
+
+            const pulse =
+                ((performance.now() * 0.001 + index) % 25) / 25;
+
+            return Cesium.Color.RED.withAlpha(
+                0.18 * (1 - pulse)
+            );
+
+        }, false)
+    )
+}
         });
 
         pulseEntities.push(entity);
@@ -1210,15 +1224,13 @@ document.getElementById("pulseToggle").addEventListener("click", () => {
     pulseEnabled = !pulseEnabled;
 
     document.getElementById("pulseToggle").innerText =
-        pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
+        pulseEnabled
+            ? "Seismic Pulse: ON"
+            : "Seismic Pulse: OFF";
 
-    if (!pulseEnabled) {
-        pulseEntities.forEach(e => viewer.entities.remove(e));
-        pulseEntities = [];
-        viewer.scene.requestRender();
-    } else {
-        addSeismicPulse();
-    }
+    pulseEntities.forEach(entity => {
+        entity.show = pulseEnabled;
+    });
 });
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
