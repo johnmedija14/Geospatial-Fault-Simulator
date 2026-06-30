@@ -1161,26 +1161,23 @@ function render(region) {
     activeMarkers = [];
 
     riskNodes
-    .filter(n => region === "all" || n.region === region)
-    .forEach(n => {
-        const entity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            point: {
-                pixelSize: 14,
-                color: Cesium.Color.RED
-            },
-            label: {
-                text: n.name
-            },
-            properties: n
+        .filter(n => region === "all" || n.region === region)
+        .forEach(n => {
+            const entity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+                point: {
+                    pixelSize: 14,
+                    color: Cesium.Color.RED
+                },
+                label: {
+                    text: n.name
+                },
+                properties: n
+            });
+
+            markers.push(entity);
+            activeMarkers.push(n);
         });
-
-        markers.push(entity);
-        activeMarkers.push(n);
-    });
-}
-
-render("all");
 
     document.getElementById("breakdownList").innerHTML = `
         <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
@@ -1189,23 +1186,32 @@ render("all");
         <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
     `;
 
- const currentRegion = "all";
-const count = activeMarkers.length;
+    const count = activeMarkers.length;
 
-document.getElementById("popCount").textContent =
-    currentRegion === "all"
-        ? "≈ 4,050,000"
-        : `≈ ${count * 450000}`;
-    document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
-    document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
-    document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
+    document.getElementById("popCount").textContent =
+        region === "all"
+            ? "≈ 4,050,000"
+            : `≈ ${count * 450000}`;
+
+    document.getElementById("highCount").textContent =
+        Math.max(1, Math.round(count / 3));
+
+    document.getElementById("modCount").textContent =
+        Math.max(1, Math.round(count / 2));
+
+    document.getElementById("lowCount").textContent =
+        Math.max(1, count - Math.round(count / 2));
 
     updateSelectedInfo(null);
 }
 
-render("all");
-addHeatLayer();
-addSeismicPulse();
+function init() {
+    render("all");
+    addHeatLayer();
+    addSeismicPulse();
+}
+
+init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
 
