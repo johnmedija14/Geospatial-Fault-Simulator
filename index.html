@@ -492,11 +492,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayerPicker: true,   // IMPORTANT: turn this ON
-
-    imageryProvider: Cesium.createWorldImagery(), // FIXED
-
-    terrainProvider: Cesium.createWorldTerrain()  // optional but recommended
+    baseLayerPicker: true
 });
     
 viewer.scene.globe.depthTestAgainstTerrain = false;
