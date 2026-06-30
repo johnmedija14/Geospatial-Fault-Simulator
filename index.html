@@ -231,10 +231,10 @@ body { display: flex; flex-direction: column; }
 
 .legendPanel {
     position: absolute;
-    top: 92px;
+    top: 110px;
     left: 14px;
     z-index: 998;
-    width: 320px;
+    width: 220px;
     background: rgba(10, 14, 24, 0.86);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 18px;
@@ -286,6 +286,12 @@ body { display: flex; flex-direction: column; }
 .legendRed {
     background: radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%);
 }
+.legendGreen {
+    background: radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%);
+}
+.legendBlue {
+    background: radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%);
+}
 .legendText b { color: white; }
 
 @keyframes fadeIn {
@@ -294,6 +300,7 @@ body { display: flex; flex-direction: column; }
 }
 </style>
 </head>
+
 <body>
 
 <div id="topbar">
@@ -341,6 +348,14 @@ body { display: flex; flex-direction: column; }
                 <div class="legendRow">
                     <div class="legendIcon legendRed">⚠</div>
                     <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+                </div>
+                <div class="legendRow">
+                    <div class="legendIcon legendGreen">✚</div>
+                    <div class="legendText"><b>Green marker</b> shows possible evacuation centers or hospitals.</div>
+                </div>
+                <div class="legendRow">
+                    <div class="legendIcon legendBlue">🌊</div>
+                    <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
                 </div>
             </div>
         </div>
@@ -412,7 +427,7 @@ window.onerror = function(msg, src, line) {
     box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTcxMDY5OS01NGNiLTRhOTYtYjA5Yi03MGU2NjA4NGU3YTIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI4MTI4MDJ9.FI17Q76OE7diFhN3DyMFAxvfm8KhpxqAl6OPUIf5XkU";
+Cesium.Ion.defaultAccessToken = "YOUR_CESIUM_ION_TOKEN_HERE";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
     baseLayerPicker: true,
@@ -543,8 +558,11 @@ function intensityToMagnitude(intensity) {
     return 6.5;
 }
 
-function magnitudeToPulseSize(mag) { return 180 + (mag - 6) * 180; }
-function magnitudeToPulseAlpha(mag) { return 0.03 + (mag - 6) * 0.01; }
+function pulseParams(intensity) {
+    if (intensity === "IX") return { speed: 1.75, base: 260, alpha: 0.045 };
+    if (intensity === "VIII") return { speed: 1.35, base: 210, alpha: 0.035 };
+    return { speed: 1.05, base: 160, alpha: 0.025 };
+}
 
 function makeHazardPin(color, glyph) {
     return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
@@ -552,26 +570,25 @@ function makeHazardPin(color, glyph) {
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
 
 function labelStyleByIntensity(intensity) {
-    if (intensity === "IX") {
-        return { font: "18px sans-serif", color: Cesium.Color.fromCssColorString("#fff2f2") };
-    }
-    if (intensity === "VIII") {
-        return { font: "16px sans-serif", color: Cesium.Color.WHITE };
-    }
-    return { font: "14px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe") };
+    if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
+    if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
+    return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
 }
 
 function addHeatLayer() {
     heatEntities.forEach(e => viewer.entities.remove(e));
     heatEntities = [];
+
     riskNodes.forEach(n => {
         const mag = intensityToMagnitude(n.intensity);
         const e = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
-                semiMajorAxis: 600 + (mag - 6) * 220,
-                semiMinorAxis: 600 + (mag - 6) * 220,
-                material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.14)),
+                semiMajorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+                semiMinorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+                material: new Cesium.CallbackProperty(() => {
+                    return Cesium.Color.RED.withAlpha(0.06 + (mag - 6) * 0.015);
+                }, false),
                 outline: false
             }
         });
@@ -584,29 +601,26 @@ function addSeismicPulse() {
     pulseEntities = [];
 
     riskNodes.forEach((n, index) => {
+        const p = pulseParams(n.intensity);
         const mag = intensityToMagnitude(n.intensity);
-        const base = magnitudeToPulseSize(mag);
-        const alpha = magnitudeToPulseAlpha(mag);
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
                 semiMajorAxis: new Cesium.CallbackProperty(() => {
                     if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.12 + index * 180) % (base * 5);
-                    return base + t;
+                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+                    return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
                 }, false),
                 semiMinorAxis: new Cesium.CallbackProperty(() => {
                     if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.12 + index * 180) % (base * 5);
-                    return base + t;
+                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+                    return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
                 }, false),
-                material: new Cesium.ColorMaterialProperty(
-                    new Cesium.CallbackProperty(() => {
-                        if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
-                        const pulse = ((performance.now() * 0.001 + index) % 25) / 25;
-                        return Cesium.Color.RED.withAlpha(alpha * (1 - pulse));
-                    }, false)
-                ),
+                material: new Cesium.CallbackProperty(() => {
+                    if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
+                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+                    return Cesium.Color.RED.withAlpha(p.alpha * (1 - t));
+                }, false),
                 height: 0
             }
         });
@@ -689,7 +703,11 @@ function render(region) {
         const ls = labelStyleByIntensity(n.intensity);
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            billboard: { image: affectedIcon, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78 },
+            billboard: {
+                image: affectedIcon,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78
+            },
             label: {
                 text: n.name,
                 font: ls.font,
@@ -699,8 +717,8 @@ function render(region) {
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
                 pixelOffset: new Cesium.Cartesian2(0, -30),
                 eyeOffset: new Cesium.Cartesian3(0, 0, -12),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 12000),
-                scaleByDistance: new Cesium.NearFarScalar(1500, 1.2, 12000, 0.9)
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000),
+                scaleByDistance: new Cesium.NearFarScalar(1500, ls.scale, 14000, 0.92)
             },
             properties: n
         });
@@ -760,6 +778,7 @@ document.getElementById("resetView").addEventListener("click", () => {
 const legendToggle = document.getElementById("legendToggle");
 const legendBody = document.getElementById("legendBody");
 const legendArrow = document.getElementById("legendArrow");
+
 legendToggle.addEventListener("click", () => {
     const open = legendBody.classList.toggle("open");
     legendArrow.textContent = open ? "▾" : "▸";
@@ -781,7 +800,10 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
     };
     selectedEntityData = data;
     updateSelectedInfo(data);
-    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
+        duration: 1.5
+    });
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -805,11 +827,15 @@ handler.setInputAction(function(click) {
         };
         selectedEntityData = data;
         updateSelectedInfo(data);
-        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
+            duration: 1.5
+        });
         return;
     }
 
     let cartesian = viewer.scene.pickPosition(click.position);
+
     if (!Cesium.defined(cartesian)) {
         const ray = viewer.camera.getPickRay(click.position);
         if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
