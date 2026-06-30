@@ -421,6 +421,30 @@ const riskNodes = [
 ];
 
 let markers = [], activeMarkers = [], pulseEntities = [], heatEntities = [], safeZoneEntities = [], guideLineEntities = [], measureLineEntities = [];
+let safeLocationEntities = [];
+let safeMarkerIndex = new Map();
+let currentSelectedSafe = null;
+
+const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
+
+const safeLocations = [
+  { name: "Veterans Memorial Medical Center", lon: 121.0362, lat: 14.6569, type: "medical", reason: "Large institutional site with emergency response access and wide grounds.", accessNote: "Useful as a north quadrant staging and medical support area." },
+  { name: "UP Diliman Grounds", lon: 121.0649, lat: 14.6520, type: "open space", reason: "Expansive open grounds suitable for evacuation assembly and reduced collapse exposure.", accessNote: "Commonly used as a broad open refuge area." },
+  { name: "Quezon Memorial Circle", lon: 121.0419, lat: 14.6517, type: "open space", reason: "Open civic park with multiple access routes and large assembly space.", accessNote: "Strong candidate for evacuation gathering and temporary staging." },
+  { name: "LRT-2 Santolan Depot", lon: 121.0915, lat: 14.6268, type: "depot", reason: "Designated transport facility that can serve as an organized response point.", accessNote: "Good access from east Metro Manila corridors." },
+  { name: "Marikina Boys Town", lon: 121.0929, lat: 14.6542, type: "institutional", reason: "Large institutional compound with usable open and structured spaces.", accessNote: "Important east-side evacuation support location." },
+  { name: "Red Cross Marikina", lon: 121.1020, lat: 14.6477, type: "medical", reason: "Emergency-response oriented location with relief and coordination potential.", accessNote: "Suitable for first aid and quick assistance." },
+  { name: "ULTRA Pasig", lon: 121.0722, lat: 14.5764, type: "sports complex", reason: "Wide venue with open assembly capacity and known public-event space.", accessNote: "Useful as a south/east staging area." },
+  { name: "Pasig Training Center", lon: 121.0901, lat: 14.5709, type: "training center", reason: "Public facility with organized access and open operational use.", accessNote: "Can support evacuation coordination." },
+  { name: "Intramuros Golf Course", lon: 120.9730, lat: 14.5896, type: "open space", reason: "Large open green space with limited building density.", accessNote: "Helps reduce exposure to collapse hazards." },
+  { name: "Cuneta Astrodome", lon: 120.9960, lat: 14.5368, type: "sports complex", reason: "Large enclosed civic venue often used for mass gathering support.", accessNote: "Useful for transport and relief coordination." },
+  { name: "University of Santo Tomas", lon: 120.9871, lat: 14.6091, type: "university", reason: "Large campus environment with internal open areas and organized access.", accessNote: "Can serve as a central-city refuge point." },
+  { name: "Villamor Air Base Golf Course", lon: 121.0165, lat: 14.5239, type: "open space", reason: "Extensive open area suitable for assembly and emergency staging.", accessNote: "Useful in the south Metro response corridor." },
+  { name: "University of Makati", lon: 121.0355, lat: 14.5581, type: "university", reason: "Institutional campus with accessibility and coordination potential.", accessNote: "Can support organized evacuation flow." },
+  { name: "Pateros Municipal Hall", lon: 121.0670, lat: 14.5450, type: "civic center", reason: "Government facility with public access and administrative coordination role.", accessNote: "Helpful for local evacuation management." },
+  { name: "Paranaque City Hall", lon: 121.0214, lat: 14.5090, type: "civic center", reason: "Civic facility that can host coordination and public support functions.", accessNote: "Important south Metro staging point." },
+  { name: "Sunken Garden", lon: 121.0604, lat: 14.5847, type: "open space", reason: "Wide open area with reduced overhead hazard exposure.", accessNote: "Good assembly area for nearby communities." }
+];
 
 function intensityToMagnitude(intensity) {
   if (intensity === "IX") return scenarioMag;
@@ -500,6 +524,34 @@ function getDistanceKm(lon1, lat1, lon2, lat2) {
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+function safeDistanceInfo(node, loc) {
+  const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
+  const ruptureRisk = d < 1.5 ? "Low" : d < 3 ? "Low to Moderate" : "Low";
+  return { distanceKm: d, ruptureRisk };
+}
+
+function readEntityData(entity) {
+  if (!entity || !entity.properties) return null;
+  const props = entity.properties;
+  const getProp = (key) => (props[key] && typeof props[key].getValue === "function") ? props[key].getValue() : null;
+  return {
+    name: getProp("name"),
+    region: getProp("region"),
+    lon: getProp("lon"),
+    lat: getProp("lat"),
+    population: getProp("population"),
+    intensity: getProp("intensity"),
+    rupture: getProp("rupture"),
+    liquefaction: getProp("liquefaction"),
+    structures: getProp("structures"),
+    type: getProp("type"),
+    reason: getProp("reason"),
+    accessNote: getProp("accessNote"),
+    nearestHazard: getProp("nearestHazard"),
+    distanceToFault: getProp("distanceToFault")
+  };
+}
+
 function updateSelectedInfo(data) {
   const info = document.getElementById("selectedInfo");
   const analysis = document.getElementById("analysisBox");
@@ -511,29 +563,46 @@ function updateSelectedInfo(data) {
     return;
   }
 
-  if (data.intensity) {
+  const isSafe = data.region === "Safe Zone";
+
+  if (!isSafe && data.intensity) {
     const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
     const intensityLabels = { "VII": "HIGH", "VIII": "VERY HIGH", "IX": "EXTREME", "X": "CATASTROPHIC" };
     document.getElementById("intensityPointer").style.left = intensityMap[data.intensity] + "%";
     document.getElementById("intensityText").innerHTML = `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
+  } else if (isSafe) {
+    document.getElementById("intensityPointer").style.left = "22%";
+    document.getElementById("intensityText").innerHTML = "Safe Zone — LOW EXPOSURE";
   }
 
   info.innerHTML = `
-    <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name}</span></div>
-    <div class="infoRow"><span class="infoLabel">Population</span><span class="infoValue">${data.population || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">Expected Intensity</span><span class="infoValue">${data.intensity || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">${isSafe ? "Refuge Level" : "Expected Intensity"}</span><span class="infoValue">${data.intensity || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
   `;
 
-  analysis.innerHTML = `
-    <b>Automated Hazard Assessment</b><br><br>
-    ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
-    Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude ${scenarioMag.toFixed(1)} rupture scenario.<br><br>
-    Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.<br><br>
-    <b>Preparedness Mode:</b> ${measureMode ? "Distance inspection is active." : "Safe-zone guidance is active."}
-  `;
+  if (isSafe) {
+    analysis.innerHTML = `
+      <b>Safe Zone Board</b><br><br>
+      <b>Place:</b> ${data.name || "-"}<br>
+      <b>Why it is safe:</b> ${data.reason || "Open or institutional area selected for evacuation and emergency staging."}<br>
+      <b>Access note:</b> ${data.accessNote || "Chosen for organized access and emergency support."}<br>
+      <b>Proximity to fault:</b> ${data.distanceToFault ? `${data.distanceToFault.toFixed(2)} km` : "Computed from nearest mapped fault reference"}<br>
+      <b>Nearest hazard reference:</b> ${data.nearestHazard || "Nearest red-marked site"}<br><br>
+      This location is being treated as a lower-exposure refuge point compared with nearby hazard nodes.
+    `;
+  } else {
+    analysis.innerHTML = `
+      <b>Automated Hazard Assessment</b><br><br>
+      ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
+      Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude ${scenarioMag.toFixed(1)} rupture scenario.<br><br>
+      Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.<br><br>
+      <b>Preparedness Mode:</b> ${measureMode ? "Distance inspection is active." : "Safe-zone guidance is active."}
+    `;
+  }
 }
 
 function setCenterMarker(lon, lat, name) {
@@ -554,14 +623,16 @@ function setCenterMarker(lon, lat, name) {
       scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9)
     }
   });
-  updateSelectedInfo({ name, region: "Tap Point", lon, lat });
 }
 
 function clearSafeLayers() {
   safeZoneEntities.forEach(e => viewer.entities.remove(e));
   guideLineEntities.forEach(e => viewer.entities.remove(e));
+  safeLocationEntities.forEach(e => viewer.entities.remove(e));
   safeZoneEntities = [];
   guideLineEntities = [];
+  safeLocationEntities = [];
+  safeMarkerIndex = new Map();
 }
 
 function clearMeasureLines() {
@@ -616,50 +687,24 @@ function render(region) {
   updateSelectedInfo(null);
 }
 
-const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
-
-const safeLocations = [
-  { name: "Open Space", lon: 121.072, lat: 14.635, type: "evacuation" },
-  { name: "Hospital", lon: 121.060, lat: 14.675, type: "hospital" },
-  { name: "Evacuation Center", lon: 121.105, lat: 14.605, type: "evacuation" }
-];
-
 function addSafeZones() {
   clearSafeLayers();
 
-  riskNodes.forEach((node) => {
-    const nearest = safeLocations.reduce((best, loc) => {
-      const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
-      return (!best || d < best.d) ? { loc, d } : best;
+  safeLocations.forEach((loc, idx) => {
+    const nearestHazard = riskNodes.reduce((best, node) => {
+      const d = getDistanceKm(loc.lon, loc.lat, node.lon, node.lat);
+      return (!best || d < best.d) ? { node, d } : best;
     }, null);
 
-    if (!nearest) return;
-
-    const line = viewer.entities.add({
-      polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArray([
-          node.lon, node.lat,
-          nearest.loc.lon, nearest.loc.lat
-        ]),
-        width: 3,
-        material: new Cesium.PolylineDashMaterialProperty({
-          color: Cesium.Color.WHITE.withAlpha(0.35),
-          gapColor: Cesium.Color.TRANSPARENT,
-          dashLength: 16
-        })
-      }
-    });
-    guideLineEntities.push(line);
-
-    const safeMarker = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(nearest.loc.lon, nearest.loc.lat),
+    const safeEntity = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat),
       billboard: {
         image: safeIcon,
-        scale: 0.65,
+        scale: 0.70,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM
       },
       label: {
-        text: nearest.loc.name,
+        text: loc.name,
         font: "13px sans-serif",
         fillColor: Cesium.Color.WHITE,
         outlineColor: Cesium.Color.BLACK,
@@ -669,14 +714,42 @@ function addSafeZones() {
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
       },
       properties: {
-  name: nearest.loc.name,
-  region: "Safe Zone",
-  lon: nearest.loc.lon,
-  lat: nearest.loc.lat
-}
+        name: loc.name,
+        region: "Safe Zone",
+        lon: loc.lon,
+        lat: loc.lat,
+        population: "Evacuation / Open Area",
+        intensity: "Low Exposure",
+        rupture: "Low",
+        liquefaction: "Low",
+        structures: loc.type || "Safe site",
+        reason: loc.reason || "Selected safe site.",
+        accessNote: loc.accessNote || "Accessible for evacuation and emergency support.",
+        nearestHazard: nearestHazard ? nearestHazard.node.name : "",
+        distanceToFault: nearestHazard ? nearestHazard.d : null
+      }
     });
 
-    safeZoneEntities.push(safeMarker);
+    safeLocationEntities.push(safeEntity);
+    safeMarkerIndex.set(loc.name, idx);
+
+    if (nearestHazard) {
+      const line = viewer.entities.add({
+        polyline: {
+          positions: Cesium.Cartesian3.fromDegreesArray([
+            loc.lon, loc.lat,
+            nearestHazard.node.lon, nearestHazard.node.lat
+          ]),
+          width: 2,
+          material: new Cesium.PolylineDashMaterialProperty({
+            color: Cesium.Color.WHITE.withAlpha(0.20),
+            gapColor: Cesium.Color.TRANSPARENT,
+            dashLength: 12
+          })
+        }
+      });
+      guideLineEntities.push(line);
+    }
   });
 }
 
@@ -808,30 +881,9 @@ legendToggle.addEventListener("click", () => {
 });
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
-  if (!entity || !entity.properties) return;
-
-  const props = entity.properties;
-
-  const getProp = (key) => (props[key] && typeof props[key].getValue === "function")
-    ? props[key].getValue()
-    : null;
-
-  const data = {
-    name: getProp("name"),
-    region: getProp("region"),
-    lon: getProp("lon"),
-    lat: getProp("lat"),
-    population: getProp("population"),
-    intensity: getProp("intensity"),
-    rupture: getProp("rupture"),
-    liquefaction: getProp("liquefaction"),
-    structures: getProp("structures")
-  };
-
-  if (data.name || data.region) {
-    updateSelectedInfo(data);
-  }
-
+  const data = readEntityData(entity);
+  if (!data) return;
+  updateSelectedInfo(data);
   if (data.lon != null && data.lat != null) {
     viewer.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
@@ -846,20 +898,13 @@ handler.setInputAction(function(click) {
 
   if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
     viewer.selectedEntity = picked.id;
-    const props = picked.id.properties;
-    const data = {
-      name: props.name.getValue(),
-      region: props.region.getValue(),
-      lon: props.lon.getValue(),
-      lat: props.lat.getValue(),
-      population: props.population.getValue(),
-      intensity: props.intensity ? props.intensity.getValue() : null,
-      rupture: props.rupture ? props.rupture.getValue() : null,
-      liquefaction: props.liquefaction ? props.liquefaction.getValue() : null,
-      structures: props.structures ? props.structures.getValue() : null
-    };
-    updateSelectedInfo(data);
-    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+    const data = readEntityData(picked.id);
+    if (data) {
+      updateSelectedInfo(data);
+      if (data.lon != null && data.lat != null) {
+        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+      }
+    }
     return;
   }
 
