@@ -545,8 +545,8 @@ viewer.entities.add({
             return Cesium.Cartesian3.fromDegreesArrayHeights(
                 westValleyFault.flatMap((v, i) => {
                     if (i % 2 === 0) {
-                        const wave = Math.sin(ruptureT + i * 0.2) * 0.00015;
-                        const base = Math.sin(Date.now() * 0.002) * 0.0002;
+                        const base = 250;
+const radius = Math.min(1800, base + t * 0.2);
                         return [v + base + wave, westValleyFault[i + 1], 100];
                     }
                     return [];
@@ -996,19 +996,19 @@ function addSeismicPulse() {
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
 
             ellipse: {
-                semiMajorAxis: new Cesium.CallbackProperty(() => {
-                    if (!pulseEnabled) return 0;
+               semiMajorAxis: new Cesium.CallbackProperty(() => {
+    if (!pulseEnabled) return 0;
+    const t = (Date.now() * 0.0015 + index * 120) % 8000;
+    const radius = Math.min(6000, 500 + t * 0.6);
+    return radius;
+}, false),
 
-                    const t = (Date.now() * 0.0015 + index * 120) % 18000;
-                    return Math.min(12000, 800 + t);
-                }, false),
-
-                semiMinorAxis: new Cesium.CallbackProperty(() => {
-                    if (!pulseEnabled) return 0;
-
-                    const t = (Date.now() * 0.0015 + index * 120) % 18000;
-                    return Math.min(12000, 800 + t);
-                }, false),
+semiMinorAxis: new Cesium.CallbackProperty(() => {
+    if (!pulseEnabled) return 0;
+    const t = (Date.now() * 0.0015 + index * 120) % 8000;
+    const radius = Math.min(6000, 500 + t * 0.6);
+    return radius;
+}, false),
 
                 material: new Cesium.ColorMaterialProperty(
                     new Cesium.CallbackProperty(() => {
@@ -1017,7 +1017,7 @@ function addSeismicPulse() {
 
                         const t = (Math.sin(Date.now() * 0.002 + index) + 1) / 2;
 
-                        return Cesium.Color.RED.withAlpha(0.08 * (1 - t));
+                        return Cesium.Color.fromCssColorString("#ff6b81").withAlpha(0.04 * (1 - t));
                     }, false)
                 )
             }
@@ -1237,8 +1237,10 @@ document.getElementById("pulseToggle").addEventListener("click", () => {
         pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
 
     if (!pulseEnabled) {
-        pulseEntities.forEach(e => viewer.entities.remove(e));
-        pulseEntities = [];
+    pulseEntities.forEach(e => viewer.entities.remove(e));
+    pulseEntities = [];
+    viewer.scene.requestRender(); // forces immediate visual update
+}
     } else {
         addSeismicPulse();
     }
