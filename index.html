@@ -332,8 +332,8 @@ const westValleyFault = [121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,121.
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
 let scenarioMag = 7.2;
-let measureMode = true;
-let safeZonesVisible = true;
+let measureMode = false;
+let safeZonesVisible = false;
 let pulseEnabled = true;
 
 viewer.entities.add({
@@ -420,11 +420,9 @@ const riskNodes = [
   { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential" }
 ];
 
-let markers = [], activeMarkers = [], pulseEntities = [], heatEntities = [], safeZoneEntities = [], guideLineEntities = [], measureLineEntities = [];
-let safeLocationEntities = [];
-let safeMarkerIndex = new Map();
-let currentSelectedSafe = null;
-
+let markers = [], activeMarkers = [], pulseEntities = [], heatEntities = [], safeZoneEntities = [], safeConnectionEntities = [], measureLineEntities = [], measureLabelEntities = [];
+let showMeasureDistance = false;
+let showSafeZones = false;
 const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
 
 const safeLocations = [
@@ -524,12 +522,6 @@ function getDistanceKm(lon1, lat1, lon2, lat2) {
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function safeDistanceInfo(node, loc) {
-  const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
-  const ruptureRisk = d < 1.5 ? "Low" : d < 3 ? "Low to Moderate" : "Low";
-  return { distanceKm: d, ruptureRisk };
-}
-
 function readEntityData(entity) {
   if (!entity || !entity.properties) return null;
   const props = entity.properties;
@@ -625,19 +617,18 @@ function setCenterMarker(lon, lat, name) {
   });
 }
 
-function clearSafeLayers() {
-  safeZoneEntities.forEach(e => viewer.entities.remove(e));
-  guideLineEntities.forEach(e => viewer.entities.remove(e));
-  safeLocationEntities.forEach(e => viewer.entities.remove(e));
-  safeZoneEntities = [];
-  guideLineEntities = [];
-  safeLocationEntities = [];
-  safeMarkerIndex = new Map();
-}
-
 function clearMeasureLines() {
   measureLineEntities.forEach(e => viewer.entities.remove(e));
+  measureLabelEntities.forEach(e => viewer.entities.remove(e));
   measureLineEntities = [];
+  measureLabelEntities = [];
+}
+
+function clearSafeLayers() {
+  safeZoneEntities.forEach(e => viewer.entities.remove(e));
+  safeConnectionEntities.forEach(e => viewer.entities.remove(e));
+  safeZoneEntities = [];
+  safeConnectionEntities = [];
 }
 
 function render(region) {
@@ -690,17 +681,18 @@ function render(region) {
 function addSafeZones() {
   clearSafeLayers();
 
-  safeLocations.forEach((loc, idx) => {
+  safeLocations.forEach((loc) => {
     const nearestHazard = riskNodes.reduce((best, node) => {
       const d = getDistanceKm(loc.lon, loc.lat, node.lon, node.lat);
       return (!best || d < best.d) ? { node, d } : best;
     }, null);
 
     const safeEntity = viewer.entities.add({
+      show: showSafeZones,
       position: Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat),
       billboard: {
         image: safeIcon,
-        scale: 0.70,
+        scale: 0.7,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM
       },
       label: {
@@ -730,11 +722,11 @@ function addSafeZones() {
       }
     });
 
-    safeLocationEntities.push(safeEntity);
-    safeMarkerIndex.set(loc.name, idx);
+    safeZoneEntities.push(safeEntity);
 
     if (nearestHazard) {
       const line = viewer.entities.add({
+        show: showSafeZones,
         polyline: {
           positions: Cesium.Cartesian3.fromDegreesArray([
             loc.lon, loc.lat,
@@ -748,21 +740,14 @@ function addSafeZones() {
           })
         }
       });
-      guideLineEntities.push(line);
+      safeConnectionEntities.push(line);
     }
   });
 }
 
-function generatePreparednessGuide(distanceKm) {
-  const before = ["Secure heavy furniture.", "Prepare go-bag.", "Identify exits."];
-  const during = ["Drop, Cover, and Hold On.", "Stay away from glass.", "Protect head and neck."];
-  const after = ["Check injuries.", "Expect aftershocks.", "Use verified updates only."];
-  return `<b>Preparedness Guidance</b><br>Distance to nearest fault: <b>${distanceKm.toFixed(2)} km</b><br><br><b>Before:</b> ${before.join(" ")}<br><b>During:</b> ${during.join(" ")}<br><b>After:</b> ${after.join(" ")}`;
-}
-
 function drawMeasureLines() {
   clearMeasureLines();
-  if (!measureMode) return;
+  if (!showMeasureDistance) return;
 
   const highRiskNodes = riskNodes.filter(n => n.intensity === "IX" || n.rupture === "Very High" || n.rupture === "High");
 
@@ -781,6 +766,7 @@ function drawMeasureLines() {
     const midLat = (node.lat + nearest.loc.lat) / 2;
 
     const line = viewer.entities.add({
+      show: showMeasureDistance,
       polyline: {
         positions: Cesium.Cartesian3.fromDegreesArray([node.lon, node.lat, nearest.loc.lon, nearest.loc.lat]),
         width: 2,
@@ -793,6 +779,7 @@ function drawMeasureLines() {
     });
 
     const label = viewer.entities.add({
+      show: showMeasureDistance,
       position: Cesium.Cartesian3.fromDegrees(midLon, midLat),
       label: {
         text: `${distanceKm.toFixed(1)} km • ~${timeMin} min`,
@@ -808,24 +795,48 @@ function drawMeasureLines() {
       }
     });
 
-    measureLineEntities.push(line, label);
+    measureLineEntities.push(line);
+    measureLabelEntities.push(label);
   });
+}
+
+function refreshLayers() {
+  safeZoneEntities.forEach(e => e.show = showSafeZones);
+  safeConnectionEntities.forEach(e => e.show = showSafeZones);
+  measureLineEntities.forEach(e => e.show = showMeasureDistance);
+  measureLabelEntities.forEach(e => e.show = showMeasureDistance);
+  safeBtn.classList.toggle("active", showSafeZones);
+  measureBtn.classList.toggle("active", showMeasureDistance);
+  viewer.scene.requestRender();
+}
+
+function toggleSafeZones() {
+  showSafeZones = !showSafeZones;
+  if (safeZoneEntities.length === 0) addSafeZones();
+  refreshLayers();
+}
+
+function toggleMeasureDistance() {
+  showMeasureDistance = !showMeasureDistance;
+  drawMeasureLines();
+  refreshLayers();
+}
+
+function generatePreparednessGuide(distanceKm) {
+  const before = ["Secure heavy furniture.", "Prepare go-bag.", "Identify exits."];
+  const during = ["Drop, Cover, and Hold On.", "Stay away from glass.", "Protect head and neck."];
+  const after = ["Check injuries.", "Expect aftershocks.", "Use verified updates only."];
+  return `<b>Preparedness Guidance</b><br>Distance to nearest fault: <b>${distanceKm.toFixed(2)} km</b><br><br><b>Before:</b> ${before.join(" ")}<br><b>During:</b> ${during.join(" ")}<br><b>After:</b> ${after.join(" ")}`;
 }
 
 function applyPreparednessMode() {
   document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
   document.getElementById("liveStatus").textContent = "Live AI Repository: Connected";
-  document.getElementById("prepNote").textContent = measureMode
+  document.getElementById("prepNote").textContent = showMeasureDistance
     ? "Each high-risk node is connected to the nearest safe zone with an approximate distance and travel time."
-    : "Safe zones are highlighted to support evacuation planning and preparedness recommendations.";
-}
-
-function setMode(measure) {
-  measureMode = measure;
-  measureBtn.classList.toggle("active", measure);
-  safeBtn.classList.toggle("active", !measure);
-  drawMeasureLines();
-  applyPreparednessMode();
+    : showSafeZones
+      ? "Safe zones are highlighted to support evacuation planning and preparedness recommendations."
+      : "Use the buttons to show measure distance lines or safe zones.";
 }
 
 function init() {
@@ -833,6 +844,7 @@ function init() {
   addSeismicPulse();
   addSafeZones();
   drawMeasureLines();
+  refreshLayers();
   applyPreparednessMode();
 }
 init();
@@ -869,8 +881,16 @@ document.getElementById("scenarioSlider").addEventListener("input", e => {
 
 const measureBtn = document.getElementById("measureBtn");
 const safeBtn = document.getElementById("safeBtn");
-measureBtn.addEventListener("click", () => setMode(true));
-safeBtn.addEventListener("click", () => setMode(false));
+
+measureBtn.addEventListener("click", () => {
+  toggleMeasureDistance();
+  applyPreparednessMode();
+});
+
+safeBtn.addEventListener("click", () => {
+  toggleSafeZones();
+  applyPreparednessMode();
+});
 
 const legendToggle = document.getElementById("legendToggle");
 const legendBody = document.getElementById("legendBody");
@@ -934,7 +954,7 @@ handler.setInputAction(function(click) {
     const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
     document.getElementById("analysisBox").innerHTML = generatePreparednessGuide(distanceKm);
 
-    if (measureMode) {
+    if (showMeasureDistance || !showSafeZones) {
       updateSelectedInfo({
         name: closest.node.name,
         region: closest.node.region,
