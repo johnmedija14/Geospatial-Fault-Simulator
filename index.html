@@ -491,14 +491,15 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     timeline: false,
     infoBox: false,
     selectionIndicator: false,
-    geocoder: true,
-    baseLayerPicker: false,
 
-   imageryProvider: Cesium.IonImageryProvider.fromAssetId(2),
-    
+    geocoder: true,
+    baseLayerPicker: true, // IMPORTANT: turn this ON so you can choose map types
+
+    imageryProvider: Cesium.createWorldImagery(), // FIX: guaranteed working
+
     terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
-
+    
 viewer.scene.globe.depthTestAgainstTerrain = false;
 viewer.scene.globe.enableLighting = false;
 viewer.scene.requestRenderMode = false;
