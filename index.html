@@ -493,10 +493,14 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     selectionIndicator: false,
     geocoder: true,
     baseLayerPicker: false,
-    terrainProvider: new Cesium.EllipsoidTerrainProvider(),
-    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-        url: "https://tile.openstreetmap.org/"
-    })
+
+    imageryProvider:
+        new Cesium.UrlTemplateImageryProvider({
+            url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        }),
+
+    terrainProvider:
+        new Cesium.EllipsoidTerrainProvider()
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -1187,7 +1191,7 @@ function render(region) {
                     color: Cesium.Color.RED
                 },
                 label: {
-                    text: name
+                    text: n.name
                 },
                 properties: n
             });
