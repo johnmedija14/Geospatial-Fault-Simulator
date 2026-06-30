@@ -42,30 +42,14 @@ body { display:flex; flex-direction:column; }
 .statusTitle { font-weight:700; font-size:14px; }
 .statusSub { font-size:11px; color:#ffd6d6; }
 
-#content { height: calc(100vh - 74px); display:flex; gap:12px; padding:10px; box-sizing:border-box; }
-#mapWrap { flex:1; position:relative; border-radius:22px; overflow:hidden; border:1px solid rgba(255,255,255,0.12); background:#0b1220; box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+#content { height: calc(100vh - 74px); display: flex; gap: 12px; padding: 10px; box-sizing: border-box; }
+
+#mapWrap { flex: 1; position: relative; border-radius: 22px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); background: #0b1220; box-shadow: 0 16px 40px rgba(0,0,0,0.35); }
 #cesiumContainer { position:absolute; top:0; left:0; width:100%; height:100%; }
 
-#controls { position:absolute; top:14px; left:14px; z-index:9999; width:260px; background:rgba(18,24,35,0.80); color:#fff; border:1px solid rgba(255,255,255,0.12); padding:12px; border-radius:18px; box-shadow:0 10px 28px rgba(0,0,0,0.35); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+#controls { position: absolute; top: 14px; left: 14px; z-index: 9999; width: 260px; background: rgba(18,24,35,0.80); color: #fff; border: 1px solid rgba(255,255,255,0.12); padding: 12px; border-radius: 18px; box-shadow: 0 10px 28px rgba(0,0,0,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 #controls h3 { margin:0 0 10px; font-size:16px; }
 #controls select { width:100%; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:#0f1722; color:white; outline:none; }
-
-.modePanel { margin-top:10px; border-radius:14px; overflow:hidden; background:rgba(10,16,25,0.92); border:1px solid rgba(255,255,255,0.08); }
-.modeHeader { list-style:none; cursor:pointer; padding:12px 14px; font-weight:800; font-size:13px; color:#fff; background:linear-gradient(180deg, #b71c1c, #7f1111); user-select:none; }
-.modeHeader::-webkit-details-marker { display:none; }
-.modeBody { padding:12px; }
-.modePanel[open] .modeHeader { box-shadow:inset 0 -1px 0 rgba(255,255,255,0.08); }
-.modeRow { margin-top:10px; }
-.modeLabel { font-size:12px; color:#d1d5db; display:flex; justify-content:space-between; margin-bottom:6px; }
-.modeSlider { width:100%; }
-.modeValue { font-weight:700; color:#fff; }
-.modeButtons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
-.modeBtn { padding:10px; border:none; border-radius:12px; cursor:pointer; color:#fff; background:#7c2d12; }
-.modeBtn.active { background:#ff3b3b; }
-.smallNote { font-size:12px; color:#cbd5e1; line-height:1.45; margin-top:10px; }
-.statusPill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); font-size:12px; margin-top:10px; }
-.statusDotSmall { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; }
-.fullBtn { margin-top:10px; width:100%; padding:10px; border-radius:12px; border:none; background:#ff3b3b; color:white; cursor:pointer; }
 
 #sidebar { width:340px; display:flex; flex-direction:column; gap:12px; min-height:0; overflow-y:auto; padding-right:8px; }
 #sidebar::-webkit-scrollbar { width:8px; }
@@ -110,9 +94,21 @@ body { display:flex; flex-direction:column; }
 .legendBlue { background:radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%); }
 .legendText b { color:white; }
 
+.modePanel { margin-top:12px; padding:12px; border-radius:18px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10); }
+.modeRow { margin-top:10px; }
+.modeLabel { font-size:12px; color:#d1d5db; display:flex; justify-content:space-between; margin-bottom:6px; }
+.modeSlider { width:100%; }
+.modeValue { font-weight:700; color:#fff; }
+.modeButtons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.modeBtn { padding:10px; border:none; border-radius:12px; cursor:pointer; color:#fff; background:#7c2d12; }
+.modeBtn.active { background:#ff3b3b; }
+.smallNote { font-size:12px; color:#cbd5e1; line-height:1.45; margin-top:10px; }
+.statusPill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); font-size:12px; margin-top:10px; }
+.statusDotSmall { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
+
 <body>
 <div id="loadingScreen">
   <div class="loadingCard">
@@ -169,34 +165,35 @@ body { display:flex; flex-direction:column; }
         <option value="south">South</option>
       </select>
 
-      <button id="pulseToggle" class="fullBtn">Seismic Pulse: ON</button>
+      <button id="pulseToggle" style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
+        Seismic Pulse: ON
+      </button>
 
-      <details class="modePanel" id="prepPanel" open>
-        <summary class="modeHeader">Preparedness Simulation</summary>
-        <div class="modeBody">
-          <div class="modeRow">
-            <div class="modeLabel">
-              <span>Shake Scenario</span>
-              <span class="modeValue" id="scenarioValue">M 7.2</span>
-            </div>
-            <input id="scenarioSlider" class="modeSlider" type="range" min="6.0" max="8.0" value="7.2" step="0.1">
-          </div>
+      <div class="modePanel">
+        <div style="font-weight:800;font-size:13px;">Preparedness Simulation</div>
 
-          <div class="modeButtons">
-            <button class="modeBtn active" id="measureBtn">Measure Distance</button>
-            <button class="modeBtn" id="safeBtn">Safe Zones</button>
+        <div class="modeRow">
+          <div class="modeLabel">
+            <span>Shake Scenario</span>
+            <span class="modeValue" id="scenarioValue">M 7.2</span>
           </div>
-
-          <div class="statusPill">
-            <span class="statusDotSmall"></span>
-            <span id="liveStatus">Live AI Repository: Connected</span>
-          </div>
-
-          <div class="smallNote" id="prepNote">
-            Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers.
-          </div>
+          <input id="scenarioSlider" class="modeSlider" type="range" min="6.0" max="8.0" value="7.2" step="0.1">
         </div>
-      </details>
+
+        <div class="modeButtons">
+          <button class="modeBtn active" id="measureBtn">Measure Distance</button>
+          <button class="modeBtn" id="safeBtn">Safe Zones</button>
+        </div>
+
+        <div class="statusPill">
+          <span class="statusDotSmall"></span>
+          <span id="liveStatus">Live AI Repository: Connected</span>
+        </div>
+
+        <div class="smallNote" id="prepNote">
+          Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers.
+        </div>
+      </div>
     </div>
 
     <div class="legendPanel" id="legendPanel">
@@ -282,9 +279,6 @@ body { display:flex; flex-direction:column; }
 const loadingScreen = document.getElementById("loadingScreen");
 const loadingBarFill = document.getElementById("loadingBarFill");
 const loadingBarText = document.getElementById("loadingBarText");
-const measureBtn = document.getElementById("measureBtn");
-const safeBtn = document.getElementById("safeBtn");
-const prepPanel = document.getElementById("prepPanel");
 
 let fakeProgress = 0;
 const loadingTimer = setInterval(() => {
@@ -307,7 +301,10 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
   timeline: false,
   infoBox: false,
   selectionIndicator: false,
-  geocoder: true
+  geocoder: true,
+  baseLayer: new Cesium.ImageryLayer(
+    new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" })
+  )
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -330,19 +327,12 @@ window.addEventListener("load", () => {
 });
 window.addEventListener("resize", () => viewer.resize());
 
-const westValleyFault = [
-  121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,121.0750,14.8050,121.0900,14.7750,
-  121.1050,14.7450,121.0900,14.7150,121.0850,14.7000,121.0920,14.6900,121.1050,14.6700,
-  121.1150,14.6500,121.1200,14.6300,121.1100,14.6100,121.1000,14.5900,121.0950,14.5700,
-  121.0850,14.5500,121.0700,14.5200
-];
+const westValleyFault = [121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,121.0900,14.7150,121.0850,14.7000,121.0920,14.6900,121.1050,14.6700,121.1150,14.6500,121.1200,14.6300,121.1100,14.6100,121.1000,14.5900,121.0950,14.5700,121.0850,14.5500,121.0700,14.5200];
 
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
 let scenarioMag = 7.2;
 let pulseEnabled = true;
-let showMeasureDistance = true;
-let showSafeZones = false;
 
 viewer.entities.add({
   polyline: {
@@ -429,32 +419,28 @@ const riskNodes = [
 ];
 
 let markers = [], activeMarkers = [], pulseEntities = [], heatEntities = [], safeZoneEntities = [], safeConnectionEntities = [], measureLineEntities = [], measureLabelEntities = [];
+let showMeasureDistance = false;
+let showSafeZones = false;
 
-function getDistanceKm(lon1, lat1, lon2, lat2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) ** 2;
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
+const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
 
 const safeLocations = [
-  { name:"Veterans Memorial Medical Center", lon:121.0362, lat:14.6569, type:"medical", reason:"Large institutional site with emergency response access and wide grounds.", accessNote:"Useful as a north quadrant staging and medical support area." },
-  { name:"UP Diliman Grounds", lon:121.0649, lat:14.6520, type:"open space", reason:"Expansive open grounds suitable for evacuation assembly and reduced collapse exposure.", accessNote:"Commonly used as a broad open refuge area." },
-  { name:"Quezon Memorial Circle", lon:121.0419, lat:14.6517, type:"open space", reason:"Open civic park with multiple access routes and large assembly space.", accessNote:"Strong candidate for evacuation gathering and temporary staging." },
-  { name:"LRT-2 Santolan Depot", lon:121.0915, lat:14.6268, type:"depot", reason:"Designated transport facility that can serve as an organized response point.", accessNote:"Good access from east Metro Manila corridors." },
-  { name:"Marikina Boys Town", lon:121.0929, lat:14.6542, type:"institutional", reason:"Large institutional compound with usable open and structured spaces.", accessNote:"Important east-side evacuation support location." },
-  { name:"Red Cross Marikina", lon:121.1020, lat:14.6477, type:"medical", reason:"Emergency-response oriented location with relief and coordination potential.", accessNote:"Suitable for first aid and quick assistance." },
-  { name:"ULTRA Pasig", lon:121.0722, lat:14.5764, type:"sports complex", reason:"Wide venue with open assembly capacity and known public-event space.", accessNote:"Useful as a southeast staging area." },
-  { name:"Pasig Training Center", lon:121.0901, lat:14.5709, type:"training center", reason:"Public facility with organized access and open operational use.", accessNote:"Can support evacuation coordination." },
-  { name:"Intramuros Golf Course", lon:120.9730, lat:14.5896, type:"open space", reason:"Large open green space with limited building density.", accessNote:"Helps reduce exposure to collapse hazards." },
-  { name:"Cuneta Astrodome", lon:120.9960, lat:14.5368, type:"sports complex", reason:"Large enclosed civic venue often used for mass gathering support.", accessNote:"Useful for transport and relief coordination." },
-  { name:"University of Santo Tomas", lon:120.9871, lat:14.6091, type:"university", reason:"Large campus environment with internal open areas and organized access.", accessNote:"Can serve as a central-city refuge point." },
-  { name:"Villamor Air Base Golf Course", lon:121.0165, lat:14.5239, type:"open space", reason:"Extensive open area suitable for assembly and emergency staging.", accessNote:"Useful in the south Metro response corridor." },
-  { name:"University of Makati", lon:121.0355, lat:14.5581, type:"university", reason:"Institutional campus with accessibility and coordination potential.", accessNote:"Can support organized evacuation flow." },
-  { name:"Pateros Municipal Hall", lon:121.0670, lat:14.5450, type:"civic center", reason:"Government facility with public access and administrative coordination role.", accessNote:"Helpful for local evacuation management." },
-  { name:"Paranaque City Hall", lon:121.0214, lat:14.5090, type:"civic center", reason:"Civic facility that can host coordination and public support functions.", accessNote:"Important south Metro staging point." },
-  { name:"Sunken Garden", lon:121.0604, lat:14.5847, type:"open space", reason:"Wide open area with reduced overhead hazard exposure.", accessNote:"Good assembly area for nearby communities." }
+  { name: "Veterans Memorial Medical Center", lon: 121.0362, lat: 14.6569, type: "medical", reason: "Large institutional site with emergency response access and wide grounds.", accessNote: "Useful as a north quadrant staging and medical support area." },
+  { name: "UP Diliman Grounds", lon: 121.0649, lat: 14.6520, type: "open space", reason: "Expansive open grounds suitable for evacuation assembly and reduced collapse exposure.", accessNote: "Commonly used as a broad open refuge area." },
+  { name: "Quezon Memorial Circle", lon: 121.0419, lat: 14.6517, type: "open space", reason: "Open civic park with multiple access routes and large assembly space.", accessNote: "Strong candidate for evacuation gathering and temporary staging." },
+  { name: "LRT-2 Santolan Depot", lon: 121.0915, lat: 14.6268, type: "depot", reason: "Designated transport facility that can serve as an organized response point.", accessNote: "Good access from east Metro Manila corridors." },
+  { name: "Marikina Boys Town", lon: 121.0929, lat: 14.6542, type: "institutional", reason: "Large institutional compound with usable open and structured spaces.", accessNote: "Important east-side evacuation support location." },
+  { name: "Red Cross Marikina", lon: 121.1020, lat: 14.6477, type: "medical", reason: "Emergency-response oriented location with relief and coordination potential.", accessNote: "Suitable for first aid and quick assistance." },
+  { name: "ULTRA Pasig", lon: 121.0722, lat: 14.5764, type: "sports complex", reason: "Wide venue with open assembly capacity and known public-event space.", accessNote: "Useful as a south/east staging area." },
+  { name: "Pasig Training Center", lon: 121.0901, lat: 14.5709, type: "training center", reason: "Public facility with organized access and open operational use.", accessNote: "Can support evacuation coordination." },
+  { name: "Intramuros Golf Course", lon: 120.9730, lat: 14.5896, type: "open space", reason: "Large open green space with limited building density.", accessNote: "Helps reduce exposure to collapse hazards." },
+  { name: "Cuneta Astrodome", lon: 120.9960, lat: 14.5368, type: "sports complex", reason: "Large enclosed civic venue often used for mass gathering support.", accessNote: "Useful for transport and relief coordination." },
+  { name: "University of Santo Tomas", lon: 120.9871, lat: 14.6091, type: "university", reason: "Large campus environment with internal open areas and organized access.", accessNote: "Can serve as a central-city refuge point." },
+  { name: "Villamor Air Base Golf Course", lon: 121.0165, lat: 14.5239, type: "open space", reason: "Extensive open area suitable for assembly and emergency staging.", accessNote: "Useful in the south Metro response corridor." },
+  { name: "University of Makati", lon: 121.0355, lat: 14.5581, type: "university", reason: "Institutional campus with accessibility and coordination potential.", accessNote: "Can support organized evacuation flow." },
+  { name: "Pateros Municipal Hall", lon: 121.0670, lat: 14.5450, type: "civic center", reason: "Government facility with public access and administrative coordination role.", accessNote: "Helpful for local evacuation management." },
+  { name: "Paranaque City Hall", lon: 121.0214, lat: 14.5090, type: "civic center", reason: "Civic facility that can host coordination and public support functions.", accessNote: "Important south Metro staging point." },
+  { name: "Sunken Garden", lon: 121.0604, lat: 14.5847, type: "open space", reason: "Wide open area with reduced overhead hazard exposure.", accessNote: "Good assembly area for nearby communities." }
 ];
 
 function intensityToMagnitude(intensity) {
@@ -474,18 +460,71 @@ function makeHazardPin(color, glyph) {
   return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
 }
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
-const safeIcon = new Cesium.PinBuilder().fromText("✚", Cesium.Color.GREEN, 48).toDataURL();
 
 function labelStyleByIntensity(intensity) {
-  if (intensity === "IX") return { font:"19px sans-serif", color:Cesium.Color.fromCssColorString("#fff0f0"), scale:1.18 };
-  if (intensity === "VIII") return { font:"17px sans-serif", color:Cesium.Color.WHITE, scale:1.12 };
-  return { font:"15px sans-serif", color:Cesium.Color.fromCssColorString("#dbeafe"), scale:1.06 };
+  if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
+  if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
+  return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
+}
+
+function addHeatLayer() {
+  heatEntities.forEach(e => viewer.entities.remove(e));
+  heatEntities = [];
+  riskNodes.forEach(n => {
+    const mag = intensityToMagnitude(n.intensity);
+    const e = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+      ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.14)),
+        outline: false
+      }
+    });
+    heatEntities.push(e);
+  });
+}
+
+function addSeismicPulse() {
+  pulseEntities.forEach(e => viewer.entities.remove(e));
+  pulseEntities = [];
+  riskNodes.forEach((n, index) => {
+    const p = pulseParams(n.intensity);
+    const mag = intensityToMagnitude(n.intensity);
+    const colorProp = new Cesium.ColorMaterialProperty(new Cesium.CallbackProperty(() => Cesium.Color.RED.withAlpha(p.alpha), false));
+    const entity = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+      ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => {
+          if (!pulseEnabled) return 0;
+          const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+          return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
+        }, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => {
+          if (!pulseEnabled) return 0;
+          const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+          return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
+        }, false),
+        material: colorProp,
+        height: 0
+      }
+    });
+    pulseEntities.push(entity);
+  });
+}
+
+function getDistanceKm(lon1, lat1, lon2, lat2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function readEntityData(entity) {
   if (!entity || !entity.properties) return null;
   const props = entity.properties;
-  const getProp = key => props[key] && typeof props[key].getValue === "function" ? props[key].getValue() : null;
+  const getProp = (key) => (props[key] && typeof props[key].getValue === "function") ? props[key].getValue() : null;
   return {
     name: getProp("name"),
     region: getProp("region"),
@@ -514,7 +553,9 @@ function updateSelectedInfo(data) {
     document.getElementById("intensityText").innerHTML = "Awaiting selection";
     return;
   }
+
   const isSafe = data.region === "Safe Zone";
+
   if (!isSafe && data.intensity) {
     const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
     const intensityLabels = { "VII": "HIGH", "VIII": "VERY HIGH", "IX": "EXTREME", "X": "CATASTROPHIC" };
@@ -524,6 +565,7 @@ function updateSelectedInfo(data) {
     document.getElementById("intensityPointer").style.left = "22%";
     document.getElementById("intensityText").innerHTML = "Safe Zone — LOW EXPOSURE";
   }
+
   info.innerHTML = `
     <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
@@ -532,21 +574,46 @@ function updateSelectedInfo(data) {
     <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
   `;
-  analysis.innerHTML = isSafe ? `
-    <b>Safe Zone Board</b><br><br>
-    <b>Place:</b> ${data.name || "-"}<br>
-    <b>Why it is safe:</b> ${data.reason || "Open or institutional area selected for evacuation and emergency staging."}<br>
-    <b>Access note:</b> ${data.accessNote || "Chosen for organized access and emergency support."}<br>
-    <b>Proximity to fault:</b> ${data.distanceToFault ? `${data.distanceToFault.toFixed(2)} km` : "Computed from nearest mapped fault reference"}<br>
-    <b>Nearest hazard reference:</b> ${data.nearestHazard || "Nearest red-marked site"}<br><br>
-    This location is being treated as a lower-exposure refuge point compared with nearby hazard nodes.
-  ` : `
-    <b>Automated Hazard Assessment</b><br><br>
-    ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
-    Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude ${scenarioMag.toFixed(1)} rupture scenario.<br><br>
-    Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.<br><br>
-    <b>Preparedness Mode:</b> ${showMeasureDistance ? "Distance inspection is active." : "Safe-zone guidance is active."}
-  `;
+
+  if (isSafe) {
+    analysis.innerHTML = `
+      <b>Safe Zone Board</b><br><br>
+      <b>Place:</b> ${data.name || "-"}<br>
+      <b>Why it is safe:</b> ${data.reason || "Open or institutional area selected for evacuation and emergency staging."}<br>
+      <b>Access note:</b> ${data.accessNote || "Chosen for organized access and emergency support."}<br>
+      <b>Proximity to fault:</b> ${data.distanceToFault ? `${data.distanceToFault.toFixed(2)} km` : "Computed from nearest mapped fault reference"}<br>
+      <b>Nearest hazard reference:</b> ${data.nearestHazard || "Nearest red-marked site"}<br><br>
+      This location is being treated as a lower-exposure refuge point compared with nearby hazard nodes.
+    `;
+  } else {
+    analysis.innerHTML = `
+      <b>Automated Hazard Assessment</b><br><br>
+      ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
+      Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude ${scenarioMag.toFixed(1)} rupture scenario.<br><br>
+      Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.<br><br>
+      <b>Preparedness Mode:</b> ${showMeasureDistance ? "Distance inspection is active." : "Safe-zone guidance is active."}
+    `;
+  }
+}
+
+function setCenterMarker(lon, lat, name) {
+  currentCenter = { lon, lat };
+  if (centerMarker) viewer.entities.remove(centerMarker);
+  centerMarker = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(lon, lat),
+    point: { pixelSize: 10, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
+    label: {
+      text: name,
+      font: "13px sans-serif",
+      fillColor: Cesium.Color.WHITE,
+      outlineColor: Cesium.Color.BLACK,
+      outlineWidth: 2,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      pixelOffset: new Cesium.Cartesian2(0, -18),
+      distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000),
+      scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9)
+    }
+  });
 }
 
 function clearMeasureLines() {
@@ -566,20 +633,48 @@ function clearSafeLayers() {
 function render(region) {
   markers.forEach(m => viewer.entities.remove(m));
   markers = [];
+  activeMarkers = [];
+
   riskNodes.filter(n => region === "all" || n.region === region).forEach(n => {
     const ls = labelStyleByIntensity(n.intensity);
     const entity = viewer.entities.add({
       position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-      billboard: { image: affectedIcon, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78 },
-      label: { text: n.name, font: ls.font, fillColor: ls.color, outlineColor: Cesium.Color.BLACK, outlineWidth: 3, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -30), eyeOffset: new Cesium.Cartesian3(0, 0, -12), distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000), scaleByDistance: new Cesium.NearFarScalar(1500, ls.scale, 14000, 0.92) },
+      billboard: {
+        image: affectedIcon,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78
+      },
+      label: {
+        text: n.name,
+        font: ls.font,
+        fillColor: ls.color,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 3,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -30),
+        eyeOffset: new Cesium.Cartesian3(0, 0, -12),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000),
+        scaleByDistance: new Cesium.NearFarScalar(1500, ls.scale, 14000, 0.92)
+      },
       properties: n
     });
     markers.push(entity);
+    activeMarkers.push(n);
   });
-  activeMarkers = markers.slice();
-  initBreakdown();
+
+  document.getElementById("breakdownList").innerHTML = `
+    <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
+    <div class="breakdownItem"><span>Quezon City</span><b>1,150,000</b></div>
+    <div class="breakdownItem"><span>Pasig / Marikina</span><b>900,000</b></div>
+    <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
+  `;
+
+  const count = activeMarkers.length;
+  document.getElementById("popCount").textContent = region === "all" ? "≈ 4,050,000" : `≈ ${count * 450000}`;
+  document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
+  document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
+  document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
   updateSelectedInfo(null);
-  drawMeasureLines();
 }
 
 function addSafeZones() {
@@ -589,11 +684,25 @@ function addSafeZones() {
       const d = getDistanceKm(loc.lon, loc.lat, node.lon, node.lat);
       return (!best || d < best.d) ? { node, d } : best;
     }, null);
+
     const safeEntity = viewer.entities.add({
       show: showSafeZones,
       position: Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat),
-      billboard: { image: safeIcon, scale: 0.7, verticalOrigin: Cesium.VerticalOrigin.BOTTOM },
-      label: { text: loc.name, font: "13px sans-serif", fillColor: Cesium.Color.WHITE, outlineColor: Cesium.Color.BLACK, outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -30), distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000) },
+      billboard: {
+        image: safeIcon,
+        scale: 0.7,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM
+      },
+      label: {
+        text: loc.name,
+        font: "13px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -30),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
+      },
       properties: {
         name: loc.name,
         region: "Safe Zone",
@@ -610,14 +719,23 @@ function addSafeZones() {
         distanceToFault: nearestHazard ? nearestHazard.d : null
       }
     });
+
     safeZoneEntities.push(safeEntity);
+
     if (nearestHazard) {
       const line = viewer.entities.add({
         show: showSafeZones,
         polyline: {
-          positions: Cesium.Cartesian3.fromDegreesArray([loc.lon, loc.lat, nearestHazard.node.lon, nearestHazard.node.lat]),
+          positions: Cesium.Cartesian3.fromDegreesArray([
+            loc.lon, loc.lat,
+            nearestHazard.node.lon, nearestHazard.node.lat
+          ]),
           width: 2,
-          material: new Cesium.PolylineDashMaterialProperty({ color: Cesium.Color.WHITE.withAlpha(0.20), gapColor: Cesium.Color.TRANSPARENT, dashLength: 12 })
+          material: new Cesium.PolylineDashMaterialProperty({
+            color: Cesium.Color.WHITE.withAlpha(0.20),
+            gapColor: Cesium.Color.TRANSPARENT,
+            dashLength: 12
+          })
         }
       });
       safeConnectionEntities.push(line);
@@ -628,27 +746,52 @@ function addSafeZones() {
 function drawMeasureLines() {
   clearMeasureLines();
   if (!showMeasureDistance) return;
+
   const highRiskNodes = riskNodes.filter(n => n.intensity === "IX" || n.rupture === "Very High" || n.rupture === "High");
   highRiskNodes.forEach((node) => {
     const nearest = safeLocations.reduce((best, loc) => {
       const d = getDistanceKm(node.lon, node.lat, loc.lon, loc.lat);
       return (!best || d < best.d) ? { loc, d } : best;
     }, null);
+
     if (!nearest) return;
+
     const distanceKm = getDistanceKm(node.lon, node.lat, nearest.loc.lon, nearest.loc.lat);
     const avgSpeedKmh = 4.8;
     const timeMin = Math.max(1, Math.round((distanceKm / avgSpeedKmh) * 60));
     const midLon = (node.lon + nearest.loc.lon) / 2;
     const midLat = (node.lat + nearest.loc.lat) / 2;
+
     const line = viewer.entities.add({
       show: showMeasureDistance,
-      polyline: { positions: Cesium.Cartesian3.fromDegreesArray([node.lon, node.lat, nearest.loc.lon, nearest.loc.lat]), width: 2, material: new Cesium.PolylineDashMaterialProperty({ color: Cesium.Color.CYAN.withAlpha(0.22), gapColor: Cesium.Color.TRANSPARENT, dashLength: 12 }) }
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray([node.lon, node.lat, nearest.loc.lon, nearest.loc.lat]),
+        width: 2,
+        material: new Cesium.PolylineDashMaterialProperty({
+          color: Cesium.Color.CYAN.withAlpha(0.22),
+          gapColor: Cesium.Color.TRANSPARENT,
+          dashLength: 12
+        })
+      }
     });
+
     const label = viewer.entities.add({
       show: showMeasureDistance,
       position: Cesium.Cartesian3.fromDegrees(midLon, midLat),
-      label: { text: `${distanceKm.toFixed(1)} km • ~${timeMin} min`, font: "12px sans-serif", fillColor: Cesium.Color.WHITE, outlineColor: Cesium.Color.BLACK, outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -6), backgroundColor: Cesium.Color.BLACK.withAlpha(0.35), showBackground: true, distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000) }
+      label: {
+        text: `${distanceKm.toFixed(1)} km • ~${timeMin} min`,
+        font: "12px sans-serif",
+        fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -6),
+        backgroundColor: Cesium.Color.BLACK.withAlpha(0.35),
+        showBackground: true,
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000)
+      }
     });
+
     measureLineEntities.push(line);
     measureLabelEntities.push(label);
   });
@@ -662,18 +805,16 @@ function refreshLayers() {
   viewer.scene.requestRender();
 }
 
-function toggleMeasureDistance() {
-  showMeasureDistance = true;
-  showSafeZones = false;
-  drawMeasureLines();
+function toggleSafeZones() {
+  showSafeZones = !showSafeZones;
+  if (safeZoneEntities.length === 0) addSafeZones();
   refreshLayers();
   applyPreparednessMode();
 }
 
-function toggleSafeZones() {
-  showSafeZones = true;
-  showMeasureDistance = false;
-  if (safeZoneEntities.length === 0) addSafeZones();
+function toggleMeasureDistance() {
+  showMeasureDistance = !showMeasureDistance;
+  drawMeasureLines();
   refreshLayers();
   applyPreparednessMode();
 }
@@ -685,69 +826,6 @@ function generatePreparednessGuide(distanceKm) {
   return `<b>Preparedness Guidance</b><br>Distance to nearest fault: <b>${distanceKm.toFixed(2)} km</b><br><br><b>Before:</b> ${before.join(" ")}<br><b>During:</b> ${during.join(" ")}<br><b>After:</b> ${after.join(" ")}`;
 }
 
-function initBreakdown() {
-  const totals = { north: 1050000, qc: 1150000, pasig: 900000, south: 1500000 };
-  const labels = { north: "North", qc: "Quezon City", pasig: "Pasig / Marikina", south: "South Metro" };
-  const list = document.getElementById("breakdownList");
-  list.innerHTML = Object.entries(totals).map(([k, v]) => `<div class="breakdownItem"><span>${labels[k]}</span><b>${v.toLocaleString()}</b></div>`).join("");
-  const active = activeMarkers.length || markers.length;
-  document.getElementById("popCount").textContent = regionLabelFromSelection(document.getElementById("regionSelect").value) === "All Regions" ? "≈ 4,050,000" : `≈ ${Math.max(450000, active * 45000).toLocaleString()}`;
-  document.getElementById("highCount").textContent = String(Math.max(1, Math.round(active / 3)));
-  document.getElementById("modCount").textContent = String(Math.max(1, Math.round(active / 2)));
-  document.getElementById("lowCount").textContent = String(Math.max(1, active - Math.round(active / 2)));
-}
-
-function regionLabelFromSelection(v) {
-  return { all:"All Regions", north:"North", qc:"Quezon City", pasig:"Pasig / Marikina", south:"South" }[v] || "All Regions";
-}
-
-function addHeatLayer() {
-  if (heatEntities.length) return;
-  riskNodes.forEach(n => {
-    const e = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-      point: { pixelSize: 18, color: Cesium.Color.RED.withAlpha(0.22), outlineColor: Cesium.Color.ORANGE.withAlpha(0.18), outlineWidth: 2 }
-    });
-    heatEntities.push(e);
-  });
-}
-
-function setCenterMarker(lon, lat, name) {
-  currentCenter = { lon, lat };
-  if (centerMarker) viewer.entities.remove(centerMarker);
-  centerMarker = viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(lon, lat),
-    point: { pixelSize: 10, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
-    label: { text: name, font: "13px sans-serif", fillColor: Cesium.Color.WHITE, outlineColor: Cesium.Color.BLACK, outlineWidth: 2, style: Cesium.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new Cesium.Cartesian2(0, -18), distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000), scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9) }
-  });
-}
-
-function addSeismicPulse() {
-  riskNodes.forEach((n, index) => {
-    const p = pulseParams(n.intensity);
-    const mag = intensityToMagnitude(n.intensity);
-    const colorProp = new Cesium.ColorMaterialProperty(new Cesium.CallbackProperty(() => Cesium.Color.RED.withAlpha(p.alpha), false));
-    const entity = viewer.entities.add({
-      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-      ellipse: {
-        semiMajorAxis: new Cesium.CallbackProperty(() => {
-          if (!pulseEnabled) return 0;
-          const t = performance.now() * 0.001 * p.speed + index * 0.35 + 1;
-          return p.base * t + p.base * 1.8 * (mag - 6) * 0.5;
-        }, false),
-        semiMinorAxis: new Cesium.CallbackProperty(() => {
-          if (!pulseEnabled) return 0;
-          const t = performance.now() * 0.001 * p.speed + index * 0.35 + 1;
-          return p.base * t + p.base * 1.8 * (mag - 6) * 0.5;
-        }, false),
-        material: colorProp,
-        height: 0
-      }
-    });
-    pulseEntities.push(entity);
-  });
-}
-
 function applyPreparednessMode() {
   document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
   document.getElementById("liveStatus").textContent = "Live AI Repository: Connected";
@@ -756,56 +834,87 @@ function applyPreparednessMode() {
     : showSafeZones
       ? "Safe zones are highlighted to support evacuation planning and preparedness recommendations."
       : "Use the buttons to show measure distance lines or safe zones.";
-  measureBtn.classList.toggle("active", showMeasureDistance);
-  safeBtn.classList.toggle("active", showSafeZones);
 }
 
-function renderAllLayers() {
+function init() {
   render("all");
+  addSeismicPulse();
   addSafeZones();
   drawMeasureLines();
-  initBreakdown();
+  refreshLayers();
   applyPreparednessMode();
 }
+init();
 
-measureBtn.addEventListener("click", toggleMeasureDistance);
-safeBtn.addEventListener("click", toggleSafeZones);
+const measureBtn = document.getElementById("measureBtn");
+const safeBtn = document.getElementById("safeBtn");
+
+measureBtn.addEventListener("click", () => toggleMeasureDistance());
+safeBtn.addEventListener("click", () => toggleSafeZones());
+
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
+
 document.getElementById("pulseToggle").addEventListener("click", () => {
   pulseEnabled = !pulseEnabled;
   pulseEntities.forEach(entity => entity.show = pulseEnabled);
   document.getElementById("pulseToggle").innerText = pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
   viewer.scene.requestRender();
 });
+
 document.getElementById("toggleHeat").addEventListener("click", () => {
-  if (heatEntities.length === 0) addHeatLayer();
-  else { heatEntities.forEach(entity => viewer.entities.remove(entity)); heatEntities = []; }
+  if (heatEntities.length === 0) {
+    addHeatLayer();
+  } else {
+    heatEntities.forEach(entity => viewer.entities.remove(entity));
+    heatEntities = [];
+  }
 });
+
 document.getElementById("resetView").addEventListener("click", () => {
   viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000), duration: 1.5 });
 });
+
 document.getElementById("scenarioSlider").addEventListener("input", e => {
   scenarioMag = parseFloat(e.target.value);
+  document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
+  viewer.scene.requestRender();
   applyPreparednessMode();
-});
-document.getElementById("legendToggle").addEventListener("click", () => {
-  const body = document.getElementById("legendBody");
-  const arrow = document.getElementById("legendArrow");
-  const open = body.classList.toggle("open");
-  arrow.textContent = open ? "▾" : "▸";
+  drawMeasureLines();
 });
 
-viewer.selectedEntityChanged.addEventListener(entity => {
+const legendToggle = document.getElementById("legendToggle");
+const legendBody = document.getElementById("legendBody");
+const legendArrow = document.getElementById("legendArrow");
+legendToggle.addEventListener("click", () => {
+  const open = legendBody.classList.toggle("open");
+  legendArrow.textContent = open ? "▾" : "▸";
+});
+
+viewer.selectedEntityChanged.addEventListener(function(entity) {
   const data = readEntityData(entity);
   if (!data) return;
   updateSelectedInfo(data);
+  if (data.lon != null && data.lat != null) {
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
+      duration: 1.5
+    });
+  }
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 handler.setInputAction(function(click) {
   const picked = viewer.scene.pick(click.position);
+
   if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
     viewer.selectedEntity = picked.id;
+    const data = readEntityData(picked.id);
+    if (data) {
+      updateSelectedInfo(data);
+      if (data.lon != null && data.lat != null) {
+        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+      }
+    }
     return;
   }
 
@@ -814,7 +923,11 @@ handler.setInputAction(function(click) {
     const ray = viewer.camera.getPickRay(click.position);
     if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
   }
-  if (!Cesium.defined(cartesian)) return;
+
+  if (!Cesium.defined(cartesian)) {
+    setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+    return;
+  }
 
   const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
   const lon = Cesium.Math.toDegrees(cartographic.longitude);
@@ -830,27 +943,23 @@ handler.setInputAction(function(click) {
   if (closest) {
     const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
     document.getElementById("analysisBox").innerHTML = generatePreparednessGuide(distanceKm);
-    updateSelectedInfo({
-      name: closest.node.name,
-      region: closest.node.region,
-      lon: closest.node.lon,
-      lat: closest.node.lat,
-      population: closest.node.population,
-      intensity: closest.node.intensity,
-      rupture: closest.node.rupture,
-      liquefaction: closest.node.liquefaction,
-      structures: closest.node.structures
-    });
+    if (showMeasureDistance || !showSafeZones) {
+      updateSelectedInfo({
+        name: closest.node.name,
+        region: closest.node.region,
+        lon: closest.node.lon,
+        lat: closest.node.lat,
+        population: closest.node.population,
+        intensity: closest.node.intensity,
+        rupture: closest.node.rupture,
+        liquefaction: closest.node.liquefaction,
+        structures: closest.node.structures
+      });
+    } else {
+      document.getElementById("analysisBox").innerHTML += "<br><br><b>Safe Zone Insight:</b> Follow the highlighted evacuation points and keep routes clear.";
+    }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-function init() {
-  renderAllLayers();
-  addSeismicPulse();
-  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000) });
-  viewer.scene.requestRender();
-}
-window.addEventListener("load", init);
 </script>
 </body>
 </html>
