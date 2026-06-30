@@ -487,9 +487,14 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 console.log("Cesium loaded:", Cesium);
     
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
+    animation: false,
+    timeline: false,
+    infoBox: false,
+    selectionIndicator: false,
+    geocoder: true,
     baseLayerPicker: true,
-    terrainProvider: Cesium.createWorldTerrainAsync
+    imageryProvider: Cesium.createWorldImagery(),
+    terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
     
 (async function () {
@@ -506,6 +511,8 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 
     viewer.resize();
     viewer.scene.requestRender();
+    viewer.scene.globe.baseColor = Cesium.Color.BLACK;
+viewer.scene.globe.showGroundAtmosphere = true;
 })();
 
 viewer.scene.globe.enableLighting = false;
