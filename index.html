@@ -494,7 +494,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     geocoder: true,
     baseLayerPicker: true,
 
-    imageryProvider: Cesium.createWorldImagery(),
+    imageryProvider: imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
     terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
 
