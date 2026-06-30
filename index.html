@@ -492,24 +492,13 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayerPicker: true,
-
-    imageryProvider: imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
-    terrainProvider: new Cesium.EllipsoidTerrainProvider()
+    baseLayerPicker: true
 });
 
 viewer.scene.globe.enableLighting = false;
 
 viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
-});
-
-viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(121.085, 14.69),
-    point: {
-        pixelSize: 30,
-        color: Cesium.Color.RED
-    }
 });
     
 const westValleyFault = [
