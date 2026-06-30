@@ -494,13 +494,11 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     geocoder: true,
     baseLayerPicker: false,
 
-    imageryProvider:
-        new Cesium.UrlTemplateImageryProvider({
-            url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-        }),
+    imageryProvider: new Cesium.UrlTemplateImageryProvider({
+        url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    }),
 
-    terrainProvider:
-        new Cesium.EllipsoidTerrainProvider()
+    terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
