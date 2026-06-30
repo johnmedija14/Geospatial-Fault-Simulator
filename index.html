@@ -947,26 +947,38 @@ function addHeatLayer() {
         n.lat
     ),
 
-    ellipse: {
-        semiMajorAxis:
-            n.intensity === "IX" ? 1000 :
-            n.intensity === "VIII" ? 700 :
-            500,
+    function addHeatLayer() {
+    heatEntities.forEach(e => viewer.entities.remove(e));
+    heatEntities = [];
 
-        semiMinorAxis:
-            n.intensity === "IX" ? 1000 :
-            n.intensity === "VIII" ? 700 :
-            500,
+    riskNodes.forEach(n => {
 
-        material: new Cesium.ColorMaterialProperty(
-            n.intensity === "IX"
-                ? Cesium.Color.RED.withAlpha(0.20)
-                : n.intensity === "VIII"
-                ? Cesium.Color.ORANGE.withAlpha(0.15)
-                : Cesium.Color.YELLOW.withAlpha(0.10)
-        )
-    }
-});
+        const e = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(
+                n.lon,
+                n.lat
+            ),
+
+            ellipse: {
+                semiMajorAxis:
+                    n.intensity === "IX" ? 1000 :
+                    n.intensity === "VIII" ? 700 :
+                    500,
+
+                semiMinorAxis:
+                    n.intensity === "IX" ? 1000 :
+                    n.intensity === "VIII" ? 700 :
+                    500,
+
+                material: new Cesium.ColorMaterialProperty(
+                    n.intensity === "IX"
+                        ? Cesium.Color.RED.withAlpha(0.20)
+                        : n.intensity === "VIII"
+                        ? Cesium.Color.ORANGE.withAlpha(0.15)
+                        : Cesium.Color.YELLOW.withAlpha(0.10)
+                )
+            }
+        });
 
         heatEntities.push(e);
     });
