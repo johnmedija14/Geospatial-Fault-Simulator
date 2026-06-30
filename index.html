@@ -486,8 +486,7 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 console.log("Cesium loaded:", Cesium);
     
-(async function () {
-   const viewer = new Cesium.Viewer("cesiumContainer", {
+const viewer = new Cesium.Viewer("cesiumContainer", {
     imageryProvider: new Cesium.OpenStreetMapImageryProvider({
         url: "https://tile.openstreetmap.org/"
     }),
@@ -496,23 +495,16 @@ console.log("Cesium loaded:", Cesium);
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayerPicker: true
+    baseLayerPicker: true,
+    terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
 viewer.scene.globe.enableLighting = false;
 viewer.scene.requestRenderMode = false;
 
-window.addEventListener("load", () => {
-    viewer.resize();
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
-    });
-    viewer.scene.requestRender();
-});
-
-window.addEventListener("resize", () => {
-    viewer.resize();
+viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
 });
     
 const westValleyFault = [
@@ -1402,12 +1394,12 @@ function loadBuildings() {
 }
 
 window.addEventListener("load", () => {
-    viewer.resize();
+
     viewer.scene.requestRender();
 });
 
 window.addEventListener("resize", () => {
-    viewer.resize();
+    
 });
     
 loadBuildings();
