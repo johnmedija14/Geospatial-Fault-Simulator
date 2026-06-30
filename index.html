@@ -157,7 +157,6 @@ body {
     flex-direction: column;
     gap: 12px;
     min-height: 0;
-
     overflow-y: auto;
     padding-right: 8px;
 }
@@ -170,7 +169,7 @@ body {
     background: rgba(255,255,255,0.25);
     border-radius: 999px;
 }
-    
+
 .card {
     background: rgba(17,24,39,0.86);
     border: 1px solid rgba(255,255,255,0.10);
@@ -179,6 +178,7 @@ body {
     box-shadow: 0 12px 30px rgba(0,0,0,0.30);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+    transition: all .35s ease;
 }
 
 .card h3 {
@@ -252,14 +252,6 @@ body {
     color: #cbd5e1;
 }
 
-.scaleLabels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    margin-top: 8px;
-    color: #cbd5e1;
-}
-
 .steps {
     margin: 0;
     padding-left: 20px;
@@ -293,6 +285,7 @@ body {
     padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     font-size: 13px;
+    animation: fadeIn .35s ease;
 }
 
 .infoRow:last-child {
@@ -338,20 +331,12 @@ body {
     border-radius: 8px;
     max-width: 360px;
 }
-    .card {
-    transition: all .35s ease;
-}
-
-.infoRow {
-    animation: fadeIn .35s ease;
-}
 
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(12px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -393,9 +378,9 @@ body {
             </select>
 
             <button id="pulseToggle"
-style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
-Seismic Pulse: ON
-</button>
+                style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
+                Seismic Pulse: ON
+            </button>
         </div>
 
         <div id="cesiumContainer"></div>
@@ -418,58 +403,50 @@ Seismic Pulse: ON
             <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
         </section>
 
-       <section class="card">
-    <h3>INTENSITY OVERVIEW</h3>
+        <section class="card">
+            <h3>INTENSITY OVERVIEW</h3>
+            <div class="intensityContainer">
+                <div class="intensityBar"></div>
+                <div id="intensityPointer"></div>
+            </div>
 
-    <div class="intensityContainer">
-        <div class="intensityBar"></div>
-        <div id="intensityPointer"></div>
-    </div>
+            <div id="intensityText" style="text-align:center;margin-top:10px;">Awaiting selection</div>
 
-    <div id="intensityText"
-         style="text-align:center;margin-top:10px;">
-         Awaiting selection
-    </div>
-
-    <div class="scaleLabels">
-        <span>LOW</span>
-        <span>MODERATE</span>
-        <span>VERY HIGH</span>
-    </div>
-</section>
+            <div class="scaleLabels">
+                <span>LOW</span>
+                <span>MODERATE</span>
+                <span>VERY HIGH</span>
+            </div>
+        </section>
 
         <section class="card">
             <h3>REGION BREAKDOWN (POPULATION)</h3>
             <div id="breakdownList"></div>
         </section>
 
-<section class="card">
-    <h3>EXPERIMENTATION</h3>
+        <section class="card">
+            <h3>EXPERIMENTATION</h3>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                <button id="toggleHeat"
+                    style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">
+                    Toggle Heat Layer
+                </button>
 
-    <div style="display:flex;flex-direction:column;gap:10px;">
+                <button id="resetView"
+                    style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">
+                    Reset Camera
+                </button>
+            </div>
+        </section>
 
-        <button id="toggleHeat"
-        style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">
-        Toggle Heat Layer
-        </button>
-
-        <button id="resetView"
-        style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">
-        Reset Camera
-        </button>
-
-    </div>
-</section>
-
-<!-- KEEP THIS BELOW -->
-<section class="card">
-    <h3>HOW TO USE</h3>
-    <ol class="steps">
-        <li>Select a region to filter risk zones</li>
-        <li>Tap a marker or nearby zone on the map</li>
-        <li>Observe seismic wave propagation and intensity impact</li>
-    </ol>
- </section>
+        <section class="card">
+            <h3>HOW TO USE</h3>
+            <ol class="steps">
+                <li>Select a region to filter risk zones</li>
+                <li>Tap a marker or nearby zone on the map</li>
+                <li>Observe seismic wave propagation and intensity impact</li>
+            </ol>
+        </section>
     </aside>
 </div>
 
@@ -482,86 +459,80 @@ window.onerror = function(msg, src, line) {
     box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MTU5ZjgyOC0zMjRiLTRmMjAtYWFjMi0zYTU4ODlhMzY2NzIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3ODU0MjB9.nGz8SIvyymSPR72dDrE7QP6OJZkBmLYO02_GaOnbEI4";
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTcxMDY5OS01NGNiLTRhOTYtYjA5Yi03MGU2NjA4NGU3YTIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI4MTI4MDJ9.FI17Q76OE7diFhN3DyMFAxvfm8KhpxqAl6OPUIf5XkU";
 
-console.log("Cesium loaded:", Cesium);
-    
 const viewer = new Cesium.Viewer("cesiumContainer", {
+    baseLayerPicker: true,
     animation: false,
     timeline: false,
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayerPicker: true
+    baseLayer: new Cesium.ImageryLayer(
+        new Cesium.OpenStreetMapImageryProvider({
+            url: "https://tile.openstreetmap.org/"
+        })
+    )
 });
-    
+
 viewer.scene.globe.depthTestAgainstTerrain = false;
 viewer.scene.globe.enableLighting = false;
 viewer.scene.requestRenderMode = false;
 
-viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
+window.addEventListener("load", () => {
+    viewer.resize();
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
+    });
+    viewer.scene.requestRender();
 });
-    
+
+window.addEventListener("resize", () => {
+    viewer.resize();
+});
+
 const westValleyFault = [
-121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
-121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
-121.0900,14.7150,121.0850,14.7000,121.0920,14.6900,
-121.1050,14.6700,121.1150,14.6500,121.1200,14.6300,
-121.1100,14.6100,121.1000,14.5900,121.0950,14.5700,
-121.0850,14.5500,121.0700,14.5200
+    121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
+    121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
+    121.0900,14.7150,121.0850,14.7000,121.0920,14.6900,
+    121.1050,14.6700,121.1150,14.6500,121.1200,14.6300,
+    121.1100,14.6100,121.1000,14.5900,121.0950,14.5700,
+    121.0850,14.5500,121.0700,14.5200
 ];
 
-let ruptureT = 0;
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
-
 let time = 0;
 
 viewer.entities.add({
     polyline: {
         positions: new Cesium.CallbackProperty(() => {
-
             time += 0.01;
-
             const coords = [];
 
             for (let i = 0; i < westValleyFault.length; i += 2) {
-
                 const lon = westValleyFault[i];
                 const lat = westValleyFault[i + 1];
-
                 const wave = Math.sin(time + i) * 0.0005;
-
-                coords.push(
-                    lon + wave,
-                    lat,
-                    100
-                );
+                coords.push(lon + wave, lat, 100);
             }
 
             return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
-
         }, false),
-
         width: 6,
         material: Cesium.Color.ORANGERED,
         clampToGround: false
     }
 });
 
-    function createFaultBuffer() {
-
+function createFaultBuffer() {
     const bufferPointsLeft = [];
     const bufferPointsRight = [];
 
     for (let i = 0; i < westValleyFault.length; i += 2) {
-
         const lon = westValleyFault[i];
         const lat = westValleyFault[i + 1];
-
-        const offset = 0.012; // ~1km buffer (adjustable)
-
+        const offset = 0.012;
         bufferPointsLeft.push(lon - offset, lat);
         bufferPointsRight.push(lon + offset, lat);
     }
@@ -585,9 +556,8 @@ const right = [];
 for (let i = 0; i < westValleyFault.length; i += 2) {
     const lon = westValleyFault[i];
     const lat = westValleyFault[i + 1];
-
-   left.push(lon - 0.01, lat);
-right.push(lon + 0.01, lat);
+    left.push(lon - 0.01, lat);
+    right.push(lon + 0.01, lat);
 }
 
 viewer.entities.add({
@@ -619,311 +589,282 @@ setInterval(() => {
     if (waveRadius > 280000) waveRadius = 1000;
 }, 70);
 
-const dashboard = document.createElement("div");
-dashboard.style = `display:none;`;
-document.body.appendChild(dashboard);
-
 const riskNodes = [
-{
-    region:"north",
-    name:"Antipolo City Proper",
-    lon:121.1800,
-    lat:14.6200,
-    population:"900,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Urban residential + tourism zone"
-},
-    
-{
-    region:"north",
-    name:"Lower Antipolo",
-    lon:121.1600,
-    lat:14.5900,
-    population:"600,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Moderate",
-    structures:"Urban hillside developments"
-},
-    
-{
-    region:"north",
-    name:"Montalban Highlands",
-    lon:121.1900,
-    lat:14.7400,
-    population:"200,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Hillside communities"
-},
-    
-{
-    region:"north",
-    name:"San Jose del Monte",
-    lon:121.0450,
-    lat:14.8050,
-    population:"651,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Residential expansion zones"
-},
-
-{
-    region:"north",
-    name:"San Mateo Center",
-    lon:121.1700,
-    lat:14.7000,
-    population:"300,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"Moderate",
-    structures:"River-adjacent settlements"
-},
-
-{
-    region:"north",
-    name:"Rodriguez–San Mateo",
-    lon:121.1500,
-    lat:14.7200,
-    population:"580,000",
-    intensity:"VIII",
-    rupture:"High",
-    liquefaction:"Moderate",
-    structures:"Hillside communities"
-},
-
-{
-    region:"qc",
-    name:"Batasan Hills",
-    lon:121.0850,
-    lat:14.6900,
-    population:"166,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"Low",
-    structures:"Dense residential communities"
-},
-
-{
-    region:"qc",
-    name:"Commonwealth Avenue Corridor",
-    lon:121.0800,
-    lat:14.6800,
-    population:"800,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"Low",
-    structures:"High-density urban strip"
-},
-
-{
-    region:"qc",
-    name:"Diliman Government Core",
-    lon:121.0500,
-    lat:14.6500,
-    population:"250,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Government institutions + universities"
-},
-    
-{
-    region:"qc",
-    name:"Fairview",
-    lon:121.0600,
-    lat:14.7300,
-    population:"1,200,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"Moderate",
-    structures:"Dense residential + malls"
-},
-
-{
-    region:"qc",
-    name:"Loyola Heights",
-    lon:121.0750,
-    lat:14.6500,
-    population:"34,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Universities and institutions"
-},
-
-{
-    region:"qc",
-    name:"Novaliches Proper",
-    lon:121.0500,
-    lat:14.7500,
-    population:"500,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Low",
-    structures:"Residential subdivisions"
-},
-
-{
-    region:"qc",
-    name:"Payatas",
-    lon:121.0900,
-    lat:14.7250,
-    population:"130,000",
-    intensity:"IX",
-    rupture:"High",
-    liquefaction:"Moderate",
-    structures:"Informal settlements"
-},
-
-{
-    region:"pasig",
-    name:"Concepcion Uno",
-    lon:121.1100,
-    lat:14.6400,
-    population:"120,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"High",
-    structures:"Dense residential zone"
-},
-
-{
-    region:"pasig",
-    name:"Concepcion Dos",
-    lon:121.1150,
-    lat:14.6300,
-    population:"110,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"High",
-    structures:"Urban housing cluster"
-},
-    
-{
-    region:"pasig",
-    name:"Marikina",
-    lon:121.1000,
-    lat:14.6600,
-    population:"456,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"High",
-    structures:"Commercial and residential districts"
-},
-
-{
-    region:"pasig",
-    name:"Marikina River Basin Central",
-    lon:121.1000,
-    lat:14.6500,
-    population:"450,000",
-    intensity:"IX",
-    rupture:"Very High",
-    liquefaction:"High",
-    structures:"Floodplain settlements"
-},
-
-{
-    region:"pasig",
-    name:"Pasig",
-    lon:121.0800,
-    lat:14.5900,
-    population:"803,000",
-    intensity:"VIII",
-    rupture:"High",
-    liquefaction:"Moderate",
-    structures:"CBD and mixed developments"
-},
-
-{
-    region:"pasig",
-    name:"Parang Marikina",
-    lon:121.1200,
-    lat:14.6600,
-    population:"90,000",
-    intensity:"VIII",
-    rupture:"High",
-    liquefaction:"Moderate",
-    structures:"Residential expansion area"
-},
-
-{
-    region:"south",
-    name:"BGC Core Zone",
-    lon:121.0500,
-    lat:14.5500,
-    population:"300,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"Moderate",
-    structures:"High-rise commercial district"
-},
-
-{
-    region:"south",
-    name:"Taguig",
-    lon:121.0500,
-    lat:14.5200,
-    population:"887,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"High",
-    structures:"BGC and residential towers"
-},
-
-{
-    region:"south",
-    name:"Taguig Western Edge",
-    lon:121.0700,
-    lat:14.5400,
-    population:"500,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"High",
-    structures:"Mixed residential-industrial"
-},
-
-{
-    region:"south",
-    name:"Muntinlupa",
-    lon:121.0400,
-    lat:14.4500,
-    population:"544,000",
-    intensity:"VII",
-    rupture:"Low",
-    liquefaction:"Low",
-    structures:"Residential subdivisions"
-},
-
-{
-    region:"south",
-    name:"Pateros",
-    lon:121.0600,
-    lat:14.5450,
-    population:"70,000",
-    intensity:"VIII",
-    rupture:"Moderate",
-    liquefaction:"High",
-    structures:"Dense residential town"
-},
-
-{
-    region:"south",
-    name:"Upper Muntinlupa Expansion",
-    lon:121.0350,
-    lat:14.4700,
-    population:"200,000",
-    intensity:"VII",
-    rupture:"Low",
-    liquefaction:"Low",
-    structures:"Suburban residential"
-}
-
+    {
+        region:"north",
+        name:"Antipolo City Proper",
+        lon:121.1800,
+        lat:14.6200,
+        population:"900,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Urban residential + tourism zone"
+    },
+    {
+        region:"north",
+        name:"Lower Antipolo",
+        lon:121.1600,
+        lat:14.5900,
+        population:"600,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Moderate",
+        structures:"Urban hillside developments"
+    },
+    {
+        region:"north",
+        name:"Montalban Highlands",
+        lon:121.1900,
+        lat:14.7400,
+        population:"200,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Hillside communities"
+    },
+    {
+        region:"north",
+        name:"San Jose del Monte",
+        lon:121.0450,
+        lat:14.8050,
+        population:"651,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Residential expansion zones"
+    },
+    {
+        region:"north",
+        name:"San Mateo Center",
+        lon:121.1700,
+        lat:14.7000,
+        population:"300,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"Moderate",
+        structures:"River-adjacent settlements"
+    },
+    {
+        region:"north",
+        name:"Rodriguez–San Mateo",
+        lon:121.1500,
+        lat:14.7200,
+        population:"580,000",
+        intensity:"VIII",
+        rupture:"High",
+        liquefaction:"Moderate",
+        structures:"Hillside communities"
+    },
+    {
+        region:"qc",
+        name:"Batasan Hills",
+        lon:121.0850,
+        lat:14.6900,
+        population:"166,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"Low",
+        structures:"Dense residential communities"
+    },
+    {
+        region:"qc",
+        name:"Commonwealth Avenue Corridor",
+        lon:121.0800,
+        lat:14.6800,
+        population:"800,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"Low",
+        structures:"High-density urban strip"
+    },
+    {
+        region:"qc",
+        name:"Diliman Government Core",
+        lon:121.0500,
+        lat:14.6500,
+        population:"250,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Government institutions + universities"
+    },
+    {
+        region:"qc",
+        name:"Fairview",
+        lon:121.0600,
+        lat:14.7300,
+        population:"1,200,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"Moderate",
+        structures:"Dense residential + malls"
+    },
+    {
+        region:"qc",
+        name:"Loyola Heights",
+        lon:121.0750,
+        lat:14.6500,
+        population:"34,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Universities and institutions"
+    },
+    {
+        region:"qc",
+        name:"Novaliches Proper",
+        lon:121.0500,
+        lat:14.7500,
+        population:"500,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Low",
+        structures:"Residential subdivisions"
+    },
+    {
+        region:"qc",
+        name:"Payatas",
+        lon:121.0900,
+        lat:14.7250,
+        population:"130,000",
+        intensity:"IX",
+        rupture:"High",
+        liquefaction:"Moderate",
+        structures:"Informal settlements"
+    },
+    {
+        region:"pasig",
+        name:"Concepcion Uno",
+        lon:121.1100,
+        lat:14.6400,
+        population:"120,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"High",
+        structures:"Dense residential zone"
+    },
+    {
+        region:"pasig",
+        name:"Concepcion Dos",
+        lon:121.1150,
+        lat:14.6300,
+        population:"110,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"High",
+        structures:"Urban housing cluster"
+    },
+    {
+        region:"pasig",
+        name:"Marikina",
+        lon:121.1000,
+        lat:14.6600,
+        population:"456,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"High",
+        structures:"Commercial and residential districts"
+    },
+    {
+        region:"pasig",
+        name:"Marikina River Basin Central",
+        lon:121.1000,
+        lat:14.6500,
+        population:"450,000",
+        intensity:"IX",
+        rupture:"Very High",
+        liquefaction:"High",
+        structures:"Floodplain settlements"
+    },
+    {
+        region:"pasig",
+        name:"Pasig",
+        lon:121.0800,
+        lat:14.5900,
+        population:"803,000",
+        intensity:"VIII",
+        rupture:"High",
+        liquefaction:"Moderate",
+        structures:"CBD and mixed developments"
+    },
+    {
+        region:"pasig",
+        name:"Parang Marikina",
+        lon:121.1200,
+        lat:14.6600,
+        population:"90,000",
+        intensity:"VIII",
+        rupture:"High",
+        liquefaction:"Moderate",
+        structures:"Residential expansion area"
+    },
+    {
+        region:"south",
+        name:"BGC Core Zone",
+        lon:121.0500,
+        lat:14.5500,
+        population:"300,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"Moderate",
+        structures:"High-rise commercial district"
+    },
+    {
+        region:"south",
+        name:"Taguig",
+        lon:121.0500,
+        lat:14.5200,
+        population:"887,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"High",
+        structures:"BGC and residential towers"
+    },
+    {
+        region:"south",
+        name:"Taguig Western Edge",
+        lon:121.0700,
+        lat:14.5400,
+        population:"500,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"High",
+        structures:"Mixed residential-industrial"
+    },
+    {
+        region:"south",
+        name:"Muntinlupa",
+        lon:121.0400,
+        lat:14.4500,
+        population:"544,000",
+        intensity:"VII",
+        rupture:"Low",
+        liquefaction:"Low",
+        structures:"Residential subdivisions"
+    },
+    {
+        region:"south",
+        name:"Pateros",
+        lon:121.0600,
+        lat:14.5450,
+        population:"70,000",
+        intensity:"VIII",
+        rupture:"Moderate",
+        liquefaction:"High",
+        structures:"Dense residential town"
+    },
+    {
+        region:"south",
+        name:"Upper Muntinlupa Expansion",
+        lon:121.0350,
+        lat:14.4700,
+        population:"200,000",
+        intensity:"VII",
+        rupture:"Low",
+        liquefaction:"Low",
+        structures:"Suburban residential"
+    }
 ];
 
 let markers = [];
@@ -932,30 +873,17 @@ let selectedEntityData = null;
 let pulseEntities = [];
 let pulseEnabled = true;
 let heatEntities = [];
-function addHeatLayer() {
 
+function addHeatLayer() {
     heatEntities.forEach(e => viewer.entities.remove(e));
     heatEntities = [];
 
     riskNodes.forEach(n => {
-
         const e = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(
-                n.lon,
-                n.lat
-            ),
-
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
-                semiMajorAxis:
-                    n.intensity === "IX" ? 1000 :
-                    n.intensity === "VIII" ? 700 :
-                    500,
-
-                semiMinorAxis:
-                    n.intensity === "IX" ? 1000 :
-                    n.intensity === "VIII" ? 700 :
-                    500,
-
+                semiMajorAxis: n.intensity === "IX" ? 1000 : n.intensity === "VIII" ? 700 : 500,
+                semiMinorAxis: n.intensity === "IX" ? 1000 : n.intensity === "VIII" ? 700 : 500,
                 material: new Cesium.ColorMaterialProperty(
                     n.intensity === "IX"
                         ? Cesium.Color.RED.withAlpha(0.20)
@@ -971,60 +899,37 @@ function addHeatLayer() {
 }
 
 function addSeismicPulse() {
-
     pulseEntities.forEach(e => viewer.entities.remove(e));
     pulseEntities = [];
 
     riskNodes.forEach((n, index) => {
-
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-
-          ellipse: {
-
-    semiMajorAxis: new Cesium.CallbackProperty(() => {
-
-        if (!pulseEnabled) return 0;
-
-        const t =
-            (performance.now() * 0.35 + index * 800) % 25000;
-
-        return 1000 + t;
-
-    }, false),
-
-    semiMinorAxis: new Cesium.CallbackProperty(() => {
-
-        if (!pulseEnabled) return 0;
-
-        const t =
-            (performance.now() * 0.35 + index * 800) % 25000;
-
-        return 1000 + t;
-
-    }, false),
-
-    material: new Cesium.ColorMaterialProperty(
-        new Cesium.CallbackProperty(() => {
-
-            if (!pulseEnabled)
-                return Cesium.Color.TRANSPARENT;
-
-            const pulse =
-                ((performance.now() * 0.001 + index) % 25) / 25;
-
-            return Cesium.Color.RED.withAlpha(
-                0.18 * (1 - pulse)
-            );
-
-        }, false)
-    )
-}
+            ellipse: {
+                semiMajorAxis: new Cesium.CallbackProperty(() => {
+                    if (!pulseEnabled) return 0;
+                    const t = (performance.now() * 0.35 + index * 800) % 25000;
+                    return 1000 + t;
+                }, false),
+                semiMinorAxis: new Cesium.CallbackProperty(() => {
+                    if (!pulseEnabled) return 0;
+                    const t = (performance.now() * 0.35 + index * 800) % 25000;
+                    return 1000 + t;
+                }, false),
+                material: new Cesium.ColorMaterialProperty(
+                    new Cesium.CallbackProperty(() => {
+                        if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
+                        const pulse = ((performance.now() * 0.001 + index) % 25) / 25;
+                        return Cesium.Color.RED.withAlpha(0.18 * (1 - pulse));
+                    }, false)
+                )
+            }
         });
 
         pulseEntities.push(entity);
     });
 }
+
 function getDistanceKm(lon1, lat1, lon2, lat2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1035,32 +940,19 @@ function getDistanceKm(lon1, lat1, lon2, lat2) {
     return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-function riskFromDistance(km) {
-    if (km <= 3) return { label: "Very High", color: "#ff2d2d" };
-    if (km <= 8) return { label: "High", color: "#ff9f1c" };
-    if (km <= 15) return { label: "Moderate", color: "#d7d92e" };
-    return { label: "Low", color: "#3bd24f" };
-}
-
 function updateSelectedInfo(data) {
-
     const info = document.getElementById("selectedInfo");
     const analysis = document.getElementById("analysisBox");
 
     if (!data) {
         info.innerHTML = "";
-        analysis.innerHTML =
-            "Select a location to begin hazard analysis.";
-
+        analysis.innerHTML = "Select a location to begin hazard analysis.";
         document.getElementById("intensityPointer").style.left = "0%";
-        document.getElementById("intensityText").innerHTML =
-            "Awaiting selection";
-
+        document.getElementById("intensityText").innerHTML = "Awaiting selection";
         return;
     }
 
     if (data.intensity) {
-
         const intensityMap = {
             "VII": 60,
             "VIII": 75,
@@ -1075,89 +967,50 @@ function updateSelectedInfo(data) {
             "X": "CATASTROPHIC"
         };
 
-        document.getElementById("intensityPointer").style.left =
-            intensityMap[data.intensity] + "%";
-
+        document.getElementById("intensityPointer").style.left = intensityMap[data.intensity] + "%";
         document.getElementById("intensityText").innerHTML =
             `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
     }
 
     info.innerHTML = `
-        <div class="infoRow">
-            <span class="infoLabel">Location</span>
-            <span class="infoValue">${data.name}</span>
-        </div>
-
-        <div class="infoRow">
-            <span class="infoLabel">Population</span>
-            <span class="infoValue">${data.population || "-"}</span>
-        </div>
-
-        <div class="infoRow">
-            <span class="infoLabel">Expected Intensity</span>
-            <span class="infoValue">${data.intensity || "-"}</span>
-        </div>
-
-        <div class="infoRow">
-            <span class="infoLabel">Ground Rupture</span>
-            <span class="infoValue">${data.rupture || "-"}</span>
-        </div>
-
-        <div class="infoRow">
-            <span class="infoLabel">Liquefaction Risk</span>
-            <span class="infoValue">${data.liquefaction || "-"}</span>
-        </div>
-
-        <div class="infoRow">
-            <span class="infoLabel">Critical Structures</span>
-            <span class="infoValue">${data.structures || "-"}</span>
-        </div>
+        <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name}</span></div>
+        <div class="infoRow"><span class="infoLabel">Population</span><span class="infoValue">${data.population || "-"}</span></div>
+        <div class="infoRow"><span class="infoLabel">Expected Intensity</span><span class="infoValue">${data.intensity || "-"}</span></div>
+        <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
+        <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
+        <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
     `;
 
     analysis.innerHTML = `
         <b>Automated Hazard Assessment</b><br><br>
-
-        ${data.name} lies within the influence area of the
-        West Valley Fault system.
-
-        Expected shaking intensity is approximately
-        PHIVOLCS Intensity ${data.intensity || "-"} during a
-        magnitude 7.2 rupture scenario.
-
-        Ground rupture risk is classified as
-        <b>${data.rupture || "-"}</b> while liquefaction
-        susceptibility is estimated to be
-        <b>${data.liquefaction || "-"}</b>.
+        ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
+        Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude 7.2 rupture scenario.<br><br>
+        Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.
     `;
 }
+
 function setCenterMarker(lon, lat, name) {
     currentCenter = { lon, lat };
     if (centerMarker) viewer.entities.remove(centerMarker);
 
     centerMarker = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(lon, lat),
-       point: {
-    pixelSize: 8,
-    color: Cesium.Color.RED,
-    outlineColor: Cesium.Color.WHITE,
-    outlineWidth: 1
-},
-
-label: {
-    text: name,
-    font: "10px sans-serif",
-    fillColor: Cesium.Color.WHITE,
-    outlineColor: Cesium.Color.BLACK,
-    outlineWidth: 2,
-    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-    pixelOffset: new Cesium.Cartesian2(0, -15),
-
-    distanceDisplayCondition:
-        new Cesium.DistanceDisplayCondition(
-            0,
-            18000
-        )
-},
+        point: {
+            pixelSize: 8,
+            color: Cesium.Color.RED,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 1
+        },
+        label: {
+            text: name,
+            font: "10px sans-serif",
+            fillColor: Cesium.Color.WHITE,
+            outlineColor: Cesium.Color.BLACK,
+            outlineWidth: 2,
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new Cesium.Cartesian2(0, -15),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 18000)
+        }
     });
 
     updateSelectedInfo({
@@ -1202,9 +1055,7 @@ function render(region) {
     const count = activeMarkers.length;
 
     document.getElementById("popCount").textContent =
-        region === "all"
-            ? "≈ 4,050,000"
-            : `≈ ${count * 450000}`;
+        region === "all" ? "≈ 4,050,000" : `≈ ${count * 450000}`;
 
     document.getElementById("highCount").textContent =
         Math.max(1, Math.round(count / 3));
@@ -1227,9 +1078,7 @@ init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
 
-document.getElementById("pulseToggle")
-.addEventListener("click", () => {
-
+document.getElementById("pulseToggle").addEventListener("click", () => {
     pulseEnabled = !pulseEnabled;
 
     pulseEntities.forEach(entity => {
@@ -1237,51 +1086,36 @@ document.getElementById("pulseToggle")
     });
 
     document.getElementById("pulseToggle").innerText =
-        pulseEnabled
-        ? "Seismic Pulse: ON"
-        : "Seismic Pulse: OFF";
+        pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
 
     viewer.scene.requestRender();
 });
 
-    let heatVisible = false;
+let heatVisible = false;
 
-document.getElementById("toggleHeat")
-.addEventListener("click", () => {
-
+document.getElementById("toggleHeat").addEventListener("click", () => {
     if (heatEntities.length === 0) {
         addHeatLayer();
         heatVisible = true;
     } else {
         heatVisible = !heatVisible;
-
         heatEntities.forEach(entity => {
             entity.show = heatVisible;
         });
     }
 
     document.getElementById("toggleHeat").innerText =
-        heatVisible
-            ? "Hide Heat Layer"
-            : "Show Heat Layer";
+        heatVisible ? "Hide Heat Layer" : "Show Heat Layer";
 });
 
-    document.getElementById("resetView")
-.addEventListener("click", () => {
-
+document.getElementById("resetView").addEventListener("click", () => {
     viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(
-            121.085,
-            14.69,
-            22000
-        ),
+        destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000),
         duration: 1.5
     });
-
 });
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
-
     if (!entity || !entity.properties) return;
 
     const props = entity.properties;
@@ -1302,32 +1136,21 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
     updateSelectedInfo(data);
 
     viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(
-            data.lon,
-            data.lat,
-            9000
-        ),
+        destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
         duration: 1.5
     });
-
 });
 
-
-const handler = new Cesium.ScreenSpaceEventHandler(
-    viewer.scene.canvas
-);
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
 
 handler.setInputAction(function(click) {
-
     const picked = viewer.scene.pick(click.position);
 
-    // User clicked a marker
     if (
         Cesium.defined(picked) &&
         Cesium.defined(picked.id) &&
         picked.id.properties
     ) {
-
         viewer.selectedEntity = picked.id;
 
         const props = picked.id.properties;
@@ -1348,77 +1171,40 @@ handler.setInputAction(function(click) {
         updateSelectedInfo(data);
 
         viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(
-                data.lon,
-                data.lat,
-                9000
-            ),
+            destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
             duration: 1.5
         });
 
         return;
     }
 
-    // User clicked elsewhere on the map
     let cartesian = viewer.scene.pickPosition(click.position);
 
-if (!Cesium.defined(cartesian)) {
-    const ray = viewer.camera.getPickRay(click.position);
+    if (!Cesium.defined(cartesian)) {
+        const ray = viewer.camera.getPickRay(click.position);
 
-    if (ray) {
-        cartesian = viewer.scene.globe.pick(
-            ray,
-            viewer.scene
-        );
+        if (ray) {
+            cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+        }
     }
-}
 
     if (!Cesium.defined(cartesian)) {
-        setCenterMarker(
-            currentCenter.lon,
-            currentCenter.lat,
-            "Proximity Zone"
-        );
+        setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
         return;
     }
 
-    const cartographic =
-        Cesium.Cartographic.fromCartesian(cartesian);
+    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude);
+    const lat = Cesium.Math.toDegrees(cartographic.latitude);
 
-    const lon =
-        Cesium.Math.toDegrees(
-            cartographic.longitude
-        );
+    setCenterMarker(lon, lat, "Tapped Zone");
 
-    const lat =
-        Cesium.Math.toDegrees(
-            cartographic.latitude
-        );
-
-    setCenterMarker(
-        lon,
-        lat,
-        "Tapped Zone"
-    );
-
-    const closest = riskNodes.reduce(
-        (best, n) => {
-            const d = getDistanceKm(
-                lon,
-                lat,
-                n.lon,
-                n.lat
-            );
-
-            return (!best || d < best.d)
-                ? { node: n, d }
-                : best;
-        },
-        null
-    );
+    const closest = riskNodes.reduce((best, n) => {
+        const d = getDistanceKm(lon, lat, n.lon, n.lat);
+        return (!best || d < best.d) ? { node: n, d } : best;
+    }, null);
 
     if (closest) {
-
         updateSelectedInfo({
             name: closest.node.name,
             region: closest.node.region,
@@ -1430,38 +1216,8 @@ if (!Cesium.defined(cartesian)) {
             liquefaction: closest.node.liquefaction,
             structures: closest.node.structures
         });
-
     }
-
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-/* =========================
-   SAFE BUILDINGS LOADER
-========================= */
-function loadBuildings() {
-    try {
-        if (typeof Cesium.createOsmBuildingsAsync === "function") {
-            Cesium.createOsmBuildingsAsync()
-                .then(b => viewer.scene.primitives.add(b))
-                .catch(err => console.warn("Buildings failed:", err));
-        } else {
-            console.warn("OSM Buildings not supported in this Cesium build.");
-        }
-    } catch (e) {
-        console.warn("OSM Buildings disabled safely:", e);
-    }
-}
-
-window.addEventListener("load", () => {
-
-    viewer.scene.requestRender();
-});
-
-window.addEventListener("resize", () => {
-    
-});
-    
-loadBuildings();
 </script>
 
 </body>
