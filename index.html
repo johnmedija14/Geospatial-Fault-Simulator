@@ -18,11 +18,7 @@ html, body {
     background: #05070c;
     color: #fff;
 }
-
-body {
-    display: flex;
-    flex-direction: column;
-}
+body { display: flex; flex-direction: column; }
 
 #topbar {
     height: 64px;
@@ -36,35 +32,19 @@ body {
     box-sizing: border-box;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+.brand { display: flex; align-items: center; gap: 12px; }
 
 .pulseIcon {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
+    width: 34px; height: 34px; border-radius: 50%;
     background: radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%);
     box-shadow: 0 0 18px rgba(255,60,60,0.7);
 }
 
-.title {
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-.subtitle {
-    font-size: 12px;
-    color: #cbd5e1;
-}
+.title { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
+.subtitle { font-size: 12px; color: #cbd5e1; }
 
 .statusBadge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; align-items: center; gap: 10px;
     background: linear-gradient(180deg, rgba(120,0,0,0.88), rgba(80,0,0,0.88));
     border: 1px solid rgba(255,80,80,0.35);
     border-radius: 18px;
@@ -74,23 +54,9 @@ body {
     -webkit-backdrop-filter: blur(14px);
 }
 
-.statusDot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #ff4d4d;
-    box-shadow: 0 0 10px #ff4d4d;
-}
-
-.statusTitle {
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.statusSub {
-    font-size: 11px;
-    color: #ffd6d6;
-}
+.statusDot { width: 12px; height: 12px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
+.statusTitle { font-weight: 700; font-size: 14px; }
+.statusSub { font-size: 11px; color: #ffd6d6; }
 
 #content {
     height: calc(100vh - 64px);
@@ -112,10 +78,8 @@ body {
 
 #cesiumContainer {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
 }
 
 #controls {
@@ -134,10 +98,7 @@ body {
     -webkit-backdrop-filter: blur(18px);
 }
 
-#controls h3 {
-    margin: 0 0 10px;
-    font-size: 16px;
-}
+#controls h3 { margin: 0 0 10px; font-size: 16px; }
 
 #controls select {
     width: 100%;
@@ -159,14 +120,8 @@ body {
     padding-right: 8px;
 }
 
-#sidebar::-webkit-scrollbar {
-    width: 8px;
-}
-
-#sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.25);
-    border-radius: 999px;
-}
+#sidebar::-webkit-scrollbar { width: 8px; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 999px; }
 
 .card {
     background: rgba(17,24,39,0.86);
@@ -176,7 +131,6 @@ body {
     box-shadow: 0 12px 30px rgba(0,0,0,0.30);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    transition: all .35s ease;
 }
 
 .card h3 {
@@ -196,52 +150,26 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.08);
     font-size: 13px;
 }
+.metric:last-child { border-bottom: none; }
+.metric span { color: #d1d5db; }
+.metric b { color: #fff; }
 
-.metric:last-child {
-    border-bottom: none;
-}
-
-.metric span {
-    color: #d1d5db;
-}
-
-.metric b {
-    color: #fff;
-}
-
-.intensityContainer{
-    position:relative;
-    height:24px;
-}
-
-.intensityBar{
-    position:absolute;
-    width:100%;
-    height:16px;
-    top:4px;
-    border-radius:999px;
-    background:linear-gradient(90deg,#3bd24f 0%,#d7d92e 35%,#ff9f1c 70%,#ff2d2d 100%);
+.intensityContainer { position: relative; height: 24px; }
+.intensityBar {
+    position: absolute; width: 100%; height: 16px; top: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,#3bd24f 0%,#d7d92e 35%,#ff9f1c 70%,#ff2d2d 100%);
     box-shadow: inset 0 0 8px rgba(0,0,0,0.45);
 }
-
-#intensityPointer{
-    position:absolute;
-    top:0px;
-    width:4px;
-    height:24px;
-    background:white;
-    border-radius:10px;
-    left:0%;
-    transition:all .5s ease;
-    box-shadow:0 0 10px white;
+#intensityPointer {
+    position: absolute; top: 0px; width: 4px; height: 24px;
+    background: white; border-radius: 10px; left: 0%;
+    transition: all .5s ease; box-shadow: 0 0 10px white;
 }
 
 .scaleLabels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    margin-top: 8px;
-    color: #cbd5e1;
+    display: flex; justify-content: space-between;
+    font-size: 11px; margin-top: 8px; color: #cbd5e1;
 }
 
 .steps {
@@ -252,46 +180,23 @@ body {
     line-height: 1.6;
 }
 
-#breakdownList {
-    display: grid;
-    gap: 8px;
-}
-
+#breakdownList { display: grid; gap: 8px; }
 .breakdownItem {
-    display: flex;
-    justify-content: space-between;
+    display: flex; justify-content: space-between;
     font-size: 13px;
     padding: 8px 0;
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.infoGrid {
-    display: grid;
-    gap: 10px;
-}
-
+.infoGrid { display: grid; gap: 10px; }
 .infoRow {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 13px;
-    animation: fadeIn .35s ease;
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px; animation: fadeIn .35s ease;
 }
-
-.infoRow:last-child {
-    border-bottom: none;
-}
-
-.infoLabel {
-    color: #cbd5e1;
-}
-
-.infoValue {
-    font-weight: 700;
-    color: #fff;
-}
+.infoRow:last-child { border-bottom: none; }
+.infoLabel { color: #cbd5e1; }
+.infoValue { font-weight: 700; color: #fff; }
 
 .analysisBadge {
     margin-top: 10px;
@@ -333,18 +238,27 @@ body {
     background: rgba(10, 14, 24, 0.86);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 18px;
-    padding: 12px 14px;
     box-shadow: 0 10px 28px rgba(0,0,0,0.35);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+    overflow: hidden;
 }
 
-.legendTitle {
+.legendHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
     font-size: 13px;
     font-weight: 800;
-    margin-bottom: 10px;
-    color: #fff;
+    cursor: pointer;
+    background: rgba(120,0,0,0.72);
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    user-select: none;
 }
+
+.legendBody { display: none; padding: 12px 14px; }
+.legendBody.open { display: block; }
 
 .legendRow {
     display: flex;
@@ -355,10 +269,7 @@ body {
     color: #e5e7eb;
     line-height: 1.35;
 }
-
-.legendRow:last-child {
-    margin-bottom: 0;
-}
+.legendRow:last-child { margin-bottom: 0; }
 
 .legendIcon {
     width: 28px;
@@ -372,22 +283,10 @@ body {
     color: white;
     border: 1px solid rgba(255,255,255,0.18);
 }
-
 .legendRed {
     background: radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%);
 }
-
-.legendGreen {
-    background: radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%);
-}
-
-.legendBlue {
-    background: radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%);
-}
-
-.legendText b {
-    color: white;
-}
+.legendText b { color: white; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(12px); }
@@ -395,7 +294,6 @@ body {
 }
 </style>
 </head>
-
 <body>
 
 <div id="topbar">
@@ -434,19 +332,16 @@ body {
             </button>
         </div>
 
-        <div class="legendPanel">
-            <div class="legendTitle">Legend</div>
-            <div class="legendRow">
-                <div class="legendIcon legendRed">⚠</div>
-                <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+        <div class="legendPanel" id="legendPanel">
+            <div class="legendHeader" id="legendToggle">
+                <span>Legend Guide</span>
+                <span id="legendArrow">▸</span>
             </div>
-            <div class="legendRow">
-                <div class="legendIcon legendGreen">✚</div>
-                <div class="legendText"><b>Green marker</b> shows possible evacuation centers / hospitals.</div>
-            </div>
-            <div class="legendRow">
-                <div class="legendIcon legendBlue">🌊</div>
-                <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
+            <div class="legendBody" id="legendBody">
+                <div class="legendRow">
+                    <div class="legendIcon legendRed">⚠</div>
+                    <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+                </div>
             </div>
         </div>
 
@@ -476,9 +371,7 @@ body {
                 <div class="intensityBar"></div>
                 <div id="intensityPointer"></div>
             </div>
-
             <div id="intensityText" style="text-align:center;margin-top:10px;">Awaiting selection</div>
-
             <div class="scaleLabels">
                 <span>LOW</span>
                 <span>MODERATE</span>
@@ -494,15 +387,8 @@ body {
         <section class="card">
             <h3>EXPERIMENTATION</h3>
             <div style="display:flex;flex-direction:column;gap:10px;">
-                <button id="toggleHeat"
-                    style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">
-                    Toggle Heat Layer
-                </button>
-
-                <button id="resetView"
-                    style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">
-                    Reset Camera
-                </button>
+                <button id="toggleHeat" style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">Toggle Heat Layer</button>
+                <button id="resetView" style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">Reset Camera</button>
             </div>
         </section>
 
@@ -535,11 +421,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: false,
     selectionIndicator: false,
     geocoder: true,
-    baseLayer: new Cesium.ImageryLayer(
-        new Cesium.OpenStreetMapImageryProvider({
-            url: "https://tile.openstreetmap.org/"
-        })
-    )
+    baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" }))
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -548,12 +430,9 @@ viewer.scene.requestRenderMode = false;
 
 window.addEventListener("load", () => {
     viewer.resize();
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
-    });
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000) });
     viewer.scene.requestRender();
 });
-
 window.addEventListener("resize", () => viewer.resize());
 
 const westValleyFault = [
@@ -600,9 +479,7 @@ function createFaultBuffer() {
     }
     viewer.entities.add({
         polygon: {
-            hierarchy: Cesium.Cartesian3.fromDegreesArray(
-                bufferPointsLeft.concat(bufferPointsRight.reverse())
-            ),
+            hierarchy: Cesium.Cartesian3.fromDegreesArray(bufferPointsLeft.concat(bufferPointsRight.reverse())),
             material: Cesium.Color.RED.withAlpha(0.10),
             outline: false
         }
@@ -618,7 +495,6 @@ for (let i = 0; i < westValleyFault.length; i += 2) {
     left.push(lon - 0.01, lat);
     right.push(lon + 0.01, lat);
 }
-
 viewer.entities.add({
     polygon: {
         hierarchy: Cesium.Cartesian3.fromDegreesArray(left.concat(right.reverse())),
@@ -631,41 +507,34 @@ viewer.entities.add({
 });
 
 const riskNodes = [
-    { region:"north", name:"Antipolo City Proper", lon:121.1800, lat:14.6200, population:"900,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Urban residential + tourism zone", type:"affected" },
-    { region:"north", name:"Lower Antipolo", lon:121.1600, lat:14.5900, population:"600,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"Urban hillside developments", type:"affected" },
-    { region:"north", name:"Montalban Highlands", lon:121.1900, lat:14.7400, population:"200,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Hillside communities", type:"affected" },
-    { region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050, population:"651,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential expansion zones", type:"affected" },
-    { region:"north", name:"San Mateo Center", lon:121.1700, lat:14.7000, population:"300,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"River-adjacent settlements", type:"affected" },
-    { region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200, population:"580,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Hillside communities", type:"affected" },
-    { region:"qc", name:"Batasan Hills", lon:121.0850, lat:14.6900, population:"166,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"Dense residential communities", type:"affected" },
-    { region:"qc", name:"Commonwealth Avenue Corridor", lon:121.0800, lat:14.6800, population:"800,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"High-density urban strip", type:"affected" },
-    { region:"qc", name:"Diliman Government Core", lon:121.0500, lat:14.6500, population:"250,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Government institutions + universities", type:"affected" },
-    { region:"qc", name:"Fairview", lon:121.0600, lat:14.7300, population:"1,200,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"Dense residential + malls", type:"affected" },
-    { region:"qc", name:"Loyola Heights", lon:121.0750, lat:14.6500, population:"34,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Universities and institutions", type:"affected" },
-    { region:"qc", name:"Novaliches Proper", lon:121.0500, lat:14.7500, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential subdivisions", type:"affected" },
-    { region:"qc", name:"Payatas", lon:121.0900, lat:14.7250, population:"130,000", intensity:"IX", rupture:"High", liquefaction:"Moderate", structures:"Informal settlements", type:"affected" },
-    { region:"pasig", name:"Concepcion Uno", lon:121.1100, lat:14.6400, population:"120,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Dense residential zone", type:"affected" },
-    { region:"pasig", name:"Concepcion Dos", lon:121.1150, lat:14.6300, population:"110,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Urban housing cluster", type:"affected" },
-    { region:"pasig", name:"Marikina", lon:121.1000, lat:14.6600, population:"456,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Commercial and residential districts", type:"affected" },
-    { region:"pasig", name:"Marikina River Basin Central", lon:121.1000, lat:14.6500, population:"450,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Floodplain settlements", type:"affected" },
-    { region:"pasig", name:"Pasig", lon:121.0800, lat:14.5900, population:"803,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"CBD and mixed developments", type:"affected" },
-    { region:"pasig", name:"Parang Marikina", lon:121.1200, lat:14.6600, population:"90,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Residential expansion area", type:"affected" },
-    { region:"south", name:"BGC Core Zone", lon:121.0500, lat:14.5500, population:"300,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"High-rise commercial district", type:"affected" },
-    { region:"south", name:"Taguig", lon:121.0500, lat:14.5200, population:"887,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"BGC and residential towers", type:"affected" },
-    { region:"south", name:"Taguig Western Edge", lon:121.0700, lat:14.5400, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Mixed residential-industrial", type:"affected" },
-    { region:"south", name:"Muntinlupa", lon:121.0400, lat:14.4500, population:"544,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Residential subdivisions", type:"affected" },
-    { region:"south", name:"Pateros", lon:121.0600, lat:14.5450, population:"70,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Dense residential town", type:"affected" },
-    { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential", type:"affected" }
+    { region:"north", name:"Antipolo City Proper", lon:121.1800, lat:14.6200, population:"900,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Urban residential + tourism zone" },
+    { region:"north", name:"Lower Antipolo", lon:121.1600, lat:14.5900, population:"600,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"Urban hillside developments" },
+    { region:"north", name:"Montalban Highlands", lon:121.1900, lat:14.7400, population:"200,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Hillside communities" },
+    { region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050, population:"651,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential expansion zones" },
+    { region:"north", name:"San Mateo Center", lon:121.1700, lat:14.7000, population:"300,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"River-adjacent settlements" },
+    { region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200, population:"580,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Hillside communities" },
+    { region:"qc", name:"Batasan Hills", lon:121.0850, lat:14.6900, population:"166,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"Dense residential communities" },
+    { region:"qc", name:"Commonwealth Avenue Corridor", lon:121.0800, lat:14.6800, population:"800,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"High-density urban strip" },
+    { region:"qc", name:"Diliman Government Core", lon:121.0500, lat:14.6500, population:"250,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Government institutions + universities" },
+    { region:"qc", name:"Fairview", lon:121.0600, lat:14.7300, population:"1,200,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"Dense residential + malls" },
+    { region:"qc", name:"Loyola Heights", lon:121.0750, lat:14.6500, population:"34,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Universities and institutions" },
+    { region:"qc", name:"Novaliches Proper", lon:121.0500, lat:14.7500, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential subdivisions" },
+    { region:"qc", name:"Payatas", lon:121.0900, lat:14.7250, population:"130,000", intensity:"IX", rupture:"High", liquefaction:"Moderate", structures:"Informal settlements" },
+    { region:"pasig", name:"Concepcion Uno", lon:121.1100, lat:14.6400, population:"120,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Dense residential zone" },
+    { region:"pasig", name:"Concepcion Dos", lon:121.1150, lat:14.6300, population:"110,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Urban housing cluster" },
+    { region:"pasig", name:"Marikina", lon:121.1000, lat:14.6600, population:"456,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Commercial and residential districts" },
+    { region:"pasig", name:"Marikina River Basin Central", lon:121.1000, lat:14.6500, population:"450,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Floodplain settlements" },
+    { region:"pasig", name:"Pasig", lon:121.0800, lat:14.5900, population:"803,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"CBD and mixed developments" },
+    { region:"pasig", name:"Parang Marikina", lon:121.1200, lat:14.6600, population:"90,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Residential expansion area" },
+    { region:"south", name:"BGC Core Zone", lon:121.0500, lat:14.5500, population:"300,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"High-rise commercial district" },
+    { region:"south", name:"Taguig", lon:121.0500, lat:14.5200, population:"887,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"BGC and residential towers" },
+    { region:"south", name:"Taguig Western Edge", lon:121.0700, lat:14.5400, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Mixed residential-industrial" },
+    { region:"south", name:"Muntinlupa", lon:121.0400, lat:14.4500, population:"544,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Residential subdivisions" },
+    { region:"south", name:"Pateros", lon:121.0600, lat:14.5450, population:"70,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Dense residential town" },
+    { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential" }
 ];
 
-let markers = [];
-let activeMarkers = [];
-let selectedEntityData = null;
-let pulseEntities = [];
-let pulseEnabled = true;
-let heatEntities = [];
-let shelterEntities = [];
-let floodEntities = [];
+let markers = [], activeMarkers = [], selectedEntityData = null, pulseEntities = [], pulseEnabled = true, heatEntities = [];
 
 function intensityToMagnitude(intensity) {
     if (intensity === "IX") return 7.2;
@@ -674,26 +543,27 @@ function intensityToMagnitude(intensity) {
     return 6.5;
 }
 
-function magnitudeToPulseSize(mag) {
-    return 180 + (mag - 6) * 180;
-}
-
-function magnitudeToPulseAlpha(mag) {
-    return 0.03 + (mag - 6) * 0.01;
-}
+function magnitudeToPulseSize(mag) { return 180 + (mag - 6) * 180; }
+function magnitudeToPulseAlpha(mag) { return 0.03 + (mag - 6) * 0.01; }
 
 function makeHazardPin(color, glyph) {
     return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
 }
-
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
-const shelterIcon = makeHazardPin(Cesium.Color.LIME, "✚");
-const floodIcon = makeHazardPin(Cesium.Color.DODGERBLUE, "🌊");
+
+function labelStyleByIntensity(intensity) {
+    if (intensity === "IX") {
+        return { font: "18px sans-serif", color: Cesium.Color.fromCssColorString("#fff2f2") };
+    }
+    if (intensity === "VIII") {
+        return { font: "16px sans-serif", color: Cesium.Color.WHITE };
+    }
+    return { font: "14px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe") };
+}
 
 function addHeatLayer() {
     heatEntities.forEach(e => viewer.entities.remove(e));
     heatEntities = [];
-
     riskNodes.forEach(n => {
         const mag = intensityToMagnitude(n.intensity);
         const e = viewer.entities.add({
@@ -717,7 +587,6 @@ function addSeismicPulse() {
         const mag = intensityToMagnitude(n.intensity);
         const base = magnitudeToPulseSize(mag);
         const alpha = magnitudeToPulseAlpha(mag);
-
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
@@ -741,7 +610,6 @@ function addSeismicPulse() {
                 height: 0
             }
         });
-
         pulseEntities.push(entity);
     });
 }
@@ -759,7 +627,6 @@ function getDistanceKm(lon1, lat1, lon2, lat2) {
 function updateSelectedInfo(data) {
     const info = document.getElementById("selectedInfo");
     const analysis = document.getElementById("analysisBox");
-
     if (!data) {
         info.innerHTML = "";
         analysis.innerHTML = "Select a location to begin hazard analysis.";
@@ -795,92 +662,22 @@ function updateSelectedInfo(data) {
 function setCenterMarker(lon, lat, name) {
     currentCenter = { lon, lat };
     if (centerMarker) viewer.entities.remove(centerMarker);
-
     centerMarker = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(lon, lat),
-        billboard: {
-            image: affectedIcon,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            scale: 0.9
-        },
+        point: { pixelSize: 10, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
         label: {
             text: name,
-            font: "12px sans-serif",
+            font: "13px sans-serif",
             fillColor: Cesium.Color.WHITE,
             outlineColor: Cesium.Color.BLACK,
             outlineWidth: 2,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            pixelOffset: new Cesium.Cartesian2(0, -28),
-            eyeOffset: new Cesium.Cartesian3(0, 0, -18),
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 5000),
-            scaleByDistance: new Cesium.NearFarScalar(1500, 1.05, 5000, 0.75)
+            pixelOffset: new Cesium.Cartesian2(0, -18),
+            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000),
+            scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9)
         }
     });
-
-    updateSelectedInfo({
-        name,
-        region: "Tap Point",
-        lon,
-        lat
-    });
-}
-
-function addSupportMarkers() {
-    shelterEntities.forEach(e => viewer.entities.remove(e));
-    floodEntities.forEach(e => viewer.entities.remove(e));
-    shelterEntities = [];
-    floodEntities = [];
-
-    const shelters = [
-        { name: "Evacuation Center", lon: 121.070, lat: 14.690 },
-        { name: "Hospital / Medical Post", lon: 121.110, lat: 14.650 }
-    ];
-
-    const hazards = [
-        { name: "Flood / Tsunami Risk", lon: 121.030, lat: 14.500 }
-    ];
-
-    shelters.forEach((s, i) => {
-        shelterEntities.push(viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(s.lon, s.lat),
-            billboard: {
-                image: shelterIcon,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                scale: 0.8
-            },
-            label: {
-                text: s.name,
-                font: "11px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 2,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                pixelOffset: new Cesium.Cartesian2(0, -24),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000)
-            }
-        }));
-    });
-
-    hazards.forEach(h => {
-        floodEntities.push(viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(h.lon, h.lat),
-            billboard: {
-                image: floodIcon,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                scale: 0.8
-            },
-            label: {
-                text: h.name,
-                font: "11px sans-serif",
-                fillColor: Cesium.Color.WHITE,
-                outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 2,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                pixelOffset: new Cesium.Cartesian2(0, -24),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000)
-            }
-        }));
-    });
+    updateSelectedInfo({ name, region: "Tap Point", lon, lat });
 }
 
 function render(region) {
@@ -889,28 +686,24 @@ function render(region) {
     activeMarkers = [];
 
     riskNodes.filter(n => region === "all" || n.region === region).forEach(n => {
+        const ls = labelStyleByIntensity(n.intensity);
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            billboard: {
-                image: affectedIcon,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                scale: 0.8
-            },
+            billboard: { image: affectedIcon, verticalOrigin: Cesium.VerticalOrigin.BOTTOM, scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78 },
             label: {
                 text: n.name,
-                font: "13px sans-serif",
-                fillColor: Cesium.Color.WHITE,
+                font: ls.font,
+                fillColor: ls.color,
                 outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 2,
+                outlineWidth: 3,
                 style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                pixelOffset: new Cesium.Cartesian2(0, -26),
+                pixelOffset: new Cesium.Cartesian2(0, -30),
                 eyeOffset: new Cesium.Cartesian3(0, 0, -12),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 9000),
-                scaleByDistance: new Cesium.NearFarScalar(1500, 1.05, 9000, 0.80)
+                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 12000),
+                scaleByDistance: new Cesium.NearFarScalar(1500, 1.2, 12000, 0.9)
             },
             properties: n
         });
-
         markers.push(entity);
         activeMarkers.push(n);
     });
@@ -927,16 +720,13 @@ function render(region) {
     document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
     document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
     document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
-
     updateSelectedInfo(null);
 }
 
 function init() {
     render("all");
-    addSupportMarkers();
     addSeismicPulse();
 }
-
 init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
@@ -949,7 +739,6 @@ document.getElementById("pulseToggle").addEventListener("click", () => {
 });
 
 let heatVisible = false;
-
 document.getElementById("toggleHeat").addEventListener("click", () => {
     if (heatEntities.length === 0) {
         addHeatLayer();
@@ -968,9 +757,16 @@ document.getElementById("resetView").addEventListener("click", () => {
     });
 });
 
+const legendToggle = document.getElementById("legendToggle");
+const legendBody = document.getElementById("legendBody");
+const legendArrow = document.getElementById("legendArrow");
+legendToggle.addEventListener("click", () => {
+    const open = legendBody.classList.toggle("open");
+    legendArrow.textContent = open ? "▾" : "▸";
+});
+
 viewer.selectedEntityChanged.addEventListener(function(entity) {
     if (!entity || !entity.properties) return;
-
     const props = entity.properties;
     const data = {
         name: props.name.getValue(),
@@ -983,14 +779,9 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
         liquefaction: props.liquefaction.getValue(),
         structures: props.structures.getValue()
     };
-
     selectedEntityData = data;
     updateSelectedInfo(data);
-
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
-        duration: 1.5
-    });
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -1000,7 +791,6 @@ handler.setInputAction(function(click) {
 
     if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
         viewer.selectedEntity = picked.id;
-
         const props = picked.id.properties;
         const data = {
             name: props.name.getValue(),
@@ -1013,19 +803,13 @@ handler.setInputAction(function(click) {
             liquefaction: props.liquefaction.getValue(),
             structures: props.structures.getValue()
         };
-
         selectedEntityData = data;
         updateSelectedInfo(data);
-
-        viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
-            duration: 1.5
-        });
+        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
         return;
     }
 
     let cartesian = viewer.scene.pickPosition(click.position);
-
     if (!Cesium.defined(cartesian)) {
         const ray = viewer.camera.getPickRay(click.position);
         if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
@@ -1062,6 +846,5 @@ handler.setInputAction(function(click) {
     }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </script>
-
 </body>
 </html>
