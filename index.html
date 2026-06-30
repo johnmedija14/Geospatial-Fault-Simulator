@@ -7,633 +7,259 @@
 
 <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Widgets/widgets.css">
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.142/Build/Cesium/Cesium.js"></script>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    background: #05070c;
-    color: #fff;
-}
-body { display: flex; flex-direction: column; }
+html, body { width:100%; height:100%; margin:0; overflow:hidden; font-family:Arial,sans-serif; background:#05070c; color:#fff; }
+body { display:flex; flex-direction:column; }
 
-#loadingScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-        radial-gradient(circle at center, rgba(255, 70, 70, 0.14) 0%, rgba(5, 7, 12, 0.96) 55%),
-        linear-gradient(180deg, rgba(8, 10, 16, 0.98), rgba(5, 7, 12, 0.98));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
+#loadingScreen { position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at center, rgba(255,70,70,0.14) 0%, rgba(5,7,12,0.96) 55%), linear-gradient(180deg, rgba(8,10,16,0.98), rgba(5,7,12,0.98)); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.loadingCard { width:min(560px, calc(100vw - 32px)); padding:28px 26px 24px; border-radius:26px; background:rgba(17,24,39,0.90); border:1px solid rgba(255,255,255,0.10); box-shadow:0 20px 60px rgba(0,0,0,0.45); text-align:center; animation:loadingFadeIn 0.45s ease; }
+.loadingEarth { width:72px; height:72px; margin:0 auto 14px; border-radius:50%; position:relative; background:radial-gradient(circle at 35% 30%, rgba(120,190,255,0.98) 0%, rgba(55,120,210,0.98) 36%, rgba(10,35,85,1) 100%); box-shadow:0 0 22px rgba(80,170,255,0.42), inset -10px -12px 20px rgba(0,0,0,0.35), inset 12px 10px 16px rgba(255,255,255,0.08); overflow:hidden; }
+.loadingEarth::before { content:""; position:absolute; inset:8px 10px 10px 8px; border-radius:50%; background:radial-gradient(circle at 30% 35%, transparent 0 26%, rgba(20,100,45,0.95) 27% 34%, transparent 35%), radial-gradient(circle at 55% 28%, rgba(20,100,45,0.95) 0 7%, transparent 8%), radial-gradient(circle at 60% 58%, rgba(20,100,45,0.95) 0 9%, transparent 10%), radial-gradient(circle at 38% 68%, rgba(20,100,45,0.95) 0 8%, transparent 9%), radial-gradient(circle at 70% 40%, rgba(20,100,45,0.95) 0 10%, transparent 11%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0 100%); filter:saturate(1.1); }
+.loadingEarth::after { content:""; position:absolute; inset:0; border-radius:50%; background:linear-gradient(135deg, rgba(255,255,255,0.18), transparent 35%, transparent 70%, rgba(255,255,255,0.08)); mix-blend-mode:screen; }
+.loadingTitle { font-size:28px; font-weight:900; letter-spacing:0.5px; color:#fff; margin-bottom:8px; }
+.loadingSubtitle { font-size:14px; color:#d7dde8; margin-bottom:22px; opacity:0.95; }
+.loadingBarTrack { width:100%; height:16px; border-radius:999px; background:rgba(255,255,255,0.08); overflow:hidden; border:1px solid rgba(255,255,255,0.10); box-shadow:inset 0 0 10px rgba(0,0,0,0.35); }
+.loadingBarFill { width:0%; height:100%; border-radius:999px; background:linear-gradient(90deg, #ff3b3b 0%, #ff7a18 45%, #ffb000 100%); box-shadow:0 0 16px rgba(255,60,60,0.55); transition:width 0.18s ease; }
+.loadingBarText { margin-top:10px; font-size:12px; color:#cbd5e1; letter-spacing:0.2px; }
+.loadingNote { margin-top:16px; font-size:12px; line-height:1.5; color:#cbd5e1; opacity:0.92; text-align:center; }
+#loadingScreen.hidden { opacity:0; pointer-events:none; transition:opacity 0.35s ease; }
+@keyframes loadingFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-.loadingCard {
-    width: min(560px, calc(100vw - 32px));
-    padding: 28px 26px 24px;
-    border-radius: 26px;
-    background: rgba(17, 24, 39, 0.90);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-    text-align: center;
-    animation: loadingFadeIn 0.45s ease;
-}
+#topbar { height:74px; background:linear-gradient(180deg, #0d1119 0%, #06080d 100%); border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 16px; z-index:20; box-sizing:border-box; }
+.brand { display:flex; align-items:center; gap:12px; min-width:0; }
+.pulseIcon { width:34px; height:34px; border-radius:50%; background:radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%); box-shadow:0 0 18px rgba(255,60,60,0.7); flex:0 0 auto; }
+.titleWrap { display:flex; flex-direction:column; min-width:0; }
+.title { font-size:22px; font-weight:800; letter-spacing:1px; line-height:1.05; }
+.subtitle { font-size:12px; color:#cbd5e1; }
+.socials { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; }
+.socialLink { display:inline-flex; align-items:center; gap:8px; color:#fff; text-decoration:none; padding:8px 10px; border-radius:999px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); transition:background .2s ease, transform .2s ease, border-color .2s ease; font-size:12px; white-space:nowrap; }
+.socialLink:hover { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); transform:translateY(-1px); }
+.socialLink i { font-size:14px; }
+.statusBadge { display:flex; align-items:center; gap:10px; background:linear-gradient(180deg, rgba(120,0,0,0.88), rgba(80,0,0,0.88)); border:1px solid rgba(255,80,80,0.35); border-radius:18px; padding:10px 14px; box-shadow:0 0 20px rgba(255,0,0,0.12); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); flex:0 0 auto; }
+.statusDot { width:12px; height:12px; border-radius:50%; background:#ff4d4d; box-shadow:0 0 10px #ff4d4d; }
+.statusTitle { font-weight:700; font-size:14px; }
+.statusSub { font-size:11px; color:#ffd6d6; }
 
-.loadingEarth {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 14px;
-    border-radius: 50%;
-    position: relative;
-    background:
-        radial-gradient(circle at 35% 30%, rgba(120, 190, 255, 0.98) 0%, rgba(55, 120, 210, 0.98) 36%, rgba(10, 35, 85, 1) 100%);
-    box-shadow:
-        0 0 22px rgba(80, 170, 255, 0.42),
-        inset -10px -12px 20px rgba(0, 0, 0, 0.35),
-        inset 12px 10px 16px rgba(255,255,255,0.08);
-    overflow: hidden;
-}
+#content { height:calc(100vh - 74px); display:flex; gap:12px; padding:10px; box-sizing:border-box; }
+#mapWrap { flex:1; position:relative; border-radius:22px; overflow:hidden; border:1px solid rgba(255,255,255,0.12); background:#0b1220; box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+#cesiumContainer { position:absolute; top:0; left:0; width:100%; height:100%; }
 
-.loadingEarth::before {
-    content: "";
-    position: absolute;
-    inset: 8px 10px 10px 8px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle at 30% 35%, transparent 0 26%, rgba(20, 100, 45, 0.95) 27% 34%, transparent 35%),
-        radial-gradient(circle at 55% 28%, rgba(20, 100, 45, 0.95) 0 7%, transparent 8%),
-        radial-gradient(circle at 60% 58%, rgba(20, 100, 45, 0.95) 0 9%, transparent 10%),
-        radial-gradient(circle at 38% 68%, rgba(20, 100, 45, 0.95) 0 8%, transparent 9%),
-        radial-gradient(circle at 70% 40%, rgba(20, 100, 45, 0.95) 0 10%, transparent 11%),
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0 100%);
-    filter: saturate(1.1);
-}
+#controls { position:absolute; top:14px; left:14px; z-index:999; background:rgba(18,24,35,0.80); color:#fff; border:1px solid rgba(255,255,255,0.12); padding:12px; border-radius:18px; width:220px; box-shadow:0 10px 28px rgba(0,0,0,0.35); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+#controls h3 { margin:0 0 10px; font-size:16px; }
+#controls select { width:100%; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:#0f1722; color:white; outline:none; }
 
-.loadingEarth::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent 35%, transparent 70%, rgba(255,255,255,0.08));
-    mix-blend-mode: screen;
-}
+#sidebar { width:340px; display:flex; flex-direction:column; gap:12px; min-height:0; overflow-y:auto; padding-right:8px; }
+#sidebar::-webkit-scrollbar { width:8px; }
+#sidebar::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.25); border-radius:999px; }
 
-.loadingTitle {
-    font-size: 28px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    color: #fff;
-    margin-bottom: 8px;
-}
+.card { background:rgba(17,24,39,0.86); border:1px solid rgba(255,255,255,0.10); border-radius:22px; padding:14px; box-shadow:0 12px 30px rgba(0,0,0,0.30); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+.card h3 { margin:0 0 12px; padding:10px 12px; border-radius:14px; background:linear-gradient(180deg, rgba(110,0,0,0.9), rgba(70,0,0,0.9)); font-size:14px; letter-spacing:0.5px; }
 
-.loadingSubtitle {
-    font-size: 14px;
-    color: #d7dde8;
-    margin-bottom: 22px;
-    opacity: 0.95;
-}
+.metric { display:flex; justify-content:space-between; gap:10px; padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:13px; }
+.metric:last-child { border-bottom:none; }
+.metric span { color:#d1d5db; }
+.metric b { color:#fff; }
 
-.loadingBarWrap {
-    width: 100%;
-}
+.intensityContainer { position:relative; height:24px; }
+.intensityBar { position:absolute; width:100%; height:16px; top:4px; border-radius:999px; background:linear-gradient(90deg,#3bd24f 0%,#d7d92e 35%,#ff9f1c 70%,#ff2d2d 100%); box-shadow:inset 0 0 8px rgba(0,0,0,0.45); }
+#intensityPointer { position:absolute; top:0px; width:4px; height:24px; background:white; border-radius:10px; left:0%; transition:all .5s ease; box-shadow:0 0 10px white; }
+.scaleLabels { display:flex; justify-content:space-between; font-size:11px; margin-top:8px; color:#cbd5e1; }
 
-.loadingBarTrack {
-    width: 100%;
-    height: 16px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.10);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.35);
-}
+.steps { margin:0; padding-left:20px; color:#e5e7eb; font-size:13px; line-height:1.6; }
+#breakdownList { display:grid; gap:8px; }
+.breakdownItem { display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
 
-.loadingBarFill {
-    width: 0%;
-    height: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #ff3b3b 0%, #ff7a18 45%, #ffb000 100%);
-    box-shadow: 0 0 16px rgba(255,60,60,0.55);
-    transition: width 0.18s ease;
-}
+.infoGrid { display:grid; gap:10px; }
+.infoRow { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08); font-size:13px; animation:fadeIn .35s ease; }
+.infoRow:last-child { border-bottom:none; }
+.infoLabel { color:#cbd5e1; }
+.infoValue { font-weight:700; color:#fff; }
+.analysisBadge { margin-top:10px; padding:10px 12px; border-radius:16px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:#fff; font-size:13px; line-height:1.5; }
+#selectedHint { color:#cbd5e1; font-size:13px; padding:6px 0 2px; }
+#errorBox { position:fixed; bottom:10px; left:10px; z-index:9999; background:rgba(0,0,0,0.85); color:#ff4d4d; padding:10px; font-size:12px; display:none; border-radius:8px; max-width:360px; }
 
-.loadingBarText {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #cbd5e1;
-    letter-spacing: 0.2px;
-}
+.legendPanel { position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:998; width:320px; background:rgba(10,14,24,0.42); border:1px solid rgba(255,255,255,0.12); border-radius:18px; box-shadow:0 10px 28px rgba(0,0,0,0.35); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); overflow:hidden; transition:background 0.25s ease, opacity 0.25s ease; opacity:0.82; }
+.legendPanel:hover { opacity:1; background:rgba(10,14,24,0.68); }
+.legendHeader { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; font-size:13px; font-weight:800; cursor:pointer; background:rgba(120,0,0,0.72); border-bottom:1px solid rgba(255,255,255,0.10); user-select:none; }
+.legendBody { display:none; padding:12px 14px; background:rgba(10,14,24,0.42); }
+.legendBody.open { display:block; }
+.legendRow { display:flex; align-items:center; gap:10px; margin-bottom:9px; font-size:12px; color:#e5e7eb; line-height:1.35; }
+.legendRow:last-child { margin-bottom:0; }
+.legendIcon { width:28px; height:28px; flex:0 0 28px; border-radius:999px; display:grid; place-items:center; font-size:16px; font-weight:700; color:white; border:1px solid rgba(255,255,255,0.18); }
+.legendRed { background:radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%); }
+.legendGreen { background:radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%); }
+.legendBlue { background:radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%); }
+.legendText b { color:white; }
 
-.loadingNote {
-    margin-top: 16px;
-    font-size: 12px;
-    line-height: 1.5;
-    color: #cbd5e1;
-    opacity: 0.92;
-    text-align: center;
-}
+.modePanel { margin-top:12px; padding:12px; border-radius:18px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.10); }
+.modeRow { margin-top:10px; }
+.modeLabel { font-size:12px; color:#d1d5db; display:flex; justify-content:space-between; margin-bottom:6px; }
+.modeSlider { width:100%; }
+.modeValue { font-weight:700; color:#fff; }
+.modeButtons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+.modeBtn { padding:10px; border:none; border-radius:12px; cursor:pointer; color:#fff; background:#7c2d12; }
+.modeBtn.active { background:#ff3b3b; }
 
-#loadingScreen.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease;
-}
+.smallNote { font-size:12px; color:#cbd5e1; line-height:1.45; margin-top:10px; }
+.statusPill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); font-size:12px; margin-top:10px; }
+.statusDotSmall { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; }
 
-@keyframes loadingFadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#topbar {
-    height: 74px;
-    background: linear-gradient(180deg, #0d1119 0%, #06080d 100%);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 0 16px;
-    z-index: 20;
-    box-sizing: border-box;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-}
-
-.pulseIcon {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%);
-    box-shadow: 0 0 18px rgba(255,60,60,0.7);
-    flex: 0 0 auto;
-}
-
-.titleWrap {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.title { font-size: 22px; font-weight: 800; letter-spacing: 1px; line-height: 1.05; }
-.subtitle { font-size: 12px; color: #cbd5e1; }
-
-.socials {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-
-.socialLink {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: #fff;
-    text-decoration: none;
-    padding: 8px 10px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.10);
-    transition: background .2s ease, transform .2s ease, border-color .2s ease;
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-.socialLink:hover {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.2);
-    transform: translateY(-1px);
-}
-
-.socialLink i {
-    font-size: 14px;
-}
-
-.statusBadge {
-    display: flex; align-items: center; gap: 10px;
-    background: linear-gradient(180deg, rgba(120,0,0,0.88), rgba(80,0,0,0.88));
-    border: 1px solid rgba(255,80,80,0.35);
-    border-radius: 18px;
-    padding: 10px 14px;
-    box-shadow: 0 0 20px rgba(255,0,0,0.12);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    flex: 0 0 auto;
-}
-.statusDot { width: 12px; height: 12px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
-.statusTitle { font-weight: 700; font-size: 14px; }
-.statusSub { font-size: 11px; color: #ffd6d6; }
-
-#content {
-    height: calc(100vh - 74px);
-    display: flex;
-    gap: 12px;
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-#mapWrap {
-    flex: 1;
-    position: relative;
-    border-radius: 22px;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: #0b1220;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.35);
-}
-
-#cesiumContainer {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-}
-
-#controls {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    z-index: 999;
-    background: rgba(18, 24, 35, 0.80);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 12px;
-    border-radius: 18px;
-    width: 220px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-}
-#controls h3 { margin: 0 0 10px; font-size: 16px; }
-
-#controls select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: #0f1722;
-    color: white;
-    outline: none;
-}
-
-#sidebar {
-    width: 340px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-#sidebar::-webkit-scrollbar { width: 8px; }
-#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 999px; }
-
-.card {
-    background: rgba(17,24,39,0.86);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 22px;
-    padding: 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.30);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-}
-
-.card h3 {
-    margin: 0 0 12px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(110,0,0,0.9), rgba(70,0,0,0.9));
-    font-size: 14px;
-    letter-spacing: 0.5px;
-}
-
-.metric {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 4px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 13px;
-}
-.metric:last-child { border-bottom: none; }
-.metric span { color: #d1d5db; }
-.metric b { color: #fff; }
-
-.intensityContainer { position: relative; height: 24px; }
-.intensityBar {
-    position: absolute; width: 100%; height: 16px; top: 4px;
-    border-radius: 999px;
-    background: linear-gradient(90deg,#3bd24f 0%,#d7d92e 35%,#ff9f1c 70%,#ff2d2d 100%);
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.45);
-}
-#intensityPointer {
-    position: absolute; top: 0px; width: 4px; height: 24px;
-    background: white; border-radius: 10px; left: 0%;
-    transition: all .5s ease; box-shadow: 0 0 10px white;
-}
-
-.scaleLabels {
-    display: flex; justify-content: space-between;
-    font-size: 11px; margin-top: 8px; color: #cbd5e1;
-}
-
-.steps {
-    margin: 0;
-    padding-left: 20px;
-    color: #e5e7eb;
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-#breakdownList { display: grid; gap: 8px; }
-.breakdownItem {
-    display: flex; justify-content: space-between;
-    font-size: 13px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.infoGrid { display: grid; gap: 10px; }
-.infoRow {
-    display: flex; justify-content: space-between; gap: 12px;
-    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 13px; animation: fadeIn .35s ease;
-}
-.infoRow:last-child { border-bottom: none; }
-.infoLabel { color: #cbd5e1; }
-.infoValue { font-weight: 700; color: #fff; }
-
-.analysisBadge {
-    margin-top: 10px;
-    padding: 10px 12px;
-    border-radius: 16px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.10);
-    color: #fff;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-#selectedHint {
-    color: #cbd5e1;
-    font-size: 13px;
-    padding: 6px 0 2px;
-}
-
-#errorBox {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    z-index: 9999;
-    background: rgba(0,0,0,0.85);
-    color: #ff4d4d;
-    padding: 10px;
-    font-size: 12px;
-    display: none;
-    border-radius: 8px;
-    max-width: 360px;
-}
-
-.legendPanel {
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 998;
-    width: 320px;
-    background: rgba(10, 14, 24, 0.42);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 18px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    overflow: hidden;
-    transition: background 0.25s ease, opacity 0.25s ease;
-    opacity: 0.82;
-}
-
-.legendPanel:hover {
-    opacity: 1;
-    background: rgba(10, 14, 24, 0.68);
-}
-
-.legendHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 14px;
-    font-size: 13px;
-    font-weight: 800;
-    cursor: pointer;
-    background: rgba(120,0,0,0.72);
-    border-bottom: 1px solid rgba(255,255,255,0.10);
-    user-select: none;
-}
-
-.legendBody {
-    display: none;
-    padding: 12px 14px;
-    background: rgba(10, 14, 24, 0.42);
-}
-
-.legendBody.open {
-    display: block;
-}
-
-.legendRow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 9px;
-    font-size: 12px;
-    color: #e5e7eb;
-    line-height: 1.35;
-}
-.legendRow:last-child { margin-bottom: 0; }
-
-.legendIcon {
-    width: 28px;
-    height: 28px;
-    flex: 0 0 28px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    font-size: 16px;
-    font-weight: 700;
-    color: white;
-    border: 1px solid rgba(255,255,255,0.18);
-}
-.legendRed { background: radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%); }
-.legendGreen { background: radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%); }
-.legendBlue { background: radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%); }
-.legendText b { color: white; }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
 
 <body>
 <div id="loadingScreen">
-    <div class="loadingCard">
-        <div class="loadingEarth"></div>
-        <div class="loadingTitle">Geospatial Earthquake Simulation</div>
-        <div class="loadingSubtitle"><em>An earthquake simulation focused on the West Valley Fault</em></div>
-
-        <div class="loadingBarWrap">
-            <div class="loadingBarTrack">
-                <div class="loadingBarFill" id="loadingBarFill"></div>
-            </div>
-            <div class="loadingBarText" id="loadingBarText">Loading map resources...</div>
-        </div>
-
-        <div class="loadingNote">
-            This is an ongoing project prototype of John Clarenz Medija, a pre-published version publicly available for public use. Information in the prototype is sourced from PHIVOLCS and related sources. Keep safe, everyone!
-        </div>
-    </div>
+  <div class="loadingCard">
+    <div class="loadingEarth"></div>
+    <div class="loadingTitle">Geospatial Earthquake Simulation</div>
+    <div class="loadingSubtitle"><em>An earthquake simulation focused on the West Valley Fault</em></div>
+    <div class="loadingBarTrack"><div class="loadingBarFill" id="loadingBarFill"></div></div>
+    <div class="loadingBarText" id="loadingBarText">Loading map resources...</div>
+    <div class="loadingNote">This is an ongoing project prototype of John Clarenz Medija, a pre-published version publicly available for public use. Information in the prototype is sourced from PHIVOLCS and related sources. Keep safe, everyone!</div>
+  </div>
 </div>
 
 <div id="topbar">
-    <div class="brand">
-        <div class="pulseIcon"></div>
-        <div class="titleWrap">
-            <div class="title">EARTHQUAKE SIMULATION</div>
-            <div class="subtitle">West Valley Fault System – Metro Manila & Nearby Areas</div>
-        </div>
+  <div class="brand">
+    <div class="pulseIcon"></div>
+    <div class="titleWrap">
+      <div class="title">EARTHQUAKE SIMULATION</div>
+      <div class="subtitle">West Valley Fault System – Metro Manila & Nearby Areas</div>
     </div>
+  </div>
 
-    <div class="socials">
-        <a class="socialLink" href="https://www.linkedin.com/in/john-clarenz-medija-4b9386411/" target="_blank" rel="noopener noreferrer">
-            <i class="fa-brands fa-linkedin"></i>
-            <span>John Clarenz Medija</span>
-        </a>
-        <a class="socialLink" href="https://www.instagram.com/aarens.cobe/" target="_blank" rel="noopener noreferrer">
-            <i class="fa-brands fa-instagram"></i>
-            <span>@aarens.cobe</span>
-        </a>
-        <a class="socialLink" href="https://www.researchgate.net/profile/John-Clarenz-Medija?ev=hdr_xprf&_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6ImhvbWUiLCJwYWdlIjoiaG9tZSIsInBvc2l0aW9uIjoiZ2xvYmFsSGVhZGVyIn19" target="_blank" rel="noopener noreferrer">
-            <i class="fa-brands fa-researchgate"></i>
-            <span>John Clarenz Medija</span>
-        </a>
-    </div>
+  <div class="socials">
+    <a class="socialLink" href="https://www.linkedin.com/in/john-clarenz-medija-4b9386411/" target="_blank" rel="noopener noreferrer">
+      <i class="fa-brands fa-linkedin"></i><span>John Clarenz Medija</span>
+    </a>
+    <a class="socialLink" href="https://www.instagram.com/aarens.cobe/" target="_blank" rel="noopener noreferrer">
+      <i class="fa-brands fa-instagram"></i><span>@aarens.cobe</span>
+    </a>
+    <a class="socialLink" href="https://www.researchgate.net/profile/John-Clarenz-Medija?ev=hdr_xprf&_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6ImhvbWUiLCJwYWdlIjoiaG9tZSIsInBvc2l0aW9uIjoiZ2xvYmFsSGVhZGVyIn19" target="_blank" rel="noopener noreferrer">
+      <i class="fa-brands fa-researchgate"></i><span>John Clarenz Medija</span>
+    </a>
+  </div>
 
-    <div class="statusBadge">
-        <div class="statusDot"></div>
-        <div>
-            <div class="statusTitle" id="statusTitle">READY</div>
-            <div class="statusSub" id="statusSub">Tap a marker or the map to analyze risk</div>
-        </div>
+  <div class="statusBadge">
+    <div class="statusDot"></div>
+    <div>
+      <div class="statusTitle" id="statusTitle">READY</div>
+      <div class="statusSub" id="statusSub">Tap a marker or the map to analyze risk</div>
     </div>
+  </div>
 </div>
 
 <div id="content">
-    <div id="mapWrap">
-        <div id="controls">
-            <h3>Region Switcher</h3>
-            <select id="regionSelect">
-                <option value="all">All Regions</option>
-                <option value="north">North</option>
-                <option value="qc">Quezon City</option>
-                <option value="pasig">Pasig / Marikina</option>
-                <option value="south">South</option>
-            </select>
+  <div id="mapWrap">
+    <div id="controls">
+      <h3>Region Switcher</h3>
+      <select id="regionSelect">
+        <option value="all">All Regions</option>
+        <option value="north">North</option>
+        <option value="qc">Quezon City</option>
+        <option value="pasig">Pasig / Marikina</option>
+        <option value="south">South</option>
+      </select>
 
-            <button id="pulseToggle"
-                style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
-                Seismic Pulse: ON
-            </button>
+      <button id="pulseToggle" style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
+        Seismic Pulse: ON
+      </button>
+
+      <div class="modePanel">
+        <div style="font-weight:800;font-size:13px;">Preparedness Simulation</div>
+        <div class="modeRow">
+          <div class="modeLabel"><span>Shake Scenario</span><span class="modeValue" id="scenarioValue">M 7.2</span></div>
+          <input id="scenarioSlider" class="modeSlider" type="range" min="6.0" max="8.0" value="7.2" step="0.1">
         </div>
-
-        <div class="legendPanel" id="legendPanel">
-            <div class="legendHeader" id="legendToggle">
-                <span>Legend Guide</span>
-                <span id="legendArrow">▸</span>
-            </div>
-            <div class="legendBody" id="legendBody">
-                <div class="legendRow">
-                    <div class="legendIcon legendRed">⚠</div>
-                    <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
-                </div>
-                <div class="legendRow">
-                    <div class="legendIcon legendGreen">✚</div>
-                    <div class="legendText"><b>Green marker</b> shows possible evacuation centers or hospitals.</div>
-                </div>
-                <div class="legendRow">
-                    <div class="legendIcon legendBlue">🌊</div>
-                    <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
-                </div>
-            </div>
+        <div class="modeButtons">
+          <button class="modeBtn active" id="measureBtn">Measure Distance</button>
+          <button class="modeBtn" id="safeBtn">Safe Zones</button>
         </div>
-
-        <div id="cesiumContainer"></div>
+        <div class="statusPill"><span class="statusDotSmall"></span><span id="liveStatus">Live AI Repository: Connected</span></div>
+        <div class="smallNote" id="prepNote">Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers.</div>
+      </div>
     </div>
 
-    <aside id="sidebar">
-        <section class="card">
-            <h3>SELECTED LOCATION</h3>
-            <div id="selectedHint">Tap a marked zone or location to view details.</div>
-            <div class="infoGrid" id="selectedInfo"></div>
-            <div class="analysisBadge" id="analysisBox">AI analysis will appear here after selection.</div>
-        </section>
+    <div class="legendPanel" id="legendPanel">
+      <div class="legendHeader" id="legendToggle">
+        <span>Legend Guide</span>
+        <span id="legendArrow">▸</span>
+      </div>
+      <div class="legendBody" id="legendBody">
+        <div class="legendRow">
+          <div class="legendIcon legendRed">⚠</div>
+          <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+        </div>
+        <div class="legendRow">
+          <div class="legendIcon legendGreen">✚</div>
+          <div class="legendText"><b>Green marker</b> shows possible evacuation centers or hospitals.</div>
+        </div>
+        <div class="legendRow">
+          <div class="legendIcon legendBlue">🌊</div>
+          <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
+        </div>
+      </div>
+    </div>
 
-        <section class="card">
-            <h3>LIVE RISK SUMMARY</h3>
-            <div class="metric"><span>Total Pop. In View</span><b id="popCount">≈ 4,050,000</b></div>
-            <div class="metric"><span>High Risk Zones</span><b id="highCount">3</b></div>
-            <div class="metric"><span>Moderate Risk Zones</span><b id="modCount">6</b></div>
-            <div class="metric"><span>Low Risk Zones</span><b id="lowCount">1</b></div>
-            <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
-        </section>
+    <div id="cesiumContainer"></div>
+  </div>
 
-        <section class="card">
-            <h3>INTENSITY OVERVIEW</h3>
-            <div class="intensityContainer">
-                <div class="intensityBar"></div>
-                <div id="intensityPointer"></div>
-            </div>
-            <div id="intensityText" style="text-align:center;margin-top:10px;">Awaiting selection</div>
-            <div class="scaleLabels">
-                <span>LOW</span>
-                <span>MODERATE</span>
-                <span>VERY HIGH</span>
-            </div>
-        </section>
+  <aside id="sidebar">
+    <section class="card">
+      <h3>SELECTED LOCATION</h3>
+      <div id="selectedHint">Tap a marked zone or location to view details.</div>
+      <div class="infoGrid" id="selectedInfo"></div>
+      <div class="analysisBadge" id="analysisBox">AI analysis will appear here after selection.</div>
+    </section>
 
-        <section class="card">
-            <h3>REGION BREAKDOWN (POPULATION)</h3>
-            <div id="breakdownList"></div>
-        </section>
+    <section class="card">
+      <h3>LIVE RISK SUMMARY</h3>
+      <div class="metric"><span>Total Pop. In View</span><b id="popCount">≈ 4,050,000</b></div>
+      <div class="metric"><span>High Risk Zones</span><b id="highCount">3</b></div>
+      <div class="metric"><span>Moderate Risk Zones</span><b id="modCount">6</b></div>
+      <div class="metric"><span>Low Risk Zones</span><b id="lowCount">1</b></div>
+      <div class="metric"><span>Active Fault System</span><b>West Valley Fault</b></div>
+    </section>
 
-        <section class="card">
-            <h3>EXPERIMENTATION</h3>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-                <button id="toggleHeat" style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">Toggle Heat Layer</button>
-                <button id="resetView" style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">Reset Camera</button>
-            </div>
-        </section>
+    <section class="card">
+      <h3>INTENSITY OVERVIEW</h3>
+      <div class="intensityContainer">
+        <div class="intensityBar"></div>
+        <div id="intensityPointer"></div>
+      </div>
+      <div id="intensityText" style="text-align:center;margin-top:10px;">Awaiting selection</div>
+      <div class="scaleLabels">
+        <span>LOW</span>
+        <span>MODERATE</span>
+        <span>VERY HIGH</span>
+      </div>
+    </section>
 
-        <section class="card">
-            <h3>HOW TO USE</h3>
-            <ol class="steps">
-                <li>Select a region to filter risk zones</li>
-                <li>Tap a marker or nearby zone on the map</li>
-                <li>Observe seismic wave propagation and intensity impact</li>
-            </ol>
-        </section>
-    </aside>
+    <section class="card">
+      <h3>REGION BREAKDOWN (POPULATION)</h3>
+      <div id="breakdownList"></div>
+    </section>
+
+    <section class="card">
+      <h3>EXPERIMENTATION</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button id="toggleHeat" style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">Toggle Heat Layer</button>
+        <button id="resetView" style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">Reset Camera</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>HOW TO USE</h3>
+      <ol class="steps">
+        <li>Select a region to filter risk zones</li>
+        <li>Tap a marker or nearby zone on the map</li>
+        <li>Observe seismic wave propagation and intensity impact</li>
+      </ol>
+    </section>
+  </aside>
 </div>
 
 <div id="errorBox"></div>
@@ -645,27 +271,27 @@ const loadingBarText = document.getElementById("loadingBarText");
 
 let fakeProgress = 0;
 const loadingTimer = setInterval(() => {
-    fakeProgress = Math.min(fakeProgress + Math.random() * 8, 92);
-    loadingBarFill.style.width = fakeProgress + "%";
-    loadingBarText.textContent = `Loading map resources... ${Math.round(fakeProgress)}%`;
+  fakeProgress = Math.min(fakeProgress + Math.random() * 8, 92);
+  loadingBarFill.style.width = fakeProgress + "%";
+  loadingBarText.textContent = `Loading map resources... ${Math.round(fakeProgress)}%`;
 }, 160);
 
 window.onerror = function(msg, src, line) {
-    const box = document.getElementById("errorBox");
-    box.style.display = "block";
-    box.innerHTML += `<div>${msg} (line ${line})</div>`;
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlYTcxMDY5OS01NGNiLTRhOTYtYjA5Yi03MGU2NjA4NGU3YTIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI4MTI4MDJ9.FI17Q76OE7diFhN3DyMFAxvfm8KhpxqAl6OPUIf5XkU";
 
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    baseLayerPicker: true,
-    animation: false,
-    timeline: false,
-    infoBox: false,
-    selectionIndicator: false,
-    geocoder: true,
-    baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" }))
+  baseLayerPicker: true,
+  animation: false,
+  timeline: false,
+  infoBox: false,
+  selectionIndicator: false,
+  geocoder: true,
+  baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({ url: "https://tile.openstreetmap.org/" }))
 });
 
 viewer.scene.globe.depthTestAgainstTerrain = false;
@@ -673,18 +299,18 @@ viewer.scene.globe.enableLighting = false;
 viewer.scene.requestRenderMode = false;
 
 window.addEventListener("load", () => {
-    viewer.resize();
-    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000) });
-    viewer.scene.requestRender();
+  viewer.resize();
+  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000) });
+  viewer.scene.requestRender();
+  setTimeout(() => {
+    clearInterval(loadingTimer);
+    loadingBarFill.style.width = "100%";
+    loadingBarText.textContent = "Ready";
     setTimeout(() => {
-        clearInterval(loadingTimer);
-        loadingBarFill.style.width = "100%";
-        loadingBarText.textContent = "Ready";
-        setTimeout(() => {
-            loadingScreen.classList.add("hidden");
-            setTimeout(() => loadingScreen.remove(), 400);
-        }, 250);
-    }, 800);
+      loadingScreen.classList.add("hidden");
+      setTimeout(() => loadingScreen.remove(), 400);
+    }, 250);
+  }, 800);
 });
 window.addEventListener("resize", () => viewer.resize());
 
@@ -692,399 +318,461 @@ const westValleyFault = [121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,121.
 
 let centerMarker = null;
 let currentCenter = { lon: 121.09, lat: 14.69 };
+let scenarioMag = 7.2;
+let safeZonesVisible = false;
+let measureMode = true;
 
 viewer.entities.add({
-    polyline: {
-        positions: new Cesium.CallbackProperty(() => {
-            const coords = [];
-            for (let i = 0; i < westValleyFault.length; i += 2) {
-                const lon = westValleyFault[i];
-                const lat = westValleyFault[i + 1];
-                const wave = Math.sin(Date.now() * 0.0008 + i) * 0.0005;
-                coords.push(lon + wave, lat, 100);
-            }
-            return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
-        }, false),
-        width: 6,
-        material: Cesium.Color.ORANGERED,
-        clampToGround: false
-    }
+  polyline: {
+    positions: new Cesium.CallbackProperty(() => {
+      const coords = [];
+      for (let i = 0; i < westValleyFault.length; i += 2) {
+        const lon = westValleyFault[i];
+        const lat = westValleyFault[i + 1];
+        const wave = Math.sin(Date.now() * 0.0008 + i) * 0.0005;
+        coords.push(lon + wave, lat, 100);
+      }
+      return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
+    }, false),
+    width: 6,
+    material: Cesium.Color.ORANGERED,
+    clampToGround: false
+  }
 });
 
 function createFaultBuffer() {
-    const bufferPointsLeft = [];
-    const bufferPointsRight = [];
-    for (let i = 0; i < westValleyFault.length; i += 2) {
-        const lon = westValleyFault[i];
-        const lat = westValleyFault[i + 1];
-        const offset = 0.012;
-        bufferPointsLeft.push(lon - offset, lat);
-        bufferPointsRight.push(lon + offset, lat);
+  const bufferPointsLeft = [];
+  const bufferPointsRight = [];
+  for (let i = 0; i < westValleyFault.length; i += 2) {
+    const lon = westValleyFault[i];
+    const lat = westValleyFault[i + 1];
+    const offset = 0.012;
+    bufferPointsLeft.push(lon - offset, lat);
+    bufferPointsRight.push(lon + offset, lat);
+  }
+  viewer.entities.add({
+    polygon: {
+      hierarchy: Cesium.Cartesian3.fromDegreesArray(bufferPointsLeft.concat(bufferPointsRight.reverse())),
+      material: Cesium.Color.RED.withAlpha(0.10),
+      outline: false
     }
-    viewer.entities.add({
-        polygon: {
-            hierarchy: Cesium.Cartesian3.fromDegreesArray(bufferPointsLeft.concat(bufferPointsRight.reverse())),
-            material: Cesium.Color.RED.withAlpha(0.10),
-            outline: false
-        }
-    });
+  });
 }
 createFaultBuffer();
 
 const left = [], right = [];
 for (let i = 0; i < westValleyFault.length; i += 2) {
-    const lon = westValleyFault[i];
-    const lat = westValleyFault[i + 1];
-    left.push(lon - 0.01, lat);
-    right.push(lon + 0.01, lat);
+  const lon = westValleyFault[i];
+  const lat = westValleyFault[i + 1];
+  left.push(lon - 0.01, lat);
+  right.push(lon + 0.01, lat);
 }
 viewer.entities.add({
-    polygon: {
-        hierarchy: Cesium.Cartesian3.fromDegreesArray(left.concat(right.reverse())),
-        material: Cesium.Color.RED.withAlpha(0.12),
-        outline: true,
-        outlineColor: Cesium.Color.RED,
-        perPositionHeight: false,
-        height: 20
-    }
+  polygon: {
+    hierarchy: Cesium.Cartesian3.fromDegreesArray(left.concat(right.reverse())),
+    material: Cesium.Color.RED.withAlpha(0.12),
+    outline: true,
+    outlineColor: Cesium.Color.RED,
+    perPositionHeight: false,
+    height: 20
+  }
 });
 
 const riskNodes = [
-    { region:"north", name:"Antipolo City Proper", lon:121.1800, lat:14.6200, population:"900,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Urban residential + tourism zone" },
-    { region:"north", name:"Lower Antipolo", lon:121.1600, lat:14.5900, population:"600,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"Urban hillside developments" },
-    { region:"north", name:"Montalban Highlands", lon:121.1900, lat:14.7400, population:"200,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Hillside communities" },
-    { region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050, population:"651,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential expansion zones" },
-    { region:"north", name:"San Mateo Center", lon:121.1700, lat:14.7000, population:"300,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"River-adjacent settlements" },
-    { region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200, population:"580,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Hillside communities" },
-    { region:"qc", name:"Batasan Hills", lon:121.0850, lat:14.6900, population:"166,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"Dense residential communities" },
-    { region:"qc", name:"Commonwealth Avenue Corridor", lon:121.0800, lat:14.6800, population:"800,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"High-density urban strip" },
-    { region:"qc", name:"Diliman Government Core", lon:121.0500, lat:14.6500, population:"250,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Government institutions + universities" },
-    { region:"qc", name:"Fairview", lon:121.0600, lat:14.7300, population:"1,200,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"Dense residential + malls" },
-    { region:"qc", name:"Loyola Heights", lon:121.0750, lat:14.6500, population:"34,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Universities and institutions" },
-    { region:"qc", name:"Novaliches Proper", lon:121.0500, lat:14.7500, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential subdivisions" },
-    { region:"qc", name:"Payatas", lon:121.0900, lat:14.7250, population:"130,000", intensity:"IX", rupture:"High", liquefaction:"Moderate", structures:"Informal settlements" },
-    { region:"pasig", name:"Concepcion Uno", lon:121.1100, lat:14.6400, population:"120,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Dense residential zone" },
-    { region:"pasig", name:"Concepcion Dos", lon:121.1150, lat:14.6300, population:"110,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Urban housing cluster" },
-    { region:"pasig", name:"Marikina", lon:121.1000, lat:14.6600, population:"456,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Commercial and residential districts" },
-    { region:"pasig", name:"Marikina River Basin Central", lon:121.1000, lat:14.6500, population:"450,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Floodplain settlements" },
-    { region:"pasig", name:"Pasig", lon:121.0800, lat:14.5900, population:"803,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"CBD and mixed developments" },
-    { region:"pasig", name:"Parang Marikina", lon:121.1200, lat:14.6600, population:"90,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Residential expansion area" },
-    { region:"south", name:"BGC Core Zone", lon:121.0500, lat:14.5500, population:"300,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"High-rise commercial district" },
-    { region:"south", name:"Taguig", lon:121.0500, lat:14.5200, population:"887,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"BGC and residential towers" },
-    { region:"south", name:"Taguig Western Edge", lon:121.0700, lat:14.5400, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Mixed residential-industrial" },
-    { region:"south", name:"Muntinlupa", lon:121.0400, lat:14.4500, population:"544,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Residential subdivisions" },
-    { region:"south", name:"Pateros", lon:121.0600, lat:14.5450, population:"70,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Dense residential town" },
-    { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential" }
+  { region:"north", name:"Antipolo City Proper", lon:121.1800, lat:14.6200, population:"900,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Urban residential + tourism zone" },
+  { region:"north", name:"Lower Antipolo", lon:121.1600, lat:14.5900, population:"600,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"Urban hillside developments" },
+  { region:"north", name:"Montalban Highlands", lon:121.1900, lat:14.7400, population:"200,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Hillside communities" },
+  { region:"north", name:"San Jose del Monte", lon:121.0450, lat:14.8050, population:"651,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential expansion zones" },
+  { region:"north", name:"San Mateo Center", lon:121.1700, lat:14.7000, population:"300,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"River-adjacent settlements" },
+  { region:"north", name:"Rodriguez–San Mateo", lon:121.1500, lat:14.7200, population:"580,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Hillside communities" },
+  { region:"qc", name:"Batasan Hills", lon:121.0850, lat:14.6900, population:"166,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"Dense residential communities" },
+  { region:"qc", name:"Commonwealth Avenue Corridor", lon:121.0800, lat:14.6800, population:"800,000", intensity:"IX", rupture:"Very High", liquefaction:"Low", structures:"High-density urban strip" },
+  { region:"qc", name:"Diliman Government Core", lon:121.0500, lat:14.6500, population:"250,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Government institutions + universities" },
+  { region:"qc", name:"Fairview", lon:121.0600, lat:14.7300, population:"1,200,000", intensity:"IX", rupture:"Very High", liquefaction:"Moderate", structures:"Dense residential + malls" },
+  { region:"qc", name:"Loyola Heights", lon:121.0750, lat:14.6500, population:"34,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Universities and institutions" },
+  { region:"qc", name:"Novaliches Proper", lon:121.0500, lat:14.7500, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Low", structures:"Residential subdivisions" },
+  { region:"qc", name:"Payatas", lon:121.0900, lat:14.7250, population:"130,000", intensity:"IX", rupture:"High", liquefaction:"Moderate", structures:"Informal settlements" },
+  { region:"pasig", name:"Concepcion Uno", lon:121.1100, lat:14.6400, population:"120,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Dense residential zone" },
+  { region:"pasig", name:"Concepcion Dos", lon:121.1150, lat:14.6300, population:"110,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Urban housing cluster" },
+  { region:"pasig", name:"Marikina", lon:121.1000, lat:14.6600, population:"456,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Commercial and residential districts" },
+  { region:"pasig", name:"Marikina River Basin Central", lon:121.1000, lat:14.6500, population:"450,000", intensity:"IX", rupture:"Very High", liquefaction:"High", structures:"Floodplain settlements" },
+  { region:"pasig", name:"Pasig", lon:121.0800, lat:14.5900, population:"803,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"CBD and mixed developments" },
+  { region:"pasig", name:"Parang Marikina", lon:121.1200, lat:14.6600, population:"90,000", intensity:"VIII", rupture:"High", liquefaction:"Moderate", structures:"Residential expansion area" },
+  { region:"south", name:"BGC Core Zone", lon:121.0500, lat:14.5500, population:"300,000", intensity:"VIII", rupture:"Moderate", liquefaction:"Moderate", structures:"High-rise commercial district" },
+  { region:"south", name:"Taguig", lon:121.0500, lat:14.5200, population:"887,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"BGC and residential towers" },
+  { region:"south", name:"Taguig Western Edge", lon:121.0700, lat:14.5400, population:"500,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Mixed residential-industrial" },
+  { region:"south", name:"Muntinlupa", lon:121.0400, lat:14.4500, population:"544,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Residential subdivisions" },
+  { region:"south", name:"Pateros", lon:121.0600, lat:14.5450, population:"70,000", intensity:"VIII", rupture:"Moderate", liquefaction:"High", structures:"Dense residential town" },
+  { region:"south", name:"Upper Muntinlupa Expansion", lon:121.0350, lat:14.4700, population:"200,000", intensity:"VII", rupture:"Low", liquefaction:"Low", structures:"Suburban residential" }
 ];
 
 let markers = [], activeMarkers = [], pulseEntities = [], pulseEnabled = true, heatEntities = [];
 
 function intensityToMagnitude(intensity) {
-    if (intensity === "IX") return 7.2;
-    if (intensity === "VIII") return 6.7;
-    if (intensity === "VII") return 6.2;
-    return 6.5;
+  if (intensity === "IX") return scenarioMag;
+  if (intensity === "VIII") return Math.max(6.7, scenarioMag - 0.5);
+  if (intensity === "VII") return Math.max(6.2, scenarioMag - 1.0);
+  return scenarioMag;
 }
 
 function pulseParams(intensity) {
-    if (intensity === "IX") return { speed: 1.75, base: 260, alpha: 0.12 };
-    if (intensity === "VIII") return { speed: 1.35, base: 210, alpha: 0.095 };
-    return { speed: 1.05, base: 160, alpha: 0.075 };
+  if (intensity === "IX") return { speed: 1.75, base: 260, alpha: 0.12 };
+  if (intensity === "VIII") return { speed: 1.35, base: 210, alpha: 0.095 };
+  return { speed: 1.05, base: 160, alpha: 0.075 };
 }
 
 function makeHazardPin(color, glyph) {
-    return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
+  return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
 }
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
 
 function labelStyleByIntensity(intensity) {
-    if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
-    if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
-    return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
+  if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
+  if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
+  return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
 }
 
 function addHeatLayer() {
-    heatEntities.forEach(e => viewer.entities.remove(e));
-    heatEntities = [];
-    riskNodes.forEach(n => {
-        const mag = intensityToMagnitude(n.intensity);
-        const e = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            ellipse: {
-                semiMajorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
-                semiMinorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
-                material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.14)),
-                outline: false
-            }
-        });
-        heatEntities.push(e);
+  heatEntities.forEach(e => viewer.entities.remove(e));
+  heatEntities = [];
+  riskNodes.forEach(n => {
+    const mag = intensityToMagnitude(n.intensity);
+    const e = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+      ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.14)),
+        outline: false
+      }
     });
+    heatEntities.push(e);
+  });
 }
 
 function addSeismicPulse() {
-    pulseEntities.forEach(e => viewer.entities.remove(e));
-    pulseEntities = [];
-
-    riskNodes.forEach((n, index) => {
-        const p = pulseParams(n.intensity);
-        const mag = intensityToMagnitude(n.intensity);
-        const colorProp = new Cesium.ColorMaterialProperty(
-            new Cesium.CallbackProperty(() => Cesium.Color.RED.withAlpha(p.alpha), false)
-        );
-
-        const entity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            ellipse: {
-                semiMajorAxis: new Cesium.CallbackProperty(() => {
-                    if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
-                    return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
-                }, false),
-                semiMinorAxis: new Cesium.CallbackProperty(() => {
-                    if (!pulseEnabled) return 0;
-                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
-                    return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
-                }, false),
-                material: colorProp,
-                height: 0
-            }
-        });
-        pulseEntities.push(entity);
+  pulseEntities.forEach(e => viewer.entities.remove(e));
+  pulseEntities = [];
+  riskNodes.forEach((n, index) => {
+    const p = pulseParams(n.intensity);
+    const mag = intensityToMagnitude(n.intensity);
+    const colorProp = new Cesium.ColorMaterialProperty(new Cesium.CallbackProperty(() => Cesium.Color.RED.withAlpha(p.alpha), false));
+    const entity = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+      ellipse: {
+        semiMajorAxis: new Cesium.CallbackProperty(() => {
+          if (!pulseEnabled) return 0;
+          const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+          return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
+        }, false),
+        semiMinorAxis: new Cesium.CallbackProperty(() => {
+          if (!pulseEnabled) return 0;
+          const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+          return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
+        }, false),
+        material: colorProp,
+        height: 0
+      }
     });
+    pulseEntities.push(entity);
+  });
 }
 
 function getDistanceKm(lon1, lat1, lon2, lat2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
 function updateSelectedInfo(data) {
-    const info = document.getElementById("selectedInfo");
-    const analysis = document.getElementById("analysisBox");
-    if (!data) {
-        info.innerHTML = "";
-        analysis.innerHTML = "Select a location to begin hazard analysis.";
-        document.getElementById("intensityPointer").style.left = "0%";
-        document.getElementById("intensityText").innerHTML = "Awaiting selection";
-        return;
-    }
+  const info = document.getElementById("selectedInfo");
+  const analysis = document.getElementById("analysisBox");
+  if (!data) {
+    info.innerHTML = "";
+    analysis.innerHTML = "Select a location to begin hazard analysis.";
+    document.getElementById("intensityPointer").style.left = "0%";
+    document.getElementById("intensityText").innerHTML = "Awaiting selection";
+    return;
+  }
 
-    if (data.intensity) {
-        const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
-        const intensityLabels = { "VII": "HIGH", "VIII": "VERY HIGH", "IX": "EXTREME", "X": "CATASTROPHIC" };
-        document.getElementById("intensityPointer").style.left = intensityMap[data.intensity] + "%";
-        document.getElementById("intensityText").innerHTML = `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
-    }
+  if (data.intensity) {
+    const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
+    const intensityLabels = { "VII": "HIGH", "VIII": "VERY HIGH", "IX": "EXTREME", "X": "CATASTROPHIC" };
+    document.getElementById("intensityPointer").style.left = intensityMap[data.intensity] + "%";
+    document.getElementById("intensityText").innerHTML = `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
+  }
 
-    info.innerHTML = `
-        <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name}</span></div>
-        <div class="infoRow"><span class="infoLabel">Population</span><span class="infoValue">${data.population || "-"}</span></div>
-        <div class="infoRow"><span class="infoLabel">Expected Intensity</span><span class="infoValue">${data.intensity || "-"}</span></div>
-        <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
-        <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
-        <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
-    `;
+  info.innerHTML = `
+    <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name}</span></div>
+    <div class="infoRow"><span class="infoLabel">Population</span><span class="infoValue">${data.population || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">Expected Intensity</span><span class="infoValue">${data.intensity || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
+    <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
+  `;
 
-    analysis.innerHTML = `
-        <b>Automated Hazard Assessment</b><br><br>
-        ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
-        Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude 7.2 rupture scenario.<br><br>
-        Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.
-    `;
+  analysis.innerHTML = `
+    <b>Automated Hazard Assessment</b><br><br>
+    ${data.name} lies within the influence area of the West Valley Fault system.<br><br>
+    Expected shaking intensity is approximately PHIVOLCS Intensity ${data.intensity || "-"} during a magnitude ${scenarioMag.toFixed(1)} rupture scenario.<br><br>
+    Ground rupture risk is classified as <b>${data.rupture || "-"}</b> while liquefaction susceptibility is estimated to be <b>${data.liquefaction || "-"}</b>.<br><br>
+    <b>Preparedness Mode:</b> ${measureMode ? "Distance inspection is active." : "Safe-zone guidance is active."}
+  `;
 }
 
 function setCenterMarker(lon, lat, name) {
-    currentCenter = { lon, lat };
-    if (centerMarker) viewer.entities.remove(centerMarker);
-    centerMarker = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(lon, lat),
-        point: { pixelSize: 10, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
-        label: {
-            text: name,
-            font: "13px sans-serif",
-            fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 2,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            pixelOffset: new Cesium.Cartesian2(0, -18),
-            distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000),
-            scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9)
-        }
-    });
-    updateSelectedInfo({ name, region: "Tap Point", lon, lat });
+  currentCenter = { lon, lat };
+  if (centerMarker) viewer.entities.remove(centerMarker);
+  centerMarker = viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(lon, lat),
+    point: { pixelSize: 10, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
+    label: {
+      text: name,
+      font: "13px sans-serif",
+      fillColor: Cesium.Color.WHITE,
+      outlineColor: Cesium.Color.BLACK,
+      outlineWidth: 2,
+      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+      pixelOffset: new Cesium.Cartesian2(0, -18),
+      distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 7000),
+      scaleByDistance: new Cesium.NearFarScalar(1500, 1.1, 7000, 0.9)
+    }
+  });
+  updateSelectedInfo({ name, region: "Tap Point", lon, lat });
 }
 
 function render(region) {
-    markers.forEach(m => viewer.entities.remove(m));
-    markers = [];
-    activeMarkers = [];
+  markers.forEach(m => viewer.entities.remove(m));
+  markers = [];
+  activeMarkers = [];
 
-    riskNodes.filter(n => region === "all" || n.region === region).forEach(n => {
-        const ls = labelStyleByIntensity(n.intensity);
-        const entity = viewer.entities.add({
-            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
-            billboard: {
-                image: affectedIcon,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-                scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78
-            },
-            label: {
-                text: n.name,
-                font: ls.font,
-                fillColor: ls.color,
-                outlineColor: Cesium.Color.BLACK,
-                outlineWidth: 3,
-                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-                pixelOffset: new Cesium.Cartesian2(0, -30),
-                eyeOffset: new Cesium.Cartesian3(0, 0, -12),
-                distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000),
-                scaleByDistance: new Cesium.NearFarScalar(1500, ls.scale, 14000, 0.92)
-            },
-            properties: n
-        });
-        markers.push(entity);
-        activeMarkers.push(n);
+  riskNodes.filter(n => region === "all" || n.region === region).forEach(n => {
+    const ls = labelStyleByIntensity(n.intensity);
+    const entity = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+      billboard: {
+        image: affectedIcon,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        scale: n.intensity === "IX" ? 0.95 : n.intensity === "VIII" ? 0.85 : 0.78
+      },
+      label: {
+        text: n.name,
+        font: ls.font,
+        fillColor: ls.color,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 3,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -30),
+        eyeOffset: new Cesium.Cartesian3(0, 0, -12),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000),
+        scaleByDistance: new Cesium.NearFarScalar(1500, ls.scale, 14000, 0.92)
+      },
+      properties: n
     });
+    markers.push(entity);
+    activeMarkers.push(n);
+  });
 
-    document.getElementById("breakdownList").innerHTML = `
-        <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
-        <div class="breakdownItem"><span>Quezon City</span><b>1,150,000</b></div>
-        <div class="breakdownItem"><span>Pasig / Marikina</span><b>900,000</b></div>
-        <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
-    `;
+  document.getElementById("breakdownList").innerHTML = `
+    <div class="breakdownItem"><span>North</span><b>1,050,000</b></div>
+    <div class="breakdownItem"><span>Quezon City</span><b>1,150,000</b></div>
+    <div class="breakdownItem"><span>Pasig / Marikina</span><b>900,000</b></div>
+    <div class="breakdownItem"><span>South Metro</span><b>1,500,000</b></div>
+  `;
 
-    const count = activeMarkers.length;
-    document.getElementById("popCount").textContent = region === "all" ? "≈ 4,050,000" : `≈ ${count * 450000}`;
-    document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
-    document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
-    document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
-    updateSelectedInfo(null);
+  const count = activeMarkers.length;
+  document.getElementById("popCount").textContent = region === "all" ? "≈ 4,050,000" : `≈ ${count * 450000}`;
+  document.getElementById("highCount").textContent = Math.max(1, Math.round(count / 3));
+  document.getElementById("modCount").textContent = Math.max(1, Math.round(count / 2));
+  document.getElementById("lowCount").textContent = Math.max(1, count - Math.round(count / 2));
+  updateSelectedInfo(null);
+}
+
+function addSafeZones() {
+  heatEntities.forEach(e => viewer.entities.remove(e));
+  heatEntities = [];
+  if (!safeZonesVisible) return;
+  const safePoints = [
+    { name: "Open Space", lon: 121.072, lat: 14.635 },
+    { name: "Hospital", lon: 121.060, lat: 14.675 },
+    { name: "Evacuation Center", lon: 121.105, lat: 14.605 }
+  ];
+  safePoints.forEach(p => {
+    const e = viewer.entities.add({
+      position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat),
+      point: { pixelSize: 12, color: Cesium.Color.LIME, outlineColor: Cesium.Color.WHITE, outlineWidth: 1 },
+      label: {
+        text: p.name,
+        font: "13px sans-serif",
+        fillColor: Cesium.Color.LIME,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -18),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
+      }
+    });
+    heatEntities.push(e);
+  });
+}
+
+function generatePreparednessGuide(distanceKm) {
+  const before = ["Secure heavy furniture.", "Prepare go-bag.", "Identify exits."];
+  const during = ["Drop, Cover, and Hold On.", "Stay away from glass.", "Protect head and neck."];
+  const after = ["Check injuries.", "Expect aftershocks.", "Use verified updates only."];
+  return `<b>Preparedness Guidance</b><br>Distance to nearest fault: <b>${distanceKm.toFixed(2)} km</b><br><br><b>Before:</b> ${before.join(" ")}<br><b>During:</b> ${during.join(" ")}<br><b>After:</b> ${after.join(" ")}`;
+}
+
+function applyPreparednessMode() {
+  document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
+  document.getElementById("liveStatus").textContent = "Live AI Repository: Connected";
+  document.getElementById("prepNote").textContent = measureMode
+    ? "Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers."
+    : "Safe zones are highlighted to support evacuation planning and preparedness recommendations.";
 }
 
 function init() {
-    render("all");
-    addSeismicPulse();
+  render("all");
+  addSeismicPulse();
+  applyPreparednessMode();
 }
 init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
-
 document.getElementById("pulseToggle").addEventListener("click", () => {
-    pulseEnabled = !pulseEnabled;
-    pulseEntities.forEach(entity => entity.show = pulseEnabled);
-    document.getElementById("pulseToggle").innerText = pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
-    viewer.scene.requestRender();
+  pulseEnabled = !pulseEnabled;
+  pulseEntities.forEach(entity => entity.show = pulseEnabled);
+  document.getElementById("pulseToggle").innerText = pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
+  viewer.scene.requestRender();
 });
 
-let heatVisible = false;
 document.getElementById("toggleHeat").addEventListener("click", () => {
-    if (heatEntities.length === 0) {
-        addHeatLayer();
-        heatVisible = true;
-    } else {
-        heatVisible = !heatVisible;
-        heatEntities.forEach(entity => entity.show = heatVisible);
-    }
-    document.getElementById("toggleHeat").innerText = heatVisible ? "Hide Heat Layer" : "Show Heat Layer";
+  if (heatEntities.length === 0) {
+    addHeatLayer();
+    safeZonesVisible = false;
+  } else {
+    heatEntities.forEach(entity => viewer.entities.remove(entity));
+    heatEntities = [];
+  }
 });
 
 document.getElementById("resetView").addEventListener("click", () => {
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000),
-        duration: 1.5
-    });
+  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000), duration: 1.5 });
 });
+
+document.getElementById("scenarioSlider").addEventListener("input", e => {
+  scenarioMag = parseFloat(e.target.value);
+  document.getElementById("scenarioValue").textContent = `M ${scenarioMag.toFixed(1)}`;
+  viewer.scene.requestRender();
+  applyPreparednessMode();
+});
+
+const measureBtn = document.getElementById("measureBtn");
+const safeBtn = document.getElementById("safeBtn");
+
+function setMode(measure) {
+  measureMode = measure;
+  safeZonesVisible = !measure;
+  measureBtn.classList.toggle("active", measure);
+  safeBtn.classList.toggle("active", !measure);
+  addSafeZones();
+  applyPreparednessMode();
+}
+measureBtn.addEventListener("click", () => setMode(true));
+safeBtn.addEventListener("click", () => setMode(false));
 
 const legendToggle = document.getElementById("legendToggle");
 const legendBody = document.getElementById("legendBody");
 const legendArrow = document.getElementById("legendArrow");
 legendToggle.addEventListener("click", () => {
-    const open = legendBody.classList.toggle("open");
-    legendArrow.textContent = open ? "▾" : "▸";
+  const open = legendBody.classList.toggle("open");
+  legendArrow.textContent = open ? "▾" : "▸";
 });
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
-    if (!entity || !entity.properties) return;
-    const props = entity.properties;
-    const data = {
-        name: props.name.getValue(),
-        region: props.region.getValue(),
-        lon: props.lon.getValue(),
-        lat: props.lat.getValue(),
-        population: props.population.getValue(),
-        intensity: props.intensity.getValue(),
-        rupture: props.rupture.getValue(),
-        liquefaction: props.liquefaction.getValue(),
-        structures: props.structures.getValue()
-    };
-    updateSelectedInfo(data);
-    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+  if (!entity || !entity.properties) return;
+  const props = entity.properties;
+  const data = {
+    name: props.name.getValue(),
+    region: props.region.getValue(),
+    lon: props.lon.getValue(),
+    lat: props.lat.getValue(),
+    population: props.population.getValue(),
+    intensity: props.intensity.getValue(),
+    rupture: props.rupture.getValue(),
+    liquefaction: props.liquefaction.getValue(),
+    structures: props.structures.getValue()
+  };
+  updateSelectedInfo(data);
+  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-
 handler.setInputAction(function(click) {
-    const picked = viewer.scene.pick(click.position);
+  const picked = viewer.scene.pick(click.position);
 
-    if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
-        viewer.selectedEntity = picked.id;
-        const props = picked.id.properties;
-        const data = {
-            name: props.name.getValue(),
-            region: props.region.getValue(),
-            lon: props.lon.getValue(),
-            lat: props.lat.getValue(),
-            population: props.population.getValue(),
-            intensity: props.intensity.getValue(),
-            rupture: props.rupture.getValue(),
-            liquefaction: props.liquefaction.getValue(),
-            structures: props.structures.getValue()
-        };
-        updateSelectedInfo(data);
-        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
-        return;
+  if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
+    viewer.selectedEntity = picked.id;
+    const props = picked.id.properties;
+    const data = {
+      name: props.name.getValue(),
+      region: props.region.getValue(),
+      lon: props.lon.getValue(),
+      lat: props.lat.getValue(),
+      population: props.population.getValue(),
+      intensity: props.intensity.getValue(),
+      rupture: props.rupture.getValue(),
+      liquefaction: props.liquefaction.getValue(),
+      structures: props.structures.getValue()
+    };
+    updateSelectedInfo(data);
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+    return;
+  }
+
+  let cartesian = viewer.scene.pickPosition(click.position);
+  if (!Cesium.defined(cartesian)) {
+    const ray = viewer.camera.getPickRay(click.position);
+    if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+  }
+
+  if (!Cesium.defined(cartesian)) {
+    setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+    return;
+  }
+
+  const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+  const lon = Cesium.Math.toDegrees(cartographic.longitude);
+  const lat = Cesium.Math.toDegrees(cartographic.latitude);
+
+  setCenterMarker(lon, lat, "Tapped Zone");
+
+  const closest = riskNodes.reduce((best, n) => {
+    const d = getDistanceKm(lon, lat, n.lon, n.lat);
+    return (!best || d < best.d) ? { node: n, d } : best;
+  }, null);
+
+  if (closest) {
+    const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
+    document.getElementById("analysisBox").innerHTML = generatePreparednessGuide(distanceKm);
+    if (measureMode) {
+      updateSelectedInfo({
+        name: closest.node.name,
+        region: closest.node.region,
+        lon: closest.node.lon,
+        lat: closest.node.lat,
+        population: closest.node.population,
+        intensity: closest.node.intensity,
+        rupture: closest.node.rupture,
+        liquefaction: closest.node.liquefaction,
+        structures: closest.node.structures
+      });
+    } else {
+      document.getElementById("analysisBox").innerHTML += "<br><br><b>Safe Zone Insight:</b> Follow the highlighted evacuation points and keep routes clear.";
     }
-
-    let cartesian = viewer.scene.pickPosition(click.position);
-    if (!Cesium.defined(cartesian)) {
-        const ray = viewer.camera.getPickRay(click.position);
-        if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-    }
-
-    if (!Cesium.defined(cartesian)) {
-        setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
-        return;
-    }
-
-    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-    const lon = Cesium.Math.toDegrees(cartographic.longitude);
-    const lat = Cesium.Math.toDegrees(cartographic.latitude);
-
-    setCenterMarker(lon, lat, "Tapped Zone");
-
-    const closest = riskNodes.reduce((best, n) => {
-        const d = getDistanceKm(lon, lat, n.lon, n.lat);
-        return (!best || d < best.d) ? { node: n, d } : best;
-    }, null);
-
-    if (closest) {
-        updateSelectedInfo({
-            name: closest.node.name,
-            region: closest.node.region,
-            lon: closest.node.lon,
-            lat: closest.node.lat,
-            population: closest.node.population,
-            intensity: closest.node.intensity,
-            rupture: closest.node.rupture,
-            liquefaction: closest.node.liquefaction,
-            structures: closest.node.structures
-        });
-    }
+  }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 </script>
 </body>
