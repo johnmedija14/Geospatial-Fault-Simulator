@@ -550,7 +550,7 @@ viewer.entities.add({
 
         width: 6,
         material: Cesium.Color.ORANGERED,
-        clampToGround: true
+        clampToGround: false
     }
 });
 
@@ -1233,7 +1233,6 @@ document.getElementById("pulseToggle")
         : "Seismic Pulse: OFF";
 
     viewer.scene.requestRender();
-});
 });
 
     let heatVisible = true;
