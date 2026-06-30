@@ -31,15 +31,12 @@ body { display: flex; flex-direction: column; }
     z-index: 20;
     box-sizing: border-box;
 }
-
 .brand { display: flex; align-items: center; gap: 12px; }
-
 .pulseIcon {
     width: 34px; height: 34px; border-radius: 50%;
     background: radial-gradient(circle, rgba(255,60,60,1) 0%, rgba(160,0,0,0.2) 70%);
     box-shadow: 0 0 18px rgba(255,60,60,0.7);
 }
-
 .title { font-size: 24px; font-weight: 800; letter-spacing: 1px; }
 .subtitle { font-size: 12px; color: #cbd5e1; }
 
@@ -53,7 +50,6 @@ body { display: flex; flex-direction: column; }
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
 }
-
 .statusDot { width: 12px; height: 12px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 10px #ff4d4d; }
 .statusTitle { font-weight: 700; font-size: 14px; }
 .statusSub { font-size: 11px; color: #ffd6d6; }
@@ -97,7 +93,6 @@ body { display: flex; flex-direction: column; }
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 }
-
 #controls h3 { margin: 0 0 10px; font-size: 16px; }
 
 #controls select {
@@ -283,15 +278,9 @@ body { display: flex; flex-direction: column; }
     color: white;
     border: 1px solid rgba(255,255,255,0.18);
 }
-.legendRed {
-    background: radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%);
-}
-.legendGreen {
-    background: radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%);
-}
-.legendBlue {
-    background: radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%);
-}
+.legendRed { background: radial-gradient(circle, rgba(255,88,88,1) 0%, rgba(170,0,0,1) 70%); }
+.legendGreen { background: radial-gradient(circle, rgba(73,201,101,1) 0%, rgba(18,120,49,1) 70%); }
+.legendBlue { background: radial-gradient(circle, rgba(34,90,170,1) 0%, rgba(10,34,90,1) 70%); }
 .legendText b { color: white; }
 
 @keyframes fadeIn {
@@ -302,7 +291,6 @@ body { display: flex; flex-direction: column; }
 </head>
 
 <body>
-
 <div id="topbar">
     <div class="brand">
         <div class="pulseIcon"></div>
@@ -578,7 +566,6 @@ function labelStyleByIntensity(intensity) {
 function addHeatLayer() {
     heatEntities.forEach(e => viewer.entities.remove(e));
     heatEntities = [];
-
     riskNodes.forEach(n => {
         const mag = intensityToMagnitude(n.intensity);
         const e = viewer.entities.add({
@@ -586,9 +573,7 @@ function addHeatLayer() {
             ellipse: {
                 semiMajorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
                 semiMinorAxis: new Cesium.CallbackProperty(() => 600 + (mag - 6) * 220, false),
-                material: new Cesium.CallbackProperty(() => {
-                    return Cesium.Color.RED.withAlpha(0.06 + (mag - 6) * 0.015);
-                }, false),
+                material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.14)),
                 outline: false
             }
         });
@@ -603,6 +588,14 @@ function addSeismicPulse() {
     riskNodes.forEach((n, index) => {
         const p = pulseParams(n.intensity);
         const mag = intensityToMagnitude(n.intensity);
+        const colorProp = new Cesium.ColorMaterialProperty(
+            new Cesium.CallbackProperty(() => {
+                if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
+                const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
+                return Cesium.Color.RED.withAlpha(p.alpha * (1 - t));
+            }, false)
+        );
+
         const entity = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
@@ -616,11 +609,7 @@ function addSeismicPulse() {
                     const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
                     return p.base + t * p.base * (1.8 + (mag - 6) * 0.5);
                 }, false),
-                material: new Cesium.CallbackProperty(() => {
-                    if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
-                    const t = (performance.now() * 0.001 * p.speed + index * 0.35) % 1;
-                    return Cesium.Color.RED.withAlpha(p.alpha * (1 - t));
-                }, false),
+                material: colorProp,
                 height: 0
             }
         });
@@ -778,7 +767,6 @@ document.getElementById("resetView").addEventListener("click", () => {
 const legendToggle = document.getElementById("legendToggle");
 const legendBody = document.getElementById("legendBody");
 const legendArrow = document.getElementById("legendArrow");
-
 legendToggle.addEventListener("click", () => {
     const open = legendBody.classList.toggle("open");
     legendArrow.textContent = open ? "▾" : "▸";
@@ -800,10 +788,7 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
     };
     selectedEntityData = data;
     updateSelectedInfo(data);
-    viewer.camera.flyTo({
-        destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
-        duration: 1.5
-    });
+    viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -827,15 +812,11 @@ handler.setInputAction(function(click) {
         };
         selectedEntityData = data;
         updateSelectedInfo(data);
-        viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
-            duration: 1.5
-        });
+        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
         return;
     }
 
     let cartesian = viewer.scene.pickPosition(click.position);
-
     if (!Cesium.defined(cartesian)) {
         const ray = viewer.camera.getPickRay(click.position);
         if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
