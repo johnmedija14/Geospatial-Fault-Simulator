@@ -1170,10 +1170,35 @@ function setCenterMarker(lon, lat, name) {
     });
 }
 
+let markers = [];
+let activeMarkers = [];
+
 function render(region) {
     markers.forEach(m => viewer.entities.remove(m));
     markers = [];
     activeMarkers = [];
+
+    riskNodes
+    .filter(n => region === "all" || n.region === region)
+    .forEach(n => {
+        const entity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+            point: {
+                pixelSize: 14,
+                color: Cesium.Color.RED
+            },
+            label: {
+                text: n.name
+            },
+            properties: n
+        });
+
+        markers.push(entity);
+        activeMarkers.push(n);
+    });
+}
+
+render("all");
 
     riskNodes
     .filter(n => region === "all" || n.region === region)
