@@ -391,6 +391,11 @@ body {
                 <option value="pasig">Pasig / Marikina</option>
                 <option value="south">South</option>
             </select>
+
+            <button id="pulseToggle"
+style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
+Seismic Pulse: ON
+</button>
         </div>
 
         <div id="cesiumContainer"></div>
@@ -438,6 +443,33 @@ body {
             <div id="breakdownList"></div>
         </section>
 
+<section class="card">
+    <h3>EXPERIMENTATION</h3>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <button id="toggleHeat"
+        style="padding:10px;border-radius:12px;border:none;background:#ff9f1c;color:white;">
+        Toggle Heat Layer
+        </button>
+
+        <button id="togglePulse"
+        style="padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;">
+        Toggle Seismic Pulse
+        </button>
+
+        <button id="resetView"
+        style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">
+        Reset Camera
+        </button>
+
+    </div>
+</section>
+
+<!-- KEEP THIS BELOW -->
+<section class="card">
+    <h3>HOW TO USE</h3>
+        
         <section class="card">
             <h3>HOW TO USE</h3>
             <ol class="steps">
@@ -935,9 +967,11 @@ let markers = [];
 let activeMarkers = [];
 let selectedEntityData = null;
 let pulseEntities = [];
-let pulseTime = 0; 
+let pulseTime = true; 
 function addSeismicPulse() {
-    // clear old pulses
+   
+    function addSeismicPulse() {
+
     pulseEntities.forEach(e => viewer.entities.remove(e));
     pulseEntities = [];
 
@@ -948,19 +982,29 @@ function addSeismicPulse() {
 
             ellipse: {
                 semiMajorAxis: new Cesium.CallbackProperty(() => {
-                    const t = (Date.now() * 0.002 + index * 200) % 30000;
-                    return 1000 + t;
+                    if (!pulseEnabled) return 0;
+
+                    const t = (Date.now() * 0.0015 + index * 120) % 18000;
+                    return Math.min(12000, 800 + t); // ✅ HARD CAP
                 }, false),
 
                 semiMinorAxis: new Cesium.CallbackProperty(() => {
-                    const t = (Date.now() * 0.002 + index * 200) % 30000;
-                    return 1000 + t;
+                    if (!pulseEnabled) return 0;
+
+                    const t = (Date.now() * 0.0015 + index * 120) % 18000;
+                    return Math.min(12000, 800 + t);
                 }, false),
 
                 material: new Cesium.ColorMaterialProperty(
                     new Cesium.CallbackProperty(() => {
-                        const t = (Math.sin(Date.now() * 0.003 + index) + 1) / 2;
-                        return Cesium.Color.RED.withAlpha(0.25 * (1 - t));
+
+                        if (!pulseEnabled) return Cesium.Color.TRANSPARENT;
+
+                        const t = (Math.sin(Date.now() * 0.002 + index) + 1) / 2;
+
+                        return Cesium.Color.RED.withAlpha(
+                            0.08 * (1 - t) // ✅ MUCH LOWER opacity
+                        );
                     }, false)
                 )
             }
@@ -969,7 +1013,6 @@ function addSeismicPulse() {
         pulseEntities.push(entity);
     });
 }
-
 function getDistanceKm(lon1, lat1, lon2, lat2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1172,6 +1215,21 @@ addHeatLayer();
 addSeismicPulse();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
+
+document.getElementById("pulseToggle").addEventListener("click", () => {
+
+    pulseEnabled = !pulseEnabled;
+
+    document.getElementById("pulseToggle").innerText =
+        pulseEnabled ? "Seismic Pulse: ON" : "Seismic Pulse: OFF";
+
+    if (!pulseEnabled) {
+        pulseEntities.forEach(e => viewer.entities.remove(e));
+        pulseEntities = [];
+    } else {
+        addSeismicPulse();
+    }
+});
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
 
