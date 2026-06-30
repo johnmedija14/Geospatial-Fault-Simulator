@@ -487,15 +487,11 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 console.log("Cesium loaded:", Cesium);
     
 const viewer = new Cesium.Viewer("cesiumContainer", {
-    animation: false,
-    timeline: false,
-    infoBox: false,
-    selectionIndicator: false,
-    geocoder: true,
+    imageryProvider: new Cesium.IonImageryProvider({ assetId: 2 }),
     baseLayerPicker: true,
-    terrainProvider: new Cesium.EllipsoidTerrainProvider()
+    terrainProvider: Cesium.createWorldTerrainAsync
 });
-
+    
 (async function () {
     try {
         const terrain = await Cesium.createWorldTerrainAsync({
