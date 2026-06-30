@@ -482,7 +482,7 @@ window.onerror = function(msg, src, line) {
     box.innerHTML += `<div>${msg} (line ${line})</div>`;
 };
 
-Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYTUzZmI1OS0wNjUxLTQxYjktOGMzMC1lODQyNzQ3YzIxZGMiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3NjgwNzd9.jmAmq8mS_RcWJ0ZHunsG1neH_Mry1-3s4Ldu-NH7HoY";
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MTU5ZjgyOC0zMjRiLTRmMjAtYWFjMi0zYTU4ODlhMzY2NzIiLCJpZCI6NDUwNDYyLCJzdWIiOiJqb2hubWVkaWphMTQiLCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoiam9obm1lZGlqYTE0X2RlZmF1bHQiLCJpYXQiOjE3ODI3ODU0MjB9.nGz8SIvyymSPR72dDrE7QP6OJZkBmLYO02_GaOnbEI4";
 
 console.log("Cesium loaded:", Cesium);
     
@@ -493,27 +493,10 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
     selectionIndicator: false,
     geocoder: true,
     baseLayerPicker: true,
+
     imageryProvider: Cesium.createWorldImagery(),
     terrainProvider: new Cesium.EllipsoidTerrainProvider()
 });
-    
-(async function () {
-    try {
-        const terrain = await Cesium.createWorldTerrainAsync({
-            requestVertexNormals: true,
-            requestWaterMask: true
-        });
-        viewer.terrainProvider = terrain;
-    } catch (e) {
-        console.warn("Terrain failed, fallback to ellipsoid:", e);
-        viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider();
-    }
-
-    viewer.resize();
-    viewer.scene.requestRender();
-    viewer.scene.globe.baseColor = Cesium.Color.BLACK;
-viewer.scene.globe.showGroundAtmosphere = true;
-})();
 
 viewer.scene.globe.enableLighting = false;
 
@@ -521,17 +504,14 @@ viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(121.085, 14.69, 22000)
 });
 
-    viewer.entities.add({
-    position: Cesium.Cartesian3.fromDegrees(
-        121.085,
-        14.69
-    ),
+viewer.entities.add({
+    position: Cesium.Cartesian3.fromDegrees(121.085, 14.69),
     point: {
         pixelSize: 30,
         color: Cesium.Color.RED
     }
 });
-
+    
 const westValleyFault = [
 121.0470,14.8800,121.0550,14.8600,121.0600,14.8350,
 121.0750,14.8050,121.0900,14.7750,121.1050,14.7450,
