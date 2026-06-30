@@ -934,7 +934,6 @@ let markers = [];
 let activeMarkers = [];
 let selectedEntityData = null;
 let pulseEntities = [];
-let pulseTime = true; 
 let pulseEnabled = true;
 let heatEntities = [];
 function addHeatLayer() {
@@ -1219,18 +1218,53 @@ init();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
 
-document.getElementById("pulseToggle").addEventListener("click", () => {
+document.getElementById("pulseToggle")
+.addEventListener("click", () => {
 
     pulseEnabled = !pulseEnabled;
-
-    document.getElementById("pulseToggle").innerText =
-        pulseEnabled
-            ? "Seismic Pulse: ON"
-            : "Seismic Pulse: OFF";
 
     pulseEntities.forEach(entity => {
         entity.show = pulseEnabled;
     });
+
+    document.getElementById("pulseToggle").innerText =
+        pulseEnabled
+        ? "Seismic Pulse: ON"
+        : "Seismic Pulse: OFF";
+
+    viewer.scene.requestRender();
+});
+});
+
+    let heatVisible = true;
+
+document.getElementById("toggleHeat")
+.addEventListener("click", () => {
+
+    heatVisible = !heatVisible;
+
+    heatEntities.forEach(entity => {
+        entity.show = heatVisible;
+    });
+
+    document.getElementById("toggleHeat").innerText =
+        heatVisible
+            ? "Hide Heat Layer"
+            : "Show Heat Layer";
+});
+
+    document.getElementById("resetView")
+.addEventListener("click", () => {
+
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(
+            121.085,
+            14.69,
+            22000
+        ),
+        duration: 1.5
+    });
+
 });
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
