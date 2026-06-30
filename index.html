@@ -453,11 +453,6 @@ Seismic Pulse: ON
         Toggle Heat Layer
         </button>
 
-        <button id="togglePulse"
-        style="padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;">
-        Toggle Seismic Pulse
-        </button>
-
         <button id="resetView"
         style="padding:10px;border-radius:12px;border:none;background:#3b82f6;color:white;">
         Reset Camera
@@ -469,15 +464,12 @@ Seismic Pulse: ON
 <!-- KEEP THIS BELOW -->
 <section class="card">
     <h3>HOW TO USE</h3>
-        
-        <section class="card">
-            <h3>HOW TO USE</h3>
-            <ol class="steps">
-                <li>Select a region to filter risk zones</li>
-                <li>Tap a marker or nearby zone on the map</li>
-                <li>Observe seismic wave propagation and intensity impact</li>
-            </ol>
-        </section>
+    <ol class="steps">
+        <li>Select a region to filter risk zones</li>
+        <li>Tap a marker or nearby zone on the map</li>
+        <li>Observe seismic wave propagation and intensity impact</li>
+    </ol>
+ </section>
     </aside>
 </div>
 
@@ -968,9 +960,32 @@ let activeMarkers = [];
 let selectedEntityData = null;
 let pulseEntities = [];
 let pulseTime = true; 
+let pulseEnabled = true;
+let heatEntities = [];
+function addHeatLayer() {
+    heatEntities.forEach(e => viewer.entities.remove(e));
+    heatEntities = [];
+
+    riskNodes.forEach(n => {
+        const e = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+            ellipse: {
+                semiMajorAxis: 15000,
+                semiMinorAxis: 15000,
+                material: new Cesium.ColorMaterialProperty(
+                    Cesium.Color.RED.withAlpha(
+                        n.intensity === "IX" ? 0.25 :
+                        n.intensity === "VIII" ? 0.18 : 0.10
+                    )
+                )
+            }
+        });
+
+        heatEntities.push(e);
+    });
+}
+
 function addSeismicPulse() {
-   
-    function addSeismicPulse() {
 
     pulseEntities.forEach(e => viewer.entities.remove(e));
     pulseEntities = [];
@@ -985,7 +1000,7 @@ function addSeismicPulse() {
                     if (!pulseEnabled) return 0;
 
                     const t = (Date.now() * 0.0015 + index * 120) % 18000;
-                    return Math.min(12000, 800 + t); // ✅ HARD CAP
+                    return Math.min(12000, 800 + t);
                 }, false),
 
                 semiMinorAxis: new Cesium.CallbackProperty(() => {
@@ -1002,9 +1017,7 @@ function addSeismicPulse() {
 
                         const t = (Math.sin(Date.now() * 0.002 + index) + 1) / 2;
 
-                        return Cesium.Color.RED.withAlpha(
-                            0.08 * (1 - t) // ✅ MUCH LOWER opacity
-                        );
+                        return Cesium.Color.RED.withAlpha(0.08 * (1 - t));
                     }, false)
                 )
             }
