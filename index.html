@@ -944,8 +944,8 @@ function addHeatLayer() {
         const e = viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
             ellipse: {
-                semiMajorAxis: 15000,
-                semiMinorAxis: 15000,
+                semiMajorAxis: 3000,
+                semiMinorAxis: 3000,
                 material: new Cesium.ColorMaterialProperty(
                     Cesium.Color.RED.withAlpha(
                         n.intensity === "IX" ? 0.25 :
@@ -1210,7 +1210,6 @@ function render(region) {
 
 function init() {
     render("all");
-    addHeatLayer();
     addSeismicPulse();
 }
 
@@ -1235,16 +1234,21 @@ document.getElementById("pulseToggle")
     viewer.scene.requestRender();
 });
 
-    let heatVisible = true;
+    let heatVisible = false;
 
 document.getElementById("toggleHeat")
 .addEventListener("click", () => {
 
-    heatVisible = !heatVisible;
+    if (heatEntities.length === 0) {
+        addHeatLayer();
+        heatVisible = true;
+    } else {
+        heatVisible = !heatVisible;
 
-    heatEntities.forEach(entity => {
-        entity.show = heatVisible;
-    });
+        heatEntities.forEach(entity => {
+            entity.show = heatVisible;
+        });
+    }
 
     document.getElementById("toggleHeat").innerText =
         heatVisible
