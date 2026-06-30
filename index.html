@@ -669,11 +669,11 @@ function addSafeZones() {
         distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 14000)
       },
       properties: {
-        name: nearest.loc.name,
-        region: "Safe Zone",
-        lon: nearest.loc.lon,
-        lat: nearest.loc.lat
-      }
+  name: nearest.loc.name,
+  region: "Safe Zone",
+  lon: nearest.loc.lon,
+  lat: nearest.loc.lat
+}
     });
 
     safeZoneEntities.push(safeMarker);
@@ -809,20 +809,35 @@ legendToggle.addEventListener("click", () => {
 
 viewer.selectedEntityChanged.addEventListener(function(entity) {
   if (!entity || !entity.properties) return;
+
   const props = entity.properties;
+
+  const getProp = (key) => (props[key] && typeof props[key].getValue === "function")
+    ? props[key].getValue()
+    : null;
+
   const data = {
-    name: props.name.getValue(),
-    region: props.region.getValue(),
-    lon: props.lon.getValue(),
-    lat: props.lat.getValue(),
-    population: props.population.getValue(),
-    intensity: props.intensity ? props.intensity.getValue() : null,
-    rupture: props.rupture ? props.rupture.getValue() : null,
-    liquefaction: props.liquefaction ? props.liquefaction.getValue() : null,
-    structures: props.structures ? props.structures.getValue() : null
+    name: getProp("name"),
+    region: getProp("region"),
+    lon: getProp("lon"),
+    lat: getProp("lat"),
+    population: getProp("population"),
+    intensity: getProp("intensity"),
+    rupture: getProp("rupture"),
+    liquefaction: getProp("liquefaction"),
+    structures: getProp("structures")
   };
-  updateSelectedInfo(data);
-  viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
+
+  if (data.name || data.region) {
+    updateSelectedInfo(data);
+  }
+
+  if (data.lon != null && data.lat != null) {
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000),
+      duration: 1.5
+    });
+  }
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
