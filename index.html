@@ -487,6 +487,7 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 console.log("Cesium loaded:", Cesium);
     
 const viewer = new Cesium.Viewer("cesiumContainer", {
+    imageryProvider: await Cesium.createWorldImageryAsync(),
     animation: false,
     timeline: false,
     infoBox: false,
