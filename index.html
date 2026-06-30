@@ -43,10 +43,33 @@ body { display:flex; flex-direction:column; }
 .statusSub { font-size:11px; color:#ffd6d6; }
 
 #content { height:calc(100vh - 74px); display:flex; gap:12px; padding:10px; box-sizing:border-box; }
-#mapWrap { flex:1; position:relative; border-radius:22px; overflow:hidden; border:1px solid rgba(255,255,255,0.12); background:#0b1220; box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+#mapWrap {
+    flex:1;
+    position:relative;
+    border-radius:22px;
+    overflow:visible;
+    border:1px solid rgba(255,255,255,0.12);
+    background:#0b1220;
+    box-shadow:0 16px 40px rgba(0,0,0,0.35);
+}
 #cesiumContainer { position:absolute; top:0; left:0; width:100%; height:100%; }
 
-#controls { position:absolute; top:14px; left:14px; z-index:999; background:rgba(18,24,35,0.80); color:#fff; border:1px solid rgba(255,255,255,0.12); padding:12px; border-radius:18px; width:220px; box-shadow:0 10px 28px rgba(0,0,0,0.35); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+#controls {
+    position:absolute;
+    top:14px;
+    left:14px;
+    z-index:9999;
+    background:rgba(18,24,35,0.80);
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.12);
+    padding:12px;
+    border-radius:18px;
+    width:260px;
+    box-shadow:0 10px 28px rgba(0,0,0,0.35);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    overflow:visible;
+}
 #controls h3 { margin:0 0 10px; font-size:16px; }
 #controls select { width:100%; padding:10px; border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:#0f1722; color:white; outline:none; }
 
@@ -101,11 +124,10 @@ body { display:flex; flex-direction:column; }
 .modeButtons { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
 .modeBtn { padding:10px; border:none; border-radius:12px; cursor:pointer; color:#fff; background:#7c2d12; }
 .modeBtn.active { background:#ff3b3b; }
-
 .smallNote { font-size:12px; color:#cbd5e1; line-height:1.45; margin-top:10px; }
 .statusPill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); font-size:12px; margin-top:10px; }
 .statusDotSmall { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; }
-
+  
 @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 </style>
 </head>
@@ -154,55 +176,71 @@ body { display:flex; flex-direction:column; }
 
 <div id="content">
   <div id="mapWrap">
+    <div id="cesiumContainer"></div>
+
     <div id="controls">
-      <h3>Region Switcher</h3>
-      <select id="regionSelect">
-        <option value="all">All Regions</option>
-        <option value="north">North</option>
-        <option value="qc">Quezon City</option>
-        <option value="pasig">Pasig / Marikina</option>
-        <option value="south">South</option>
-      </select>
+        <h3>Region Switcher</h3>
+        <select id="regionSelect">
+            <option value="all">All Regions</option>
+            <option value="north">North</option>
+            <option value="qc">Quezon City</option>
+            <option value="pasig">Pasig / Marikina</option>
+            <option value="south">South</option>
+        </select>
 
-      <button id="pulseToggle" style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
-        Seismic Pulse: ON
-      </button>
+        <button id="pulseToggle"
+            style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:#ff3b3b;color:white;cursor:pointer;">
+            Seismic Pulse: ON
+        </button>
 
-      <div class="modePanel">
-        <div style="font-weight:800;font-size:13px;">Preparedness Simulation</div>
-        <div class="modeRow">
-          <div class="modeLabel"><span>Shake Scenario</span><span class="modeValue" id="scenarioValue">M 7.2</span></div>
-          <input id="scenarioSlider" class="modeSlider" type="range" min="6.0" max="8.0" value="7.2" step="0.1">
+        <div class="modePanel">
+            <div style="font-weight:800;font-size:13px;">Preparedness Simulation</div>
+
+            <div class="modeRow">
+                <div class="modeLabel">
+                    <span>Shake Scenario</span>
+                    <span class="modeValue" id="scenarioValue">M 7.2</span>
+                </div>
+                <input id="scenarioSlider" class="modeSlider" type="range" min="6.0" max="8.0" value="7.2" step="0.1">
+            </div>
+
+            <div class="modeButtons">
+                <button class="modeBtn active" id="measureBtn">Measure Distance</button>
+                <button class="modeBtn" id="safeBtn">Safe Zones</button>
+            </div>
+
+            <div class="statusPill">
+                <span class="statusDotSmall"></span>
+                <span id="liveStatus">Live AI Repository: Connected</span>
+            </div>
+
+            <div class="smallNote" id="prepNote">
+                Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers.
+            </div>
         </div>
-        <div class="modeButtons">
-          <button class="modeBtn active" id="measureBtn">Measure Distance</button>
-          <button class="modeBtn" id="safeBtn">Safe Zones</button>
-        </div>
-        <div class="statusPill"><span class="statusDotSmall"></span><span id="liveStatus">Live AI Repository: Connected</span></div>
-        <div class="smallNote" id="prepNote">Click anywhere on the map to inspect distance, hazards, and preparedness guidance from verified data layers.</div>
-      </div>
     </div>
 
     <div class="legendPanel" id="legendPanel">
-      <div class="legendHeader" id="legendToggle">
-        <span>Legend Guide</span>
-        <span id="legendArrow">▸</span>
-      </div>
-      <div class="legendBody" id="legendBody">
-        <div class="legendRow">
-          <div class="legendIcon legendRed">⚠</div>
-          <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+        <div class="legendHeader" id="legendToggle">
+            <span>Legend Guide</span>
+            <span id="legendArrow">▸</span>
         </div>
-        <div class="legendRow">
-          <div class="legendIcon legendGreen">✚</div>
-          <div class="legendText"><b>Green marker</b> shows possible evacuation centers or hospitals.</div>
+        <div class="legendBody" id="legendBody">
+            <div class="legendRow">
+                <div class="legendIcon legendRed">⚠</div>
+                <div class="legendText"><b>Red marker</b> shows locations affected by the fault.</div>
+            </div>
+            <div class="legendRow">
+                <div class="legendIcon legendGreen">✚</div>
+                <div class="legendText"><b>Green marker</b> shows possible evacuation centers or hospitals.</div>
+            </div>
+            <div class="legendRow">
+                <div class="legendIcon legendBlue">🌊</div>
+                <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
+            </div>
         </div>
-        <div class="legendRow">
-          <div class="legendIcon legendBlue">🌊</div>
-          <div class="legendText"><b>Dark blue marker</b> shows possible flood, flash flood, or tsunami-prone areas.</div>
-        </div>
-      </div>
     </div>
+</div>
 
     <div id="cesiumContainer"></div>
   </div>
