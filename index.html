@@ -536,6 +536,35 @@ viewer.entities.add({
     }
 });
 
+    function createFaultBuffer() {
+
+    const bufferPointsLeft = [];
+    const bufferPointsRight = [];
+
+    for (let i = 0; i < westValleyFault.length; i += 2) {
+
+        const lon = westValleyFault[i];
+        const lat = westValleyFault[i + 1];
+
+        const offset = 0.012; // ~1km buffer (adjustable)
+
+        bufferPointsLeft.push(lon - offset, lat);
+        bufferPointsRight.push(lon + offset, lat);
+    }
+
+    viewer.entities.add({
+        polygon: {
+            hierarchy: Cesium.Cartesian3.fromDegreesArray(
+                bufferPointsLeft.concat(bufferPointsRight.reverse())
+            ),
+            material: Cesium.Color.RED.withAlpha(0.12),
+            outline: false
+        }
+    });
+}
+
+createFaultBuffer();
+
 const left = [];
 const right = [];
 
@@ -583,6 +612,42 @@ document.body.appendChild(dashboard);
 const riskNodes = [
 {
     region:"north",
+    name:"Antipolo City Proper",
+    lon:121.1800,
+    lat:14.6200,
+    population:"900,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Urban residential + tourism zone"
+},
+    
+{
+    region:"north",
+    name:"Lower Antipolo",
+    lon:121.1600,
+    lat:14.5900,
+    population:"600,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Moderate",
+    structures:"Urban hillside developments"
+},
+    
+{
+    region:"north",
+    name:"Montalban Highlands",
+    lon:121.1900,
+    lat:14.7400,
+    population:"200,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Hillside communities"
+},
+    
+{
+    region:"north",
     name:"San Jose del Monte",
     lon:121.0450,
     lat:14.8050,
@@ -591,6 +656,18 @@ const riskNodes = [
     rupture:"Moderate",
     liquefaction:"Low",
     structures:"Residential expansion zones"
+},
+
+{
+    region:"north",
+    name:"San Mateo Center",
+    lon:121.1700,
+    lat:14.7000,
+    population:"300,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"Moderate",
+    structures:"River-adjacent settlements"
 },
 
 {
@@ -619,6 +696,42 @@ const riskNodes = [
 
 {
     region:"qc",
+    name:"Commonwealth Avenue Corridor",
+    lon:121.0800,
+    lat:14.6800,
+    population:"800,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"Low",
+    structures:"High-density urban strip"
+},
+
+{
+    region:"qc",
+    name:"Diliman Government Core",
+    lon:121.0500,
+    lat:14.6500,
+    population:"250,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Government institutions + universities"
+},
+    
+{
+    region:"qc",
+    name:"Fairview",
+    lon:121.0600,
+    lat:14.7300,
+    population:"1,200,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"Moderate",
+    structures:"Dense residential + malls"
+},
+
+{
+    region:"qc",
     name:"Loyola Heights",
     lon:121.0750,
     lat:14.6500,
@@ -629,6 +742,54 @@ const riskNodes = [
     structures:"Universities and institutions"
 },
 
+{
+    region:"qc",
+    name:"Novaliches Proper",
+    lon:121.0500,
+    lat:14.7500,
+    population:"500,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Low",
+    structures:"Residential subdivisions"
+},
+
+{
+    region:"qc",
+    name:"Payatas",
+    lon:121.0900,
+    lat:14.7250,
+    population:"130,000",
+    intensity:"IX",
+    rupture:"High",
+    liquefaction:"Moderate",
+    structures:"Informal settlements"
+},
+
+{
+    region:"pasig",
+    name:"Concepcion Uno",
+    lon:121.1100,
+    lat:14.6400,
+    population:"120,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"High",
+    structures:"Dense residential zone"
+},
+
+{
+    region:"pasig",
+    name:"Concepcion Dos",
+    lon:121.1150,
+    lat:14.6300,
+    population:"110,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"High",
+    structures:"Urban housing cluster"
+},
+    
 {
     region:"pasig",
     name:"Marikina",
@@ -643,6 +804,18 @@ const riskNodes = [
 
 {
     region:"pasig",
+    name:"Marikina River Basin Central",
+    lon:121.1000,
+    lat:14.6500,
+    population:"450,000",
+    intensity:"IX",
+    rupture:"Very High",
+    liquefaction:"High",
+    structures:"Floodplain settlements"
+},
+
+{
+    region:"pasig",
     name:"Pasig",
     lon:121.0800,
     lat:14.5900,
@@ -651,6 +824,30 @@ const riskNodes = [
     rupture:"High",
     liquefaction:"Moderate",
     structures:"CBD and mixed developments"
+},
+
+{
+    region:"pasig",
+    name:"Parang Marikina",
+    lon:121.1200,
+    lat:14.6600,
+    population:"90,000",
+    intensity:"VIII",
+    rupture:"High",
+    liquefaction:"Moderate",
+    structures:"Residential expansion area"
+},
+
+{
+    region:"south",
+    name:"BGC Core Zone",
+    lon:121.0500,
+    lat:14.5500,
+    population:"300,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"Moderate",
+    structures:"High-rise commercial district"
 },
 
 {
@@ -667,6 +864,18 @@ const riskNodes = [
 
 {
     region:"south",
+    name:"Taguig Western Edge",
+    lon:121.0700,
+    lat:14.5400,
+    population:"500,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"High",
+    structures:"Mixed residential-industrial"
+},
+
+{
+    region:"south",
     name:"Muntinlupa",
     lon:121.0400,
     lat:14.4500,
@@ -675,12 +884,91 @@ const riskNodes = [
     rupture:"Low",
     liquefaction:"Low",
     structures:"Residential subdivisions"
+},
+
+{
+    region:"south",
+    name:"Pateros",
+    lon:121.0600,
+    lat:14.5450,
+    population:"70,000",
+    intensity:"VIII",
+    rupture:"Moderate",
+    liquefaction:"High",
+    structures:"Dense residential town"
+},
+
+{
+    region:"south",
+    name:"Upper Muntinlupa Expansion",
+    lon:121.0350,
+    lat:14.4700,
+    population:"200,000",
+    intensity:"VII",
+    rupture:"Low",
+    liquefaction:"Low",
+    structures:"Suburban residential"
 }
+
 ];
+
+function addHeatLayer() {  
+    riskNodes.forEach(n => {  
+        viewer.entities.add({  
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),  
+            ellipse: {  
+                semiMajorAxis: 15000,  
+                semiMinorAxis: 15000,  
+                material: new Cesium.ColorMaterialProperty(  
+                    Cesium.Color.RED.withAlpha(  
+                        n.intensity === "IX" ? 0.25 :  
+                        n.intensity === "VIII" ? 0.18 :  
+                        0.10  
+                    )  
+                )  
+            }  
+        });  
+    });  
+}
 
 let markers = [];
 let activeMarkers = [];
 let selectedEntityData = null;
+let pulseEntities = [];
+let pulseTime = 0; 
+function addSeismicPulse() {
+    // clear old pulses
+    pulseEntities.forEach(e => viewer.entities.remove(e));
+    pulseEntities = [];
+
+    riskNodes.forEach((n, index) => {
+
+        const entity = viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(n.lon, n.lat),
+
+            ellipse: {
+                semiMajorAxis: new Cesium.CallbackProperty(() => {
+                    const t = (Date.now() * 0.002 + index * 200) % 30000;
+                    return 1000 + t;
+                }, false),
+
+                semiMinorAxis: new Cesium.CallbackProperty(() => {
+                    const t = (Date.now() * 0.002 + index * 200) % 30000;
+                    return 1000 + t;
+                }, false),
+
+                material: new Cesium.ColorMaterialProperty(
+                    new Cesium.CallbackProperty(() => {
+                        const t = (Math.sin(Date.now() * 0.003 + index) + 1) / 2;
+                        return Cesium.Color.RED.withAlpha(0.25 * (1 - t));
+                    }, false)
+                )
+            }
+        });
+
+        pulseEntities.push(entity);
+    });
+}
 
 function getDistanceKm(lon1, lat1, lon2, lat2) {
     const R = 6371;
@@ -880,6 +1168,8 @@ function render(region) {
 }
 
 render("all");
+addHeatLayer();
+addSeismicPulse();
 
 document.getElementById("regionSelect").addEventListener("change", e => render(e.target.value));
 
