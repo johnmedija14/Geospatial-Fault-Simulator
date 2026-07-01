@@ -533,7 +533,7 @@ const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
   return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
 }
 
- addHeatLayer() {
+function addHeatLayer() {
   heatEntities.forEach(e => viewer.entities.remove(e));
   heatEntities = [];
   riskNodes.forEach(n => {
@@ -551,7 +551,7 @@ const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
   });
 }
 
- addSeismicPulse() {
+ function addSeismicPulse() {
   pulseEntities.forEach(e => viewer.entities.remove(e));
   pulseEntities = [];
   riskNodes.forEach((n, index) => {
@@ -579,7 +579,7 @@ const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
   });
 }
 
- getDistanceKm(lon1, lat1, lon2, lat2) {
+function getDistanceKm(lon1, lat1, lon2, lat2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
