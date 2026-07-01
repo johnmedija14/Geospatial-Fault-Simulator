@@ -173,7 +173,8 @@ body { display:flex; flex-direction:column; }
 #hamburgerMenu {
   position: absolute;
   top: 90px;
-  left: 14px;
+  right: 14px;   /* ✅ MOVED TO RIGHT SIDE */
+  left: auto;
   z-index: 10000;
   font-family: Arial;
 }
@@ -314,6 +315,7 @@ body { display:flex; flex-direction:column; }
 
     <div id="hamburgerMenu">
   <div id="hamburgerBtn">☰</div>
+  <div id="infoPopup"></div>
 
   <div id="menuPanel">
 
@@ -766,14 +768,16 @@ function updateSelectedInfo(data, isSafe = false) {
   hint.textContent = `Selected: ${data.name || "-"}`;
 
   info.innerHTML = `
-    <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">${isSafe ? "Refuge Level" : "Expected Intensity"}</span><span class="infoValue">${data.intensity || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
-    <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
-  `;
+  ${data.image ? `<img src="${data.image}" style="width:100%;border-radius:10px;margin:8px 0;">` : ""}
 
+  <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
+  <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
+  <div class="infoRow"><span class="infoLabel">${isSafe ? "Refuge Level" : "Expected Intensity"}</span><span class="infoValue">${data.intensity || "-"}</span></div>
+  <div class="infoRow"><span class="infoLabel">Ground Rupture</span><span class="infoValue">${data.rupture || "-"}</span></div>
+  <div class="infoRow"><span class="infoLabel">Liquefaction Risk</span><span class="infoValue">${data.liquefaction || "-"}</span></div>
+  <div class="infoRow"><span class="infoLabel">Critical Structures</span><span class="infoValue">${data.structures || "-"}</span></div>
+`;
+  
   if (isSafe) {
     analysis.innerHTML = `
       <b>Safe Zone Board</b><br><br>
@@ -1115,16 +1119,11 @@ handler.setInputAction(function(click) {
   const picked = viewer.scene.pick(click.position);
 
   if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
-    viewer.selectedEntity = picked.id;
-    const data = readEntityData(picked.id);
-    if (data) {
-      updateSelectedInfo(data);
-      if (data.lon != null && data.lat != null) {
-        viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(data.lon, data.lat, 9000), duration: 1.5 });
-      }
-    }
-    return;
-  }
+   viewer.selectedEntity = picked.id;
+const data = readEntityData(picked.id);
+
+if (data) {
+  updateSelectedInfo(data);
 
   let cartesian = viewer.scene.pickPosition(click.position);
   if (!Cesium.defined(cartesian)) {
@@ -1133,9 +1132,14 @@ handler.setInputAction(function(click) {
   }
 
   if (!Cesium.defined(cartesian)) {
-    setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
-    return;
-  }
+  setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+
+  // ⭐ STEP 3A (chatbot fallback popup)
+  document.getElementById("analysisBox").innerHTML =
+    "<b>Emergency Chatbot Active</b><br>Ask: What should I do during an earthquake?";
+
+  return;
+}
 
   const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
   const lon = Cesium.Math.toDegrees(cartographic.longitude);
@@ -1148,9 +1152,13 @@ handler.setInputAction(function(click) {
     return (!best || d < best.d) ? { node: n, d } : best;
   }, null);
 
-  if (closest) {
-    const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
-    document.getElementById("analysisBox").innerHTML = generatePreparednessGuide(distanceKm);
+if (closest) {
+  const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
+
+  // ⭐ STEP 3B GOES HERE
+  document.getElementById("analysisBox").innerHTML =
+    generatePreparednessGuide(distanceKm);
+}
     if (showMeasureDistance || !showSafeZones) {
       updateSelectedInfo({
         name: closest.node.name,
@@ -1211,15 +1219,37 @@ document.getElementById("finderPopup").innerHTML = `
 
 // Disaster readiness content generator
 const readinessContent = {
-  before: "Prepare emergency kits, secure heavy furniture, identify safe zones, and establish communication plans.",
-  during: "Drop, Cover, and Hold On. Stay away from glass and do not run outside during shaking.",
-  after: "Check for injuries, expect aftershocks, avoid damaged structures, and follow official updates.",
-  home: "Secure cabinets, anchor appliances, store supplies, and practice earthquake drills regularly."
+  before: {
+    text: "Before an earthquake, prepare an emergency kit, secure heavy furniture, identify safe exits, and create communication plans.",
+    img: "https://scontent.fmnl17-7.fna.fbcdn.net/v/t1.6435-9/58377431_2004248789684009_3893949579711741952_n.png"
+  },
+  during: {
+    text: "During an earthquake, Drop-Cover-Hold, stay away from glass, and avoid running outside while shaking.",
+    img: "https://scontent.fmnl17-2.fna.fbcdn.net/v/t1.6435-9/57909039_2004248716350683_8320292628146946048_n.png"
+  },
+  after: {
+    text: "After an earthquake, check for injuries, expect aftershocks, avoid damaged structures, and follow official updates.",
+    img: "https://scontent.fmnl17-4.fna.fbcdn.net/v/t1.6435-9/58374701_2004248679684020_1929455465784147968_n.png"
+  },
+  home: {
+    text: "Secure cabinets, anchor appliances, store emergency supplies, reinforce weak structures, and practice drills regularly.",
+    img: "https://scontent.fmnl17-2.fna.fbcdn.net/v/t1.6435-9/57618357_2004248833017338_4696140554528882688_n.png"
+  }
 };
+
+const popup = document.getElementById("infoPopup");
 
 document.querySelectorAll(".subItem").forEach(sub => {
   sub.onclick = () => {
-    alert(readinessContent[sub.dataset.sub]);
+    const data = readinessContent[sub.dataset.sub];
+
+    popup.innerHTML = `
+      <b>${sub.textContent}</b><br><br>
+      ${data.text}
+      <img src="${data.img}" />
+    `;
+
+    popup.style.display = "block";
   };
 });
   
