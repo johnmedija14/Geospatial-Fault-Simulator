@@ -169,6 +169,97 @@ body { display:flex; flex-direction:column; }
 .statusPill { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); font-size:12px; margin-top:10px; }
 .statusDotSmall { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+#hamburgerMenu {
+  position: absolute;
+  top: 90px;
+  left: 14px;
+  z-index: 10000;
+  font-family: Arial;
+}
+
+#hamburgerBtn {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(20,25,40,0.75);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  cursor:pointer;
+  color:white;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+#menuPanel {
+  margin-top:10px;
+  width: 260px;
+  display:none;
+  background: rgba(20,25,40,0.75);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  backdrop-filter: blur(18px);
+  padding:10px;
+}
+
+.menuItem {
+  padding:10px;
+  border-radius:12px;
+  cursor:pointer;
+  color:white;
+  font-size:13px;
+  position:relative;
+}
+
+.menuItem:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.subMenu {
+  display:none;
+  margin-top:8px;
+  margin-left:10px;
+  border-left:1px solid rgba(255,255,255,0.2);
+  padding-left:10px;
+}
+
+.subItem {
+  padding:8px;
+  font-size:12px;
+  border-radius:10px;
+  cursor:pointer;
+  color:#cbd5e1;
+}
+
+.subItem:hover {
+  background: rgba(255,255,255,0.08);
+  color:white;
+}
+
+.hoverPopup {
+  position:absolute;
+  left:270px;
+  top:0;
+  width:320px;
+  background: rgba(15,20,30,0.92);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:18px;
+  padding:12px;
+  display:none;
+  backdrop-filter: blur(18px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.4);
+  color:white;
+  font-size:12px;
+  line-height:1.4;
+}
+
+.hoverItem:hover .hoverPopup {
+  display:block;
+}
+  
 </style>
 </head>
 
@@ -220,6 +311,46 @@ body { display:flex; flex-direction:column; }
 <div id="content">
   <div id="mapWrap">
     <div id="cesiumContainer"></div>
+
+    <div id="hamburgerMenu">
+  <div id="hamburgerBtn">☰</div>
+
+  <div id="menuPanel">
+
+    <div class="menuItem hoverItem" data-panel="fault">
+      Visual Fault Illustration
+      <div class="hoverPopup" id="faultPopup"></div>
+    </div>
+
+    <div class="menuItem" data-panel="readiness">
+      Disaster Readiness ▸
+      <div class="subMenu">
+
+        <div class="subItem" data-sub="before">Before Earthquake</div>
+        <div class="subItem" data-sub="during">During Earthquake</div>
+        <div class="subItem" data-sub="after">After Earthquake</div>
+        <div class="subItem" data-sub="home">Countermeasures at Home</div>
+
+      </div>
+    </div>
+
+    <div class="menuItem hoverItem" data-panel="hotlines">
+      Emergency Hotlines
+      <div class="hoverPopup" id="hotlinePopup"></div>
+    </div>
+
+    <div class="menuItem hoverItem" data-panel="feedback">
+      Feedback
+      <div class="hoverPopup" id="feedbackPopup"></div>
+    </div>
+
+    <div class="menuItem hoverItem" data-panel="faultfinder">
+      PHIVOLCS Fault Finder
+      <div class="hoverPopup" id="finderPopup"></div>
+    </div>
+
+  </div>
+</div>
 
     <div id="controls">
       <h3>Region Switcher</h3>
@@ -1037,6 +1168,61 @@ handler.setInputAction(function(click) {
     }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const menuPanel = document.getElementById("menuPanel");
+
+hamburgerBtn.onclick = () => {
+  menuPanel.style.display = menuPanel.style.display === "block" ? "none" : "block";
+};
+
+// Toggle Disaster Readiness submenu
+document.querySelectorAll(".menuItem").forEach(item => {
+  item.addEventListener("click", () => {
+    const sub = item.querySelector(".subMenu");
+    if (sub) {
+      sub.style.display = sub.style.display === "block" ? "none" : "block";
+    }
+  });
+});
+
+// Fill hover popups
+document.getElementById("faultPopup").innerHTML = `
+  ${document.querySelector("#controls").outerHTML.replace(/position.*?;/g,'')}
+  <b>West Valley Fault Visualization</b><br>
+  Interactive seismic hazard layer based on PHIVOLCS mapping.
+`;
+
+document.getElementById("feedbackPopup").innerHTML = `
+  <b>We value your feedback</b><br><br>
+  Hello! Please send me a feedback of what must be further improved and added! Keep safe and be alert!<br><br>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLScvUK9lUfgMg1NMATDpRq-X_vMjOn9SXL8xqxfpEp998vW8mQ/viewform?usp=header" target="_blank" style="color:#60a5fa;">
+    Open Feedback Form
+  </a>
+`;
+
+document.getElementById("finderPopup").innerHTML = `
+  <b>PHIVOLCS Fault Finder</b><br><br>
+  The PHIVOLCS FaultFinder is an interactive tool that shows active faults in the Philippines.<br><br>
+  <a href="https://www.phivolcs.dost.gov.ph/information-tools/the-phivolcs-faultfinder/" target="_blank" style="color:#60a5fa;">
+    Open Fault Finder
+  </a>
+`;
+
+// Disaster readiness content generator
+const readinessContent = {
+  before: "Prepare emergency kits, secure heavy furniture, identify safe zones, and establish communication plans.",
+  during: "Drop, Cover, and Hold On. Stay away from glass and do not run outside during shaking.",
+  after: "Check for injuries, expect aftershocks, avoid damaged structures, and follow official updates.",
+  home: "Secure cabinets, anchor appliances, store supplies, and practice earthquake drills regularly."
+};
+
+document.querySelectorAll(".subItem").forEach(sub => {
+  sub.onclick = () => {
+    alert(readinessContent[sub.dataset.sub]);
+  };
+});
+  
 </script>
 </body>
 </html>
