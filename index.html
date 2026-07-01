@@ -522,7 +522,7 @@ function intensityToMagnitude(intensity) {
   return { speed: 1.05, base: 160, alpha: 0.075 };
 }
 
- makeHazardPin(color, glyph) {
+ function makeHazardPin(color, glyph) {
   return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
 }
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
@@ -623,15 +623,6 @@ function updateSelectedInfo(data, isSafe = false) {
 
   hint.textContent = `Selected: ${data.name || "-"}`;
 
-  analysis.innerHTML = `
-    <b>Automated Hazard Assessment</b><br><br>
-    ${data.name || "-"} analysis loaded.<br><br>
-    Intensity: <b>${data.intensity || "-"}</b><br>
-    Rupture: <b>${data.rupture || "-"}</b><br>
-    Liquefaction: <b>${data.liquefaction || "-"}</b>
-  `;
-}
-
   info.innerHTML = `
     <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
@@ -661,7 +652,7 @@ function updateSelectedInfo(data, isSafe = false) {
     `;
   }
 }
-
+  
 function setCenterMarker(lon, lat, name) {
   currentCenter = { lon, lat };
   if (centerMarker) viewer.entities.remove(centerMarker);
