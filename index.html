@@ -1195,11 +1195,13 @@ document.querySelectorAll(".menuItem").forEach(item => {
 });
 
 // Fill hover popups
-document.getElementById("faultPopup").innerHTML = `
-  ${document.querySelector("#controls").outerHTML.replace(/position.*?;/g,'')}
-  <b>West Valley Fault Visualization</b><br>
-  Interactive seismic hazard layer based on PHIVOLCS mapping.
-`;
+const faultPopup = document.getElementById("faultPopup");
+if (faultPopup) {
+  faultPopup.innerHTML = `
+    <b>West Valley Fault Visualization</b><br>
+    Interactive seismic hazard layer based on PHIVOLCS mapping.
+  `;
+}
 
 document.getElementById("feedbackPopup").innerHTML = `
   <b>We value your feedback</b><br><br>
@@ -1251,6 +1253,15 @@ document.querySelectorAll(".subItem").forEach(sub => {
 
     popup.style.display = "block";
   };
+
+  window.addEventListener("error", (e) => {
+  console.error("GLOBAL ERROR:", e.message);
+
+  const loader = document.getElementById("loadingScreen");
+  if (loader) {
+    loader.classList.add("hidden");
+    setTimeout(() => loader.remove(), 500);
+  }
 });
   
 </script>
