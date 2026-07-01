@@ -1115,64 +1115,69 @@ viewer.selectedEntityChanged.addEventListener(function(entity) {
 });
 
 const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-handler.setInputAction(function(click) {
+
+handler.setInputAction(function (click) {
   const picked = viewer.scene.pick(click.position);
 
   if (Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id.properties) {
-   viewer.selectedEntity = picked.id;
-const data = readEntityData(picked.id);
+    viewer.selectedEntity = picked.id;
 
-if (data) {
-  updateSelectedInfo(data);
+    const data = readEntityData(picked.id);
+    if (!data) return;
 
-  let cartesian = viewer.scene.pickPosition(click.position);
-  if (!Cesium.defined(cartesian)) {
-    const ray = viewer.camera.getPickRay(click.position);
-    if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-  }
+    updateSelectedInfo(data);
 
-  if (!Cesium.defined(cartesian)) {
-  setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+    let cartesian = viewer.scene.pickPosition(click.position);
+    if (!Cesium.defined(cartesian)) {
+      const ray = viewer.camera.getPickRay(click.position);
+      if (ray) cartesian = viewer.scene.globe.pick(ray, viewer.scene);
+    }
 
-  // ⭐ STEP 3A (chatbot fallback popup)
-  document.getElementById("analysisBox").innerHTML =
-    "<b>Emergency Chatbot Active</b><br>Ask: What should I do during an earthquake?";
+    if (!Cesium.defined(cartesian)) {
+      setCenterMarker(currentCenter.lon, currentCenter.lat, "Proximity Zone");
+      document.getElementById("analysisBox").innerHTML =
+        "<b>Emergency Chatbot Active</b><br>Ask: What should I do during an earthquake?";
+      return;
+    }
 
-  return;
-}
+    const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(cartographic.longitude);
+    const lat = Cesium.Math.toDegrees(cartographic.latitude);
 
-  const cartographic = Cesium.Cartographic.fromCartesian(cartesian);
-  const lon = Cesium.Math.toDegrees(cartographic.longitude);
-  const lat = Cesium.Math.toDegrees(cartographic.latitude);
+    setCenterMarker(lon, lat, "Tapped Zone");
 
-  setCenterMarker(lon, lat, "Tapped Zone");
+    const closest = riskNodes.reduce((best, n) => {
+      const d = getDistanceKm(lon, lat, n.lon, n.lat);
+      return !best || d < best.d ? { node: n, d } : best;
+    }, null);
 
-  const closest = riskNodes.reduce((best, n) => {
-    const d = getDistanceKm(lon, lat, n.lon, n.lat);
-    return (!best || d < best.d) ? { node: n, d } : best;
-  }, null);
+    if (closest) {
+      const distanceKm = getDistanceKm(
+        lon,
+        lat,
+        closest.node.lon,
+        closest.node.lat
+      );
 
-if (closest) {
-  const distanceKm = getDistanceKm(lon, lat, closest.node.lon, closest.node.lat);
+      document.getElementById("analysisBox").innerHTML =
+        generatePreparednessGuide(distanceKm);
 
-  // ⭐ STEP 3B GOES HERE
-  document.getElementById("analysisBox").innerHTML =
-    generatePreparednessGuide(distanceKm);
-}
-    if (showMeasureDistance || !showSafeZones) {
-      updateSelectedInfo({
-        name: closest.node.name,
-        region: closest.node.region,
-        lon: closest.node.lon,
-        lat: closest.node.lat,
-        population: closest.node.population,
-        intensity: closest.node.intensity,
-        rupture: closest.node.rupture,
-        liquefaction: closest.node.liquefaction,
-        structures: closest.node.structures
-      });
-    } else {
-      document.getElementById("analysisBox").innerHTML += "<br><br><b>Safe Zone Insight:</b> Follow the highlighted evacuation points and keep routes clear.";
+      if (showMeasureDistance || !showSafeZones) {
+        updateSelectedInfo({
+          name: closest.node.name,
+          region: closest.node.region,
+          lon: closest.node.lon,
+          lat: closest.node.lat,
+          population: closest.node.population,
+          intensity: closest.node.intensity,
+          rupture: closest.node.rupture,
+          liquefaction: closest.node.liquefaction,
+          structures: closest.node.structures
+        });
+      } else {
+        document.getElementById("analysisBox").innerHTML +=
+          "<br><br><b>Safe Zone Insight:</b> Follow the highlighted evacuation points and keep routes clear.";
+      }
     }
   }
 }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
