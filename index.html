@@ -418,7 +418,7 @@ viewer.entities.add({
   }
 });
 
-function createFaultBuffer() {
+ createFaultBuffer() {
   const bufferPointsLeft = [];
   const bufferPointsRight = [];
   for (let i = 0; i < westValleyFault.length; i += 2) {
@@ -505,35 +505,35 @@ const safeLocations = [
   { name: "Villamor Air Base Golf Course", lon: 121.0165, lat: 14.5239, type: "open space", reason: "Extensive open area suitable for assembly and emergency staging.", accessNote: "Useful in the south Metro response corridor." },
   { name: "University of Makati", lon: 121.0355, lat: 14.5581, type: "university", reason: "Institutional campus with accessibility and coordination potential.", accessNote: "Can support organized evacuation flow." },
   { name: "Pateros Municipal Hall", lon: 121.0670, lat: 14.5450, type: "civic center", reason: "Government facility with public access and administrative coordination role.", accessNote: "Helpful for local evacuation management." },
-  { name: "Paranaque City Hall", lon: 121.0214, lat: 14.5090, type: "civic center", reason: "Civic facility that can host coordination and public support functions.", accessNote: "Important south Metro staging point." },
+  { name: "Paranaque City Hall", lon: 121.0214, lat: 14.5090, type: "civic center", reason: "Civic facility that can host coordination and public support s.", accessNote: "Important south Metro staging point." },
   { name: "Sunken Garden", lon: 121.0604, lat: 14.5847, type: "open space", reason: "Wide open area with reduced overhead hazard exposure.", accessNote: "Good assembly area for nearby communities." }
 ];
 
-function intensityToMagnitude(intensity) {
+ intensityToMagnitude(intensity) {
   if (intensity === "IX") return scenarioMag;
   if (intensity === "VIII") return Math.max(6.7, scenarioMag - 0.5);
   if (intensity === "VII") return Math.max(6.2, scenarioMag - 1.0);
   return scenarioMag;
 }
 
-function pulseParams(intensity) {
+ pulseParams(intensity) {
   if (intensity === "IX") return { speed: 1.75, base: 260, alpha: 0.12 };
   if (intensity === "VIII") return { speed: 1.35, base: 210, alpha: 0.095 };
   return { speed: 1.05, base: 160, alpha: 0.075 };
 }
 
-function makeHazardPin(color, glyph) {
+ makeHazardPin(color, glyph) {
   return new Cesium.PinBuilder().fromText(glyph, color, 48).toDataURL();
 }
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
 
-function labelStyleByIntensity(intensity) {
+ labelStyleByIntensity(intensity) {
   if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
   if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
   return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
 }
 
-function addHeatLayer() {
+ addHeatLayer() {
   heatEntities.forEach(e => viewer.entities.remove(e));
   heatEntities = [];
   riskNodes.forEach(n => {
@@ -551,7 +551,7 @@ function addHeatLayer() {
   });
 }
 
-function addSeismicPulse() {
+ addSeismicPulse() {
   pulseEntities.forEach(e => viewer.entities.remove(e));
   pulseEntities = [];
   riskNodes.forEach((n, index) => {
@@ -579,7 +579,7 @@ function addSeismicPulse() {
   });
 }
 
-function getDistanceKm(lon1, lat1, lon2, lat2) {
+ getDistanceKm(lon1, lat1, lon2, lat2) {
   const R = 6371;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -609,40 +609,64 @@ function readEntityData(entity) {
   };
 }
 
-if (!isSafe && data.intensity) {
-    const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
-    const intensityLabels = {
-        "VII": "HIGH",
-        "VIII": "VERY HIGH",
-        "IX": "EXTREME",
-        "X": "CATASTROPHIC"
-    };
+function updateSelectedInfo(data, isSafe = false) {
+  const info = document.getElementById("selectedInfo");
+  const hint = document.getElementById("selectedHint");
+  const analysis = document.getElementById("analysisBox");
 
+  if (!data) {
+    hint.textContent = "Tap a marked zone or location to view details.";
+    info.innerHTML = "";
+    analysis.innerHTML = "AI analysis will appear here after selection.";
+    return;
+  }
+
+  hint.textContent = `Selected: ${data.name || "-"}`;
+
+  info.innerHTML = `
+    <div class="infoRow"><span>Location</span><span>${data.name || "-"}</span></div>
+    <div class="infoRow"><span>Region</span><span>${data.region || "-"}</span></div>
+    <div class="infoRow"><span>Population</span><span>${data.population || "-"}</span></div>
+    <div class="infoRow"><span>Intensity</span><span>${data.intensity || "-"}</span></div>
+    <div class="infoRow"><span>Rupture</span><span>${data.rupture || "-"}</span></div>
+    <div class="infoRow"><span>Liquefaction</span><span>${data.liquefaction || "-"}</span></div>
+  `;
+
+  const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
+  const intensityLabels = {
+    "VII": "HIGH",
+    "VIII": "VERY HIGH",
+    "IX": "EXTREME",
+    "X": "CATASTROPHIC"
+  };
+
+  if (!isSafe && data.intensity) {
     document.getElementById("intensityPointer").style.left =
-        intensityMap[data.intensity] + "%";
+      (intensityMap[data.intensity] || 0) + "%";
 
     document.getElementById("intensityText").innerHTML =
-        `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
+      `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
 
-    if (data.intensity === "VII") {
-        setIntensityVisual("moderate");
-    }
-    else if (data.intensity === "VIII") {
-        setIntensityVisual("high");
-    }
-    else {
-        setIntensityVisual("high");
-    }
+    if (data.intensity === "VII") setIntensityVisual("moderate");
+    else setIntensityVisual("high");
 
-} else if (isSafe) {
-
+  } else if (isSafe) {
     document.getElementById("intensityPointer").style.left = "22%";
-
     document.getElementById("intensityText").innerHTML =
-        "Safe Zone — LOW EXPOSURE";
+      "Safe Zone — LOW EXPOSURE";
 
     setIntensityVisual("low");
+  }
+
+  analysis.innerHTML = `
+    <b>Automated Hazard Assessment</b><br><br>
+    ${data.name || "-"} analysis loaded.<br><br>
+    Intensity: <b>${data.intensity || "-"}</b><br>
+    Rupture: <b>${data.rupture || "-"}</b><br>
+    Liquefaction: <b>${data.liquefaction || "-"}</b>
+  `;
 }
+
   info.innerHTML = `
     <div class="infoRow"><span class="infoLabel">Location</span><span class="infoValue">${data.name || "-"}</span></div>
     <div class="infoRow"><span class="infoLabel">${isSafe ? "Usage" : "Population"}</span><span class="infoValue">${data.population || "-"}</span></div>
