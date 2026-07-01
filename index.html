@@ -173,12 +173,14 @@ body { display:flex; flex-direction:column; }
 #hamburgerMenu {
   position: absolute;
   top: 90px;
-  right: 14px;   /* ✅ MOVED TO RIGHT SIDE */
-  left: auto;
+  right: 14px;
   z-index: 10000;
   font-family: Arial;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
-
+  
 #hamburgerBtn {
   width: 46px;
   height: 46px;
@@ -192,18 +194,19 @@ body { display:flex; flex-direction:column; }
   font-size:20px;
   cursor:pointer;
   color:white;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
 #menuPanel {
-  margin-top:10px;
+  margin-top: 10px;
   width: 260px;
-  display:none;
+  display: none;
   background: rgba(20,25,40,0.75);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 18px;
   backdrop-filter: blur(18px);
-  padding:10px;
+  padding: 10px;
+
+  text-align: left;
 }
 
 .menuItem {
@@ -212,7 +215,7 @@ body { display:flex; flex-direction:column; }
   cursor:pointer;
   color:white;
   font-size:13px;
-  position:relative;
+  position: relative; /* 🔥 REQUIRED for popup alignment */
 }
 
 .menuItem:hover {
@@ -242,15 +245,16 @@ body { display:flex; flex-direction:column; }
 
 .hoverPopup {
   position: absolute;
-  right: 100%;     /* pushes popup to the left of the menu item */
+  right: 100%;     /* 🔥 forces LEFT side */
   top: 0;
-  margin-right: 12px;  /* spacing between item and popup */
+  margin-right: 12px;
 
   width: 320px;
   background: rgba(15,20,30,0.92);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 18px;
   padding: 12px;
+
   display: none;
   backdrop-filter: blur(18px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.4);
@@ -1191,16 +1195,25 @@ hamburgerBtn.onclick = () => {
   menuPanel.style.display = menuPanel.style.display === "block" ? "none" : "block";
 };
 
-// Toggle Disaster Readiness submenu
 document.querySelectorAll(".menuItem").forEach(item => {
-  item.addEventListener("click", () => {
+  item.addEventListener("click", (e) => {
+    e.stopPropagation();
+
     const sub = item.querySelector(".subMenu");
-    if (sub) {
-      sub.style.display = sub.style.display === "block" ? "none" : "block";
-    }
+    if (!sub) return;
+
+    const isOpen = sub.style.display === "block";
+    document.querySelectorAll(".subMenu").forEach(s => s.style.display = "none");
+
+    sub.style.display = isOpen ? "none" : "block";
   });
 });
 
+// close when clicking outside
+document.addEventListener("click", () => {
+  document.querySelectorAll(".subMenu").forEach(s => s.style.display = "none");
+});
+  
 // Fill hover popups
 const faultPopup = document.getElementById("faultPopup");
 if (faultPopup) {
