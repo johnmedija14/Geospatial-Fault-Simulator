@@ -241,22 +241,24 @@ body { display:flex; flex-direction:column; }
 }
 
 .hoverPopup {
-  position:absolute;
-  left:270px;
-  top:0;
-  width:320px;
-  background: rgba(15,20,30,0.92);
-  border:1px solid rgba(255,255,255,0.12);
-  border-radius:18px;
-  padding:12px;
-  display:none;
-  backdrop-filter: blur(18px);
-  box-shadow:0 20px 40px rgba(0,0,0,0.4);
-  color:white;
-  font-size:12px;
-  line-height:1.4;
-}
+  position: absolute;
+  right: 100%;     /* pushes popup to the left of the menu item */
+  top: 0;
+  margin-right: 12px;  /* spacing between item and popup */
 
+  width: 320px;
+  background: rgba(15,20,30,0.92);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 12px;
+  display: none;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  color: white;
+  font-size: 12px;
+  line-height: 1.4;
+}
+  
 .hoverItem:hover .hoverPopup {
   display:block;
 }
