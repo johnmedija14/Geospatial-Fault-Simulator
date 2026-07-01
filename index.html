@@ -401,23 +401,34 @@ let scenarioMag = 7.2;
 let pulseEnabled = true;
 
 viewer.entities.add({
-  polyline: {
-    positions: new Cesium.CallbackProperty(() => {
-      const coords = [];
-      for (let i = 0; i < westValleyFault.length; i += 2) {
-        const lon = westValleyFault[i];
-        const lat = westValleyFault[i + 1];
-        const wave = Math.sin(Date.now() * 0.0008 + i) * 0.0005;
-        coords.push(lon + wave, lat, 100);
-      }
-      return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
-    }, false),
-    width: 6,
-    material: Cesium.Color.ORANGERED,
-    clampToGround: false
-  }
-});
+ polyline: {
+  positions: new Cesium.CallbackProperty(() => {
+    const coords = [];
 
+    for (let i = 0; i < westValleyFault.length; i += 2) {
+      const lon = westValleyFault[i];
+      const lat = westValleyFault[i + 1];
+
+      if (!isFinite(lon) || !isFinite(lat)) continue;
+
+      const wave = Math.sin(Date.now() * 0.0008 + i) * 0.00005;
+
+      coords.push(lon, lat + wave, 100);
+    }
+
+    return Cesium.Cartesian3.fromDegreesArrayHeights(coords);
+  }, false),
+
+  width: 6,
+  material: new Cesium.PolylineGlowMaterialProperty({
+    glowPower: 0.2,
+    color: Cesium.Color.ORANGERED
+  }),
+
+  clampToGround: false
+}
+});
+  
 function createFaultBuffer() {
   const bufferPointsLeft = [];
   const bufferPointsRight = [];
