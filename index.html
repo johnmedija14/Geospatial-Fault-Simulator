@@ -1258,8 +1258,10 @@ document.querySelectorAll(".subItem").forEach(sub => {
 
     popup.style.display = "block";
   };
+});
 
-  window.addEventListener("error", (e) => {
+// GLOBAL ERROR HANDLER (MOVE OUTSIDE LOOP)
+window.addEventListener("error", (e) => {
   console.error("GLOBAL ERROR:", e.message);
 
   const loader = document.getElementById("loadingScreen");
