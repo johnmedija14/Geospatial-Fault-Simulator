@@ -245,11 +245,11 @@ body { display:flex; flex-direction:column; }
 
 .hoverPopup {
   position: absolute;
-  right: 100%;     /* 🔥 forces LEFT side */
+  right: 100%;
   top: 0;
   margin-right: 12px;
-
   width: 320px;
+
   background: rgba(15,20,30,0.92);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 18px;
@@ -332,20 +332,38 @@ body { display:flex; flex-direction:column; }
 
     <div class="menuItem" data-panel="readiness">
       Disaster Readiness ▸
-      <div class="subMenu">
+     <div class="menuItem hoverItem" data-panel="readiness">
+  Disaster Readiness ▸
+  <div class="hoverPopup" id="readinessPopup">
+    <b>Disaster Readiness</b><br><br>
 
-        <div class="subItem" data-sub="before">Before Earthquake</div>
-        <div class="subItem" data-sub="during">During Earthquake</div>
-        <div class="subItem" data-sub="after">After Earthquake</div>
-        <div class="subItem" data-sub="home">Countermeasures at Home</div>
+    <b>Before Earthquake:</b><br>
+    Prepare emergency kit, secure furniture, plan exits.<br><br>
 
-      </div>
-    </div>
+    <b>During Earthquake:</b><br>
+    Drop-Cover-Hold, avoid windows, stay indoors.<br><br>
 
-    <div class="menuItem hoverItem" data-panel="hotlines">
-      Emergency Hotlines
-      <div class="hoverPopup" id="hotlinePopup"></div>
-    </div>
+    <b>After Earthquake:</b><br>
+    Check injuries, expect aftershocks, follow authorities.<br><br>
+
+    <b>At Home:</b><br>
+    Reinforce structures and conduct regular drills.
+  </div>
+</div>
+
+    <<div class="menuItem hoverItem" data-panel="hotlines">
+  Emergency Hotlines
+  <div class="hoverPopup" id="hotlinePopup">
+    <b>Emergency Hotlines (PH)</b><br><br>
+
+    📞 911 – National Emergency Hotline<br>
+    📞 Red Cross – 143<br>
+    📞 NDRRMC – (02) 8911-1406<br>
+    📞 PHIVOLCS – (02) 8426-1468<br><br>
+
+    Keep these numbers saved at all times.
+  </div>
+</div>
 
     <div class="menuItem hoverItem" data-panel="feedback">
       Feedback
@@ -1238,42 +1256,6 @@ document.getElementById("finderPopup").innerHTML = `
     Open Fault Finder
   </a>
 `;
-
-// Disaster readiness content generator
-const readinessContent = {
-  before: {
-    text: "Before an earthquake, prepare an emergency kit, secure heavy furniture, identify safe exits, and create communication plans.",
-    img: "https://scontent.fmnl17-7.fna.fbcdn.net/v/t1.6435-9/58377431_2004248789684009_3893949579711741952_n.png"
-  },
-  during: {
-    text: "During an earthquake, Drop-Cover-Hold, stay away from glass, and avoid running outside while shaking.",
-    img: "https://scontent.fmnl17-2.fna.fbcdn.net/v/t1.6435-9/57909039_2004248716350683_8320292628146946048_n.png"
-  },
-  after: {
-    text: "After an earthquake, check for injuries, expect aftershocks, avoid damaged structures, and follow official updates.",
-    img: "https://scontent.fmnl17-4.fna.fbcdn.net/v/t1.6435-9/58374701_2004248679684020_1929455465784147968_n.png"
-  },
-  home: {
-    text: "Secure cabinets, anchor appliances, store emergency supplies, reinforce weak structures, and practice drills regularly.",
-    img: "https://scontent.fmnl17-2.fna.fbcdn.net/v/t1.6435-9/57618357_2004248833017338_4696140554528882688_n.png"
-  }
-};
-
-const popup = document.getElementById("infoPopup");
-
-document.querySelectorAll(".subItem").forEach(sub => {
-  sub.onclick = () => {
-    const data = readinessContent[sub.dataset.sub];
-
-    popup.innerHTML = `
-      <b>${sub.textContent}</b><br><br>
-      ${data.text}
-      <img src="${data.img}" />
-    `;
-
-    popup.style.display = "block";
-  };
-});
 
 // GLOBAL ERROR HANDLER (MOVE OUTSIDE LOOP)
 window.addEventListener("error", (e) => {
