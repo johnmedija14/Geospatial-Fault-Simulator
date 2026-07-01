@@ -418,7 +418,7 @@ viewer.entities.add({
   }
 });
 
- createFaultBuffer() {
+function createFaultBuffer() {
   const bufferPointsLeft = [];
   const bufferPointsRight = [];
   for (let i = 0; i < westValleyFault.length; i += 2) {
@@ -509,14 +509,14 @@ const safeLocations = [
   { name: "Sunken Garden", lon: 121.0604, lat: 14.5847, type: "open space", reason: "Wide open area with reduced overhead hazard exposure.", accessNote: "Good assembly area for nearby communities." }
 ];
 
- intensityToMagnitude(intensity) {
+function intensityToMagnitude(intensity) {
   if (intensity === "IX") return scenarioMag;
   if (intensity === "VIII") return Math.max(6.7, scenarioMag - 0.5);
   if (intensity === "VII") return Math.max(6.2, scenarioMag - 1.0);
   return scenarioMag;
 }
 
- pulseParams(intensity) {
+ function pulseParams(intensity) {
   if (intensity === "IX") return { speed: 1.75, base: 260, alpha: 0.12 };
   if (intensity === "VIII") return { speed: 1.35, base: 210, alpha: 0.095 };
   return { speed: 1.05, base: 160, alpha: 0.075 };
@@ -527,7 +527,7 @@ const safeLocations = [
 }
 const affectedIcon = makeHazardPin(Cesium.Color.RED, "⚠");
 
- labelStyleByIntensity(intensity) {
+ function labelStyleByIntensity(intensity) {
   if (intensity === "IX") return { font: "19px sans-serif", color: Cesium.Color.fromCssColorString("#fff0f0"), scale: 1.18 };
   if (intensity === "VIII") return { font: "17px sans-serif", color: Cesium.Color.WHITE, scale: 1.12 };
   return { font: "15px sans-serif", color: Cesium.Color.fromCssColorString("#dbeafe"), scale: 1.06 };
@@ -622,41 +622,6 @@ function updateSelectedInfo(data, isSafe = false) {
   }
 
   hint.textContent = `Selected: ${data.name || "-"}`;
-
-  info.innerHTML = `
-    <div class="infoRow"><span>Location</span><span>${data.name || "-"}</span></div>
-    <div class="infoRow"><span>Region</span><span>${data.region || "-"}</span></div>
-    <div class="infoRow"><span>Population</span><span>${data.population || "-"}</span></div>
-    <div class="infoRow"><span>Intensity</span><span>${data.intensity || "-"}</span></div>
-    <div class="infoRow"><span>Rupture</span><span>${data.rupture || "-"}</span></div>
-    <div class="infoRow"><span>Liquefaction</span><span>${data.liquefaction || "-"}</span></div>
-  `;
-
-  const intensityMap = { "VII": 60, "VIII": 75, "IX": 92, "X": 100 };
-  const intensityLabels = {
-    "VII": "HIGH",
-    "VIII": "VERY HIGH",
-    "IX": "EXTREME",
-    "X": "CATASTROPHIC"
-  };
-
-  if (!isSafe && data.intensity) {
-    document.getElementById("intensityPointer").style.left =
-      (intensityMap[data.intensity] || 0) + "%";
-
-    document.getElementById("intensityText").innerHTML =
-      `Intensity ${data.intensity} — ${intensityLabels[data.intensity]}`;
-
-    if (data.intensity === "VII") setIntensityVisual("moderate");
-    else setIntensityVisual("high");
-
-  } else if (isSafe) {
-    document.getElementById("intensityPointer").style.left = "22%";
-    document.getElementById("intensityText").innerHTML =
-      "Safe Zone — LOW EXPOSURE";
-
-    setIntensityVisual("low");
-  }
 
   analysis.innerHTML = `
     <b>Automated Hazard Assessment</b><br><br>
